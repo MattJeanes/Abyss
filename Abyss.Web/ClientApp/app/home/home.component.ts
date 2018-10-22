@@ -7,7 +7,7 @@ import { AppService } from "../app.service";
     styleUrls: ["./home.style.scss"],
 })
 export class HomeComponent implements OnInit {
-    public appName: string = "Abyss.Web";
+    public appName: string = "Abyss";
     public count: number = 0;
     public values: string[] = [];
     constructor(private dialogService: TdDialogService, private appService: AppService) { }

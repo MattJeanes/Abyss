@@ -63,7 +63,7 @@ namespace Abyss.Web
             else
             {
                 app.UseExceptionHandler("/Home/Error");
-                //app.UseHsts();
+                app.UseHsts();
             }
 
             app.UseStaticFiles();
