@@ -1,4 +1,4 @@
-<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <IsPackable>false</IsPackable>
@@ -16,13 +16,13 @@
     <None Remove="wwwroot\dist\**" />
   </ItemGroup>
   <Target Name="NpmCommandsDebug" Condition="'$(Configuration)'=='Debug'" AfterTargets="Build">
-    <Exec Command="npm run vendor" />
+    <Exec Command="yarn run vendor" />
   </Target>
   <Target Name="NpmCommandsRelease" Condition="'$(Configuration)'=='Release'" AfterTargets="Build">
-    <Exec Command="npm run publish" />
+    <Exec Command="yarn run publish" />
   </Target>
   <Target Name="NpmCommandsClean" AfterTargets="Clean">
-    <Exec Command="npm run clean" />
+    <Exec Command="yarn run clean" />
   </Target>
   <Target Name="RunWebpack" AfterTargets="ComputeFilesToPublish">
     <ItemGroup>
