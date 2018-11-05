@@ -38,6 +38,7 @@ module.exports = (env: any) => {
                 "core-js/es6/object",
                 "core-js/es7/reflect",
                 "hammerjs",
+                "@auth0/angular-jwt",
             ]),
         },
         plugins: prod ? [] : [
