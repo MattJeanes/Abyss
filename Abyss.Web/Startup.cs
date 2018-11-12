@@ -16,6 +16,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Newtonsoft.Json.Serialization;
+using Abyss.Web.Managers;
+using Abyss.Web.Managers.Interfaces;
+using Abyss.Web.Data;
 
 namespace Abyss.Web
 {
@@ -68,11 +71,19 @@ namespace Abyss.Web
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                     };
                 })
-                .AddSteam(options =>
+                .AddSteam(AuthSchemes.Steam.Id, options =>
                 {
                     options.CallbackPath = "/auth/steam";
-                    options.ApplicationKey = Configuration["SteamApplicationKey"];
+                    options.ApplicationKey = Configuration["Authentication:Steam:ApplicationKey"];
+                })
+                .AddGoogle(AuthSchemes.Google.Id, options =>
+                {
+                    options.CallbackPath = "/auth/google";
+                    options.ClientId = Configuration["Authentication:Google:ClientId"];
+                    options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
                 });
+
+            services.AddTransient<IUserManager, UserManager>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>Login</h1>
+<div mat-dialog-content>
+    <p *ngIf="schemes">Please select a login provider</p>
+    <p *ngIf="!schemes">Loading..</p>
+    <mat-form-field *ngIf="schemes">
+        <mat-select placeholder="Please select" [(value)]="selected">
+            <mat-option *ngFor="let scheme of schemes" [value]="scheme.Id">
+                {{scheme.Name}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div mat-dialog-actions>
+    <button mat-button (click)="dialogRef.close()">Cancel</button>
+    <button mat-button [mat-dialog-close]="selected" [disabled]="!selected" cdkFocusInitial>Login</button>
+</div>

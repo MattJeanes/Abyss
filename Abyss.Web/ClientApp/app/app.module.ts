@@ -11,8 +11,14 @@ import { AppService } from "./app.service";
 import { PageNotFoundComponent } from "./errors/not-found.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login.component";
+import { LoginDialogComponent } from "./shared/login-dialog.component";
 
-import { MatButtonModule, MatSliderModule } from "@angular/material";
+import {
+    MatButtonModule,
+    MatDialogModule,
+    MatSelectModule,
+    MatSliderModule,
+} from "@angular/material";
 
 import { CovalentDialogsModule } from "@covalent/core";
 
@@ -22,7 +28,7 @@ export function JwtTokenGetter(): string {
 
 export const ROUTES: Routes = [
     { path: "", component: HomeComponent },
-    { path: "login", component: LoginComponent },
+    { path: "login/:scheme", component: LoginComponent },
     { path: "test", loadChildren: "./test/test.module#TestModule" },
     { path: "**", component: PageNotFoundComponent },
 ];
@@ -42,12 +48,18 @@ export const ROUTES: Routes = [
                 tokenGetter: JwtTokenGetter,
             },
         }),
+        MatSelectModule,
+        MatDialogModule,
     ],
     declarations: [
         AppComponent,
         HomeComponent,
         PageNotFoundComponent,
         LoginComponent,
+        LoginDialogComponent,
+    ],
+    entryComponents: [
+        LoginDialogComponent,
     ],
     bootstrap: [AppComponent],
     providers: [

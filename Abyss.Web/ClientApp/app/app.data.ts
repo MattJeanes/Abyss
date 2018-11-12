@@ -3,6 +3,11 @@ export interface IAuthResult {
 }
 
 export interface IUser {
+    Id: string;
     Name: string;
-    SteamId: string;
+}
+
+export interface IAuthScheme {
+    Id: string;
+    Name: string;
 }
