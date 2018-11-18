@@ -12,6 +12,7 @@ namespace Abyss.Web.Repositories.Interfaces
         Task AddOrUpdate(T item);
         Task Add(T item);
         Task Update(T item);
+        Task Remove(T item);
         Task Remove(ObjectId id);
     }
 }

@@ -60,6 +60,11 @@ namespace Abyss.Web.Repositories
             await _repository.ReplaceOneAsync(filter, item);
         }
 
+        public async Task Remove(T item)
+        {
+            await Remove(item.Id);
+        }
+
         public async Task Remove(ObjectId id)
         {
             var filter = Builders<T>.Filter.Eq(s => s.Id, id);

@@ -27,12 +27,19 @@ namespace Abyss.Web.Managers
         public async Task<User> GetUser(HttpContext httpContext, string schemeId)
         {
             var user = await _userHelper.GetUser(httpContext);
-
             var (username, identifier) = GetUsernameAndIdentifier(httpContext, schemeId);
-
-            if (user == null)
+            var oAuthUser = await _userRepository.GetByOAuthIdentifierAsync(schemeId, identifier);
+            if (oAuthUser != null)
             {
-                user = await _userRepository.GetByOAuthIdentifierAsync(schemeId, identifier);
+                if (user == null)
+                {
+                    user = oAuthUser;
+                }
+                else if (user.Id != oAuthUser.Id)
+                {
+                    await MergeUsers(user, oAuthUser);
+                    user = oAuthUser;
+                }
             }
             if (user == null)
             {
@@ -86,6 +93,13 @@ namespace Abyss.Web.Managers
             }
             user.Authentication.Remove(schemeId);
             await _userRepository.Update(user);
+        }
+
+        public async Task MergeUsers(User userFrom, User userTo)
+        {
+            userFrom.Authentication.ToList().ForEach(x => userTo.Authentication[x.Key] = x.Value);
+            await _userRepository.Update(userTo);
+            await _userRepository.Remove(userFrom);
         }
     }
 }
