@@ -21,7 +21,7 @@ export class AccountDialogComponent implements OnInit {
     public get onlyScheme() {
         return Object.keys(this.userSchemes).length <= 1;
     }
-    constructor(public dialogRef: MatDialogRef<AccountDialogComponent>, private authService: AuthService, public userService: UserService) { }
+    constructor(public dialogRef: MatDialogRef<AccountDialogComponent>, public authService: AuthService, public userService: UserService) { }
 
     public async ngOnInit() {
         this.schemes = await this.authService.getAuthSchemes();
