@@ -8,12 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Controllers
 {
-    [Route("auth")]
+    [Route("api/auth")]
     public class AuthenticationController : BaseController
     {
         private readonly IUserManager _userManager;
@@ -51,22 +50,16 @@ namespace Abyss.Web.Controllers
             return result;
         }
 
-        [Authorize]
-        [Route("username")]
-        [HttpPost]
-        public async Task<AuthResult> ChangeUsername()
+        [HttpDelete]
+        [Route("{schemeId}")]
+        public async Task<AuthResult> DeleteAuthScheme(string schemeId)
         {
-            using (var reader = new StreamReader(Request.Body))
+            var user = await GetUser();
+            await _userManager.DeleteAuthScheme(user, schemeId);
+            return new AuthResult
             {
-                var username = await reader.ReadToEndAsync();
-                var user = await GetUser();
-                await _userManager.ChangeUsername(user, username);
-                var newToken = _userHelper.GetToken(user);
-                return new AuthResult
-                {
-                    Token = newToken
-                };
-            }
+                Token = _userHelper.GetToken(user)
+            };
         }
     }
 }

@@ -8,5 +8,6 @@ namespace Abyss.Web.Managers.Interfaces
     {
         Task<User> GetUser(HttpContext httpContext, string schemeId);
         Task ChangeUsername(User user, string username);
+        Task DeleteAuthScheme(User user, string schemeId);
     }
 }

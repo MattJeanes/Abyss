@@ -4,12 +4,12 @@
 @include mat-core();
 @include covalent-core();
 
-$primary: mat-palette($mat-blue, 800);
-$accent: mat-palette($mat-light-blue, 600, A100, A400);
+$primary: mat-palette($mat-indigo, 600);
+$accent: mat-palette($mat-blue, 600, A100, A400);
 
-$warn: mat-palette($mat-red, 600);
+$warn: mat-palette($mat-red, 900);
 
-$theme: mat-light-theme($primary, $accent, $warn);
+$theme: mat-dark-theme($primary, $accent, $warn);
 
 @include angular-material-theme($theme);
 @include covalent-theme($theme);

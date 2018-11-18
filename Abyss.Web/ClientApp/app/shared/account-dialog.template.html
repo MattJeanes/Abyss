@@ -1,0 +1,18 @@
+<h1 class="title" mat-dialog-title>{{user ? user.Name : 'Please login'}}</h1>
+<div mat-dialog-content>
+    <button mat-raised-button color="primary" (click)="userService.changeUsername()" [disabled]="!authService.isLoggedIn()">Change username</button>
+    <p class="schemes">{{schemes ? 'Auth schemes:' : 'Loading..'}}</p>
+    <mat-list *ngIf="schemes">
+        <mat-list-item *ngFor="let scheme of schemes">
+            <img class="provider-icon" [ngClass]="{'provider-loggedin':userSchemes[scheme.Id]}" src="{{scheme.IconUrl}}" alt="{{scheme.Name}}"
+                 matTooltip="{{scheme.Name}}{{userSchemes[scheme.Id] ? ' (click to open profile)' : ''}}" matTooltipPosition="left" (click)="openProfile(scheme)" />
+            <button *ngIf="!userSchemes[scheme.Id]" class="button" mat-raised-button color="primary" (click)="login(scheme.Id)">Login</button>
+            <button *ngIf="userSchemes[scheme.Id]" class="button" mat-raised-button color="warn" (click)="authService.deleteAuthScheme(scheme.Id)" [disabled]="onlyScheme" [matTooltip]="onlyScheme ? 'You must have at least one login provider active' : 'Delete the ' + scheme.Name + ' login provider'">Delete</button>
+        </mat-list-item>
+    </mat-list>
+    <!--<pre>{{authService.getUser() | json}}</pre>-->
+</div>
+<div mat-dialog-actions>
+    <button mat-raised-button color="primary" (click)="dialogRef.close()">Close</button>
+    <button mat-raised-button color="accent" (click)="authService.logout(); dialogRef.close()" [disabled]="!authService.isLoggedIn()">Logout</button>
+</div>

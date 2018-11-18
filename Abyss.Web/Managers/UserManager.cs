@@ -4,9 +4,8 @@ using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
-using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -72,6 +71,20 @@ namespace Abyss.Web.Managers
         public async Task ChangeUsername(User user, string username)
         {
             user.Name = username;
+            await _userRepository.Update(user);
+        }
+
+        public async Task DeleteAuthScheme(User user, string schemeId)
+        {
+            if (user.Authentication.Count <= 1)
+            {
+                throw new Exception("Cannot remove only auth provider");
+            }
+            else if (!user.Authentication.ContainsKey(schemeId))
+            {
+                throw new Exception($"User does not have {schemeId} auth provider");
+            }
+            user.Authentication.Remove(schemeId);
             await _userRepository.Update(user);
         }
     }

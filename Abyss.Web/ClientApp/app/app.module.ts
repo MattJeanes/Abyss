@@ -7,17 +7,22 @@ import { RouterModule, Routes } from "@angular/router";
 import { JwtModule } from "@auth0/angular-jwt";
 
 import { AppComponent } from "./app.component";
-import { AppService } from "./app.service";
 import { PageNotFoundComponent } from "./errors/not-found.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login.component";
-import { LoginDialogComponent } from "./shared/login-dialog.component";
+import { AuthService } from "./services/auth.service";
+import { UserService } from "./services/user.service";
+import { AccountDialogComponent } from "./shared/account-dialog.component";
+import { UserManagerComponent } from "./usermanager/usermanager.component";
 
 import {
     MatButtonModule,
     MatDialogModule,
+    MatIconModule,
+    MatListModule,
     MatSelectModule,
     MatSliderModule,
+    MatTooltipModule,
 } from "@angular/material";
 
 import {
@@ -31,7 +36,7 @@ export function JwtTokenGetter(): string {
 export const ROUTES: Routes = [
     { path: "", component: HomeComponent },
     { path: "login/:scheme", component: LoginComponent },
-    { path: "test", loadChildren: "./test/test.module#TestModule" },
+    { path: "usermanager", component: UserManagerComponent },
     { path: "**", component: PageNotFoundComponent },
 ];
 
@@ -53,20 +58,25 @@ export const ROUTES: Routes = [
         MatSelectModule,
         MatDialogModule,
         CovalentDialogsModule,
+        MatListModule,
+        MatTooltipModule,
+        MatIconModule,
     ],
     declarations: [
         AppComponent,
         HomeComponent,
         PageNotFoundComponent,
         LoginComponent,
-        LoginDialogComponent,
+        AccountDialogComponent,
+        UserManagerComponent,
     ],
     entryComponents: [
-        LoginDialogComponent,
+        AccountDialogComponent,
     ],
     bootstrap: [AppComponent],
     providers: [
-        AppService,
+        AuthService,
+        UserService,
     ],
 })
 export class AppModule { }

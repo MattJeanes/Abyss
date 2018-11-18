@@ -1,14 +1,1 @@
-<h1>{{appName}}</h1>
-<h2>Yeah, we're a little WIP right now</h2>
-<a routerLink="/test" routerLinkActive="active">Test Page</a>
-<br />
-<br />
-<button mat-raised-button color="primary" (click)="appService.login()">{{appService.isLoggedIn() ? "Add auth method" : "Login"}}</button>
-&nbsp;
-<button mat-raised-button color="primary" (click)="appService.logout()" [disabled]="!appService.isLoggedIn()">Logout</button>
-&nbsp;
-<button mat-raised-button color="primary" (click)="appService.changeUsername()" [disabled]="!appService.isLoggedIn()">Change username</button>
-<br />
-<h1 *ngIf="appService.isLoggedIn()">You're logged in as {{username}}. Hi!</h1>
-<h1 *ngIf="!appService.isLoggedIn()">You're not logged in.</h1>
-<pre>{{appService.getUser() | json}}</pre>
+<h1>Hey! This site is currently WIP but feel free to login.</h1>

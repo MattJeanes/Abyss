@@ -25,6 +25,11 @@ if (module.hot) {
         if (modulePromise) {
             modulePromise.then(appModule => appModule.destroy());
         }
+        // removes any material dialogs hanging around
+        const elements = document.getElementsByClassName("cdk-overlay-container") as any as HTMLElement[]; // https://github.com/Microsoft/TypeScript/issues/5329
+        for (const el of elements) {
+            el.parentElement!.removeChild(el);
+        }
     });
 } else {
     enableProdMode();

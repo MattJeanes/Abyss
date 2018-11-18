@@ -1,1 +1,12 @@
-<router-outlet></router-outlet>
+<div class="wrapper">
+    <div class="content">
+        <div class="header">
+            <span class="title">Abyss</span>
+            <span class="spacer"></span>
+            <a mat-icon-button (click)="showAccountDialog()" matTooltip="{{authService.isLoggedIn() ? 'Logged in as ' + username : 'Login'}}">
+                <mat-icon>account_circle</mat-icon>
+            </a>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+</div>
