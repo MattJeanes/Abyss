@@ -19,11 +19,20 @@ using Newtonsoft.Json.Serialization;
 using Abyss.Web.Managers;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Data;
+using Abyss.Web.Contexts;
+using Abyss.Web.Contexts.Interfaces;
+using MongoDB.Driver;
+using Abyss.Web.Repositories.Interfaces;
+using Abyss.Web.Repositories;
+using Abyss.Web.Helpers;
+using Abyss.Web.Helpers.Interfaces;
 
 namespace Abyss.Web
 {
     public class Startup
     {
+        public readonly IConfiguration _config;
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -31,10 +40,8 @@ namespace Abyss.Web
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            Configuration = builder.Build();
+            _config = builder.Build();
         }
-
-        public IConfigurationRoot Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
@@ -66,29 +73,36 @@ namespace Abyss.Web
                         ValidateAudience = true,
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
-                        ValidIssuer = Configuration["Jwt:Issuer"],
-                        ValidAudience = Configuration["Jwt:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                        ValidIssuer = _config["Jwt:Issuer"],
+                        ValidAudience = _config["Jwt:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]))
                     };
                 })
                 .AddSteam(AuthSchemes.Steam.Id, options =>
                 {
                     options.CallbackPath = "/auth/steam";
-                    options.ApplicationKey = Configuration["Authentication:Steam:ApplicationKey"];
+                    options.ApplicationKey = _config["Authentication:Steam:ApplicationKey"];
                 })
                 .AddGoogle(AuthSchemes.Google.Id, options =>
                 {
                     options.CallbackPath = "/auth/google";
-                    options.ClientId = Configuration["Authentication:Google:ClientId"];
-                    options.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
+                    options.ClientId = _config["Authentication:Google:ClientId"];
+                    options.ClientSecret = _config["Authentication:Google:ClientSecret"];
                 });
 
             services.AddTransient<IUserManager, UserManager>();
+            services.AddTransient<IAbyssContext, AbyssContext>();
+            services.AddTransient<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
+            services.AddTransient(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
+            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IUserHelper, UserHelper>();
+            services.Configure<JwtOptions>(_config.GetSection("Jwt"));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddConsole(_config.GetSection("Logging"));
             loggerFactory.AddDebug();
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions

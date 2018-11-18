@@ -20,7 +20,9 @@ import {
     MatSliderModule,
 } from "@angular/material";
 
-import { CovalentDialogsModule } from "@covalent/core";
+import {
+    CovalentDialogsModule,
+} from "@covalent/core";
 
 export function JwtTokenGetter(): string {
     return localStorage.token;
@@ -50,6 +52,7 @@ export const ROUTES: Routes = [
         }),
         MatSelectModule,
         MatDialogModule,
+        CovalentDialogsModule,
     ],
     declarations: [
         AppComponent,

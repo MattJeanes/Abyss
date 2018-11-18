@@ -3,7 +3,12 @@
 <a routerLink="/test" routerLinkActive="active">Test Page</a>
 <br />
 <br />
-<button mat-raised-button color="primary" (click)="loginOrOut()">{{appService.isLoggedIn() ? "Logout" : "Login"}}</button>
+<button mat-raised-button color="primary" (click)="appService.login()">{{appService.isLoggedIn() ? "Add auth method" : "Login"}}</button>
+&nbsp;
+<button mat-raised-button color="primary" (click)="appService.logout()" [disabled]="!appService.isLoggedIn()">Logout</button>
+&nbsp;
+<button mat-raised-button color="primary" (click)="appService.changeUsername()" [disabled]="!appService.isLoggedIn()">Change username</button>
 <br />
-<h1>{{appService.isLoggedIn() ? "You're logged in" : "Not logged in"}}</h1>
+<h1 *ngIf="appService.isLoggedIn()">You're logged in as {{username}}. Hi!</h1>
+<h1 *ngIf="!appService.isLoggedIn()">You're not logged in.</h1>
 <pre>{{appService.getUser() | json}}</pre>

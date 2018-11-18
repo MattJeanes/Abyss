@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Abyss.Web.Entities;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
 
 namespace Abyss.Web.Managers.Interfaces
 {
     public interface IUserManager
     {
-        string GetToken(HttpContext httpContext, string schemeId);
+        Task<User> GetUser(HttpContext httpContext, string schemeId);
+        Task ChangeUsername(User user, string username);
     }
 }

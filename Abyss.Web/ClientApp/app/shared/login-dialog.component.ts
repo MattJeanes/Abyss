@@ -7,7 +7,6 @@ import { IAuthScheme } from "../app.data";
 
 @Component({
     templateUrl: "./login-dialog.template.html",
-    styleUrls: ["./login-dialog.style.scss"],
 })
 export class LoginDialogComponent implements OnInit {
     public schemes: IAuthScheme[];

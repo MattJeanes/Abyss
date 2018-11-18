@@ -9,14 +9,15 @@ import { AppService } from "../app.service";
 export class HomeComponent {
 
     public appName: string = "Abyss";
+    public get username() {
+        const user = this.appService.getUser();
+        if (user) {
+            return user.Name;
+        } else {
+            return undefined;
+        }
+    }
     public count: number = 0;
     public values: string[] = [];
     constructor(public appService: AppService) { }
-    public loginOrOut() {
-        if (this.appService.isLoggedIn()) {
-            this.appService.logout();
-        } else {
-            this.appService.login();
-        }
-    }
 }
