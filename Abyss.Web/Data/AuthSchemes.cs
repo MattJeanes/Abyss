@@ -4,6 +4,15 @@ namespace Abyss.Web.Data
 {
     public static class AuthSchemes
     {
+        // Internal schemes
+
+        public const string JsonWebToken = "JsonWebToken";
+
+        public const string ExternalLogin = "ExternalLogin";
+
+        public const string RefreshToken = "RefreshToken";
+
+        // External schemes 
         public static AuthScheme Steam = new AuthScheme
         {
             Id = "steam",
@@ -20,7 +29,7 @@ namespace Abyss.Web.Data
             IconUrl = "/images/google.png"
         };
 
-        public static List<AuthScheme> All = new List<AuthScheme>
+        public static List<AuthScheme> ExternalSchemes = new List<AuthScheme>
         {
             Steam,
             Google,

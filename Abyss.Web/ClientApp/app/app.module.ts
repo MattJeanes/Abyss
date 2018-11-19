@@ -1,4 +1,4 @@
-import { HttpClientModule } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
@@ -10,6 +10,8 @@ import { AppComponent } from "./app.component";
 import { PageNotFoundComponent } from "./errors/not-found.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login.component";
+import { AuthGuard } from "./services/auth.guard";
+import { AuthInterceptor } from "./services/auth.interceptor";
 import { AuthService } from "./services/auth.service";
 import { UserService } from "./services/user.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
@@ -36,7 +38,7 @@ export function JwtTokenGetter(): string {
 export const ROUTES: Routes = [
     { path: "", component: HomeComponent },
     { path: "login/:scheme", component: LoginComponent },
-    { path: "usermanager", component: UserManagerComponent },
+    { path: "usermanager", component: UserManagerComponent, canActivate: [AuthGuard], data: { permissions: "UserManager" } },
     { path: "**", component: PageNotFoundComponent },
 ];
 
@@ -77,6 +79,12 @@ export const ROUTES: Routes = [
     providers: [
         AuthService,
         UserService,
+        AuthGuard,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true,
+        },
     ],
 })
 export class AppModule { }

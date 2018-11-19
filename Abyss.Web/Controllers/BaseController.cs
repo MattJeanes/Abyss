@@ -19,7 +19,7 @@ namespace Abyss.Web.Controllers
 
         public async Task<User> GetUser()
         {
-            return await _userHelper.GetUser(HttpContext);
+            return await _userHelper.GetUser();
         }
     }
 }

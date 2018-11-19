@@ -3,7 +3,7 @@ import { Injectable } from "@angular/core";
 import { TdDialogService } from "@covalent/core";
 import { first } from "rxjs/operators";
 
-import { IAuthResult } from "../app.data";
+import { IAuthResult, IUser } from "../app.data";
 import { AuthService } from "./auth.service";
 
 @Injectable()
@@ -24,7 +24,14 @@ export class UserService {
         }
         if (!username || username === currentUsername) { return; }
         console.log(`Changing username to ${username}`);
-        const newToken = await this.httpClient.post<IAuthResult>(`/api/user/username`, username).pipe(first()).toPromise();
-        this.authService.setToken(newToken.Token);
+        const result = await this.httpClient.post<IAuthResult>(`/api/user/username`, username).pipe(first()).toPromise();
+        this.authService.setToken(result.Token);
+    }
+    public getUsers() {
+        return this.httpClient.get<IUser[]>("/api/user").pipe(first()).toPromise();
+    }
+    public async deleteAuthScheme(schemeId: string) {
+        const result = await this.httpClient.delete<IAuthResult>(`/api/user/scheme/${schemeId}`).pipe(first()).toPromise();
+        this.authService.setToken(result.Token);
     }
 }

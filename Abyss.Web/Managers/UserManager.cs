@@ -15,30 +15,31 @@ namespace Abyss.Web.Managers
 {
     public class UserManager : IUserManager
     {
-        public readonly IUserHelper _userHelper;
+        private readonly IUserHelper _userHelper;
         private readonly IUserRepository _userRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserManager(IUserHelper userHelper, IUserRepository userRepository)
+        public UserManager(IUserHelper userHelper, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
         {
             _userHelper = userHelper;
             _userRepository = userRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<User> GetUser(HttpContext httpContext, string schemeId)
+        public async Task<string> Login(string schemeId)
         {
-            var user = await _userHelper.GetUser(httpContext);
-            var (username, identifier) = GetUsernameAndIdentifier(httpContext, schemeId);
-            var oAuthUser = await _userRepository.GetByOAuthIdentifierAsync(schemeId, identifier);
-            if (oAuthUser != null)
+            var user = await _userHelper.GetUser();
+            var (username, identifier) = GetUsernameAndIdentifier(schemeId);
+            var externalUser = await _userRepository.GetByExternalIdentifier(schemeId, identifier);
+            if (externalUser != null)
             {
                 if (user == null)
                 {
-                    user = oAuthUser;
+                    user = externalUser;
                 }
-                else if (user.Id != oAuthUser.Id)
+                else if (user.Id != externalUser.Id)
                 {
-                    await MergeUsers(user, oAuthUser);
-                    user = oAuthUser;
+                    user = await MergeUsers(user, externalUser);
                 }
             }
             if (user == null)
@@ -58,13 +59,12 @@ namespace Abyss.Web.Managers
                 user.Authentication[schemeId] = identifier;
                 await _userRepository.Update(user);
             }
-
-            return user;
+            return await _userHelper.GetAccessToken(user);
         }
 
-        private (string username, string identifier) GetUsernameAndIdentifier(HttpContext httpContext, string schemeId)
+        private (string username, string identifier) GetUsernameAndIdentifier(string schemeId)
         {
-            var user = httpContext.User;
+            var user = _httpContextAccessor.HttpContext.User;
             var username = user.Claims.First(x => x.Type == ClaimTypes.Name).Value;
             var identifier = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
             if (schemeId == AuthSchemes.Steam.Id)
@@ -75,13 +75,14 @@ namespace Abyss.Web.Managers
             return (username, identifier);
         }
 
-        public async Task ChangeUsername(User user, string username)
+        public async Task<string> ChangeUsername(User user, string username)
         {
             user.Name = username;
             await _userRepository.Update(user);
+            return await _userHelper.GetAccessToken(user);
         }
 
-        public async Task DeleteAuthScheme(User user, string schemeId)
+        public async Task<string> DeleteAuthScheme(User user, string schemeId)
         {
             if (user.Authentication.Count <= 1)
             {
@@ -93,13 +94,27 @@ namespace Abyss.Web.Managers
             }
             user.Authentication.Remove(schemeId);
             await _userRepository.Update(user);
+            return await _userHelper.GetAccessToken(user);
         }
 
-        public async Task MergeUsers(User userFrom, User userTo)
+        private async Task<User> MergeUsers(User userFrom, User userTo)
         {
             userFrom.Authentication.ToList().ForEach(x => userTo.Authentication[x.Key] = x.Value);
             await _userRepository.Update(userTo);
             await _userRepository.Remove(userFrom);
+            return userTo;
+        }
+
+        public async Task<string> RefreshAccessToken()
+        {
+            var refreshTokenCookie = _httpContextAccessor.HttpContext.Request.Cookies.FirstOrDefault(x => x.Key == AuthSchemes.RefreshToken);
+            var user = await _userHelper.VerifyRefreshToken(refreshTokenCookie.Value);
+            return await _userHelper.GetAccessToken(user);
+        }
+
+        public async Task Logout(bool allSessions)
+        {
+            await _userHelper.Logout(allSessions);
         }
     }
 }

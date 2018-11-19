@@ -56,16 +56,19 @@ namespace Abyss.Web
             services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                    options.DefaultChallengeScheme = SteamAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultScheme = AuthSchemes.JsonWebToken;
                 })
-                .AddCookie(options =>
+                .AddCookie(AuthSchemes.ExternalLogin, options =>
                 {
-                    options.LoginPath = "/auth/login";
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(1); // JWT takes over after initial authentication
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(_config.GetValue<int>("Authentication:ExternalLogin:ValidMinutes"));
+                    options.Cookie.Name = AuthSchemes.ExternalLogin;
                 })
-                .AddJwtBearer(options =>
+                .AddCookie(AuthSchemes.RefreshToken, options =>
+                {
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(_config.GetValue<int>("Authentication:RefreshToken:ValidMinutes"));
+                    options.Cookie.Name = AuthSchemes.RefreshToken;
+                })
+                .AddJwtBearer(AuthSchemes.JsonWebToken, options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
@@ -74,20 +77,23 @@ namespace Abyss.Web
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = _config["Jwt:Issuer"],
-                        ValidAudience = _config["Jwt:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]))
+                        ValidAudience = TokenType.Access.ToString(),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])),
+                        ClockSkew = TimeSpan.FromHours(DateTime.Now.Hour - DateTimeOffset.UtcNow.Hour)
                     };
                 })
                 .AddSteam(AuthSchemes.Steam.Id, options =>
                 {
                     options.CallbackPath = "/auth/steam";
                     options.ApplicationKey = _config["Authentication:Steam:ApplicationKey"];
+                    options.SignInScheme = AuthSchemes.ExternalLogin;
                 })
                 .AddGoogle(AuthSchemes.Google.Id, options =>
                 {
                     options.CallbackPath = "/auth/google";
                     options.ClientId = _config["Authentication:Google:ClientId"];
                     options.ClientSecret = _config["Authentication:Google:ClientSecret"];
+                    options.SignInScheme = AuthSchemes.ExternalLogin;
                 });
 
             services.AddTransient<IUserManager, UserManager>();
@@ -98,6 +104,8 @@ namespace Abyss.Web
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserHelper, UserHelper>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
+            services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
+            services.AddHttpContextAccessor();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -113,7 +121,6 @@ namespace Abyss.Web
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
@@ -131,6 +138,8 @@ namespace Abyss.Web
             }
 
             app.UseAuthentication();
+
+            app.UseErrorHandlingMiddleware();
 
             app.UseStaticFiles();
 

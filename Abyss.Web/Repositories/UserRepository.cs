@@ -10,7 +10,7 @@ namespace Abyss.Web.Repositories
     {
         public UserRepository(IAbyssContext context) : base(context) { }
 
-        public async Task<User> GetByOAuthIdentifierAsync(string schemeId, string identifier)
+        public async Task<User> GetByExternalIdentifier(string schemeId, string identifier)
         {
             var builders = Builders<User>.Filter;
             var filter = builders.Eq($"{nameof(User.Authentication)}.{schemeId}", identifier);

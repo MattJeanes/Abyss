@@ -8,6 +8,6 @@ namespace Abyss.Web.Repositories.Interfaces
 {
     public interface IUserRepository : IRepository<User>
     {
-        Task<User> GetByOAuthIdentifierAsync(string schemeId, string identifier);
+        Task<User> GetByExternalIdentifier(string schemeId, string identifier);
     }
 }
