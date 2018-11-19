@@ -115,7 +115,8 @@ namespace Abyss.Web.Helpers
                 HttpOnly = true,
                 IsEssential = true,
                 SameSite = SameSiteMode.Strict,
-                Secure = true
+                Secure = true,
+                Expires = entity.Expiry
             });
             return entity;
         }
