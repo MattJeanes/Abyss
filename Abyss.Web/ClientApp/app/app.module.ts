@@ -4,7 +4,7 @@ import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule, Routes } from "@angular/router";
-import { JwtModule } from "@auth0/angular-jwt";
+import { JWT_OPTIONS, JwtHelperService, JwtInterceptor } from "@auth0/angular-jwt";
 
 import { AppComponent } from "./app.component";
 import { PageNotFoundComponent } from "./errors/not-found.component";
@@ -52,11 +52,6 @@ export const ROUTES: Routes = [
         MatButtonModule,
         MatSliderModule,
         CovalentDialogsModule,
-        JwtModule.forRoot({
-            config: {
-                tokenGetter: JwtTokenGetter,
-            },
-        }),
         MatSelectModule,
         MatDialogModule,
         CovalentDialogsModule,
@@ -85,6 +80,18 @@ export const ROUTES: Routes = [
             useClass: AuthInterceptor,
             multi: true,
         },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: JwtInterceptor,
+            multi: true,
+        },
+        {
+            provide: JWT_OPTIONS,
+            useValue: {
+                tokenGetter: JwtTokenGetter,
+            },
+        },
+        JwtHelperService,
     ],
 })
 export class AppModule { }

@@ -15,7 +15,9 @@ export class AppComponent implements OnInit {
 
     public async ngOnInit() {
         try {
-            await this.authService.getNewToken();
+            if (this.authService.isLoggedIn()) {
+                await this.authService.getNewToken();
+            }
         } catch (e) {
             this.dialogService.openAlert({
                 title: "Failed to get new auth token, forcing logout",
