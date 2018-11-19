@@ -1,7 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Abyss.Web.Contexts;
+using Abyss.Web.Contexts.Interfaces;
+using Abyss.Web.Data;
+using Abyss.Web.Helpers;
+using Abyss.Web.Helpers.Interfaces;
+using Abyss.Web.Managers;
+using Abyss.Web.Managers.Interfaces;
+using Abyss.Web.Repositories;
+using Abyss.Web.Repositories.Interfaces;
+using Abyss.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,22 +16,11 @@ using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using AspNet.Security.OpenId.Steam;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Newtonsoft.Json.Serialization;
-using Abyss.Web.Managers;
-using Abyss.Web.Managers.Interfaces;
-using Abyss.Web.Data;
-using Abyss.Web.Contexts;
-using Abyss.Web.Contexts.Interfaces;
 using MongoDB.Driver;
-using Abyss.Web.Repositories.Interfaces;
-using Abyss.Web.Repositories;
-using Abyss.Web.Helpers;
-using Abyss.Web.Helpers.Interfaces;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Text;
 
 namespace Abyss.Web
 {
@@ -105,7 +100,9 @@ namespace Abyss.Web
             services.AddTransient<IUserHelper, UserHelper>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
+            services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
             services.AddHttpContextAccessor();
+            services.AddHostedService<CleanupService>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -34,6 +36,18 @@ namespace Abyss.Web.Helpers
 
         private static Task HandleException(HttpContext context, Exception exception)
         {
+            try
+            {
+                var logger = context.RequestServices.GetService<ILogger<ErrorHandlingMiddleware>>();
+                if (logger != null)
+                {
+                    logger.LogError(exception, nameof(ErrorHandlingMiddleware));
+                }
+            }
+            catch
+            {
+                // don't want to blow up if logging the error fails
+            }
             var code = GetStatusCodeForException(exception);
             var result = GetErrorResponse(exception);
             context.Response.ContentType = "application/json";
