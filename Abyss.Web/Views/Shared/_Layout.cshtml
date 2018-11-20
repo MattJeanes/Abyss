@@ -1,20 +1,21 @@
 ﻿<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Abyss</title>
-        <base href="/" />
-        <link rel="stylesheet" href="~/loading.css" asp-append-version="true" />
-    </head>
-    <body>
-        @RenderBody()
-        @* Uncomment the below line to enable vendor styles if defined in webpack.config.vendor.ts *@
-        @* <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" /> *@
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        <environment include="Development">
-            <script src="~/dist/vendor.js" asp-append-version="true"></script>
-        </environment>
-        <script src="~/dist/app.js" asp-append-version="true"></script>
-    </body>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Abyss</title>
+    <base href="/" />
+    <link rel="stylesheet" href="~/loading.css" asp-append-version="true" />
+    <partial name="_Favicons.cshtml" />
+</head>
+<body>
+    @RenderBody()
+    @* Uncomment the below line to enable vendor styles if defined in webpack.config.vendor.ts *@
+    @* <link rel="stylesheet" href="~/dist/vendor.css" asp-append-version="true" /> *@
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <environment include="Development">
+        <script src="~/dist/vendor.js" asp-append-version="true"></script>
+    </environment>
+    <script src="~/dist/app.js" asp-append-version="true"></script>
+</body>
 </html>
