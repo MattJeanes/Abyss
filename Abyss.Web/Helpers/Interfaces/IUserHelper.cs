@@ -10,6 +10,7 @@ namespace Abyss.Web.Helpers.Interfaces
         Task<User> GetUser();
         Task<User> GetUser(ClientUser clientUser);
         Task<ClientUser> GetClientUser(User user);
+        ClientUser GetClientUser();
         Task<string> GetAccessToken(User user);
         Task<(string token, RefreshToken entity)> GetRefreshToken(User user);
         Task<RefreshToken> AddRefreshToken(User user, RefreshToken currentToken);
@@ -17,5 +18,6 @@ namespace Abyss.Web.Helpers.Interfaces
         Task<User> VerifyRefreshToken(string token);
         Task Logout(bool allSessions);
         Task<RefreshToken> GetCurrentRefreshToken();
+        bool HasPermission(string permission);
     }
 }

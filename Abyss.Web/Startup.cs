@@ -20,6 +20,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Newtonsoft.Json.Serialization;
+using StackExchange.Exceptional;
+using StackExchange.Exceptional.Stores;
 using System;
 using System.Text;
 
@@ -104,6 +106,16 @@ namespace Abyss.Web
             services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
             services.AddHttpContextAccessor();
             services.AddHostedService<CleanupService>();
+
+            var errorStore = new MongoDBErrorStore(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["ApplicationId"]);
+            Exceptional.Configure(settings =>
+            {
+                settings.DefaultStore = errorStore;
+            });
+            services.AddExceptional(settings =>
+            {
+                settings.DefaultStore = errorStore;
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -131,13 +143,16 @@ namespace Abyss.Web
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
 
             app.UseAuthentication();
 
             app.UseErrorHandlingMiddleware();
+
+            app.UseExceptional();
+
+            app.UseErrorViewer();
 
             var provider = new FileExtensionContentTypeProvider();
             provider.Mappings[".webmanifest"] = "application/manifest+json"; // https://github.com/aspnet/AspNetCore/issues/2442

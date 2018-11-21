@@ -272,5 +272,11 @@ namespace Abyss.Web.Helpers
             }
             return null;
         }
+
+        public bool HasPermission(string permission)
+        {
+            var user = GetClientUser();
+            return user?.Permissions.Contains(permission) ?? false;
+        }
     }
 }

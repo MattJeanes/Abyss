@@ -66,5 +66,12 @@ namespace Abyss.Web.Controllers
             await _userManager.Logout(allSessions ?? false);
             return true;
         }
+
+        [HttpGet]
+        [Route("error")]
+        public void Error()
+        {
+            throw new System.Exception("oh no");
+        }
     }
 }

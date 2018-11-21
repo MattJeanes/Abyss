@@ -8,6 +8,7 @@
     <PackageReference Include="AspNet.Security.OpenId.Steam" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.6" />
     <PackageReference Include="MongoDB.Driver" Version="2.7.2" />
+    <PackageReference Include="StackExchange.Exceptional.AspNetCore" Version="2.0.0-rc2.28" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="ClientApp\**" />
