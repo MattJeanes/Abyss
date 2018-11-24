@@ -1,7 +1,10 @@
-﻿using Abyss.Web.Helpers.Interfaces;
+﻿using Abyss.Web.Data;
+using Abyss.Web.Helpers.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using StackExchange.Exceptional;
+using System;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Helpers
@@ -10,27 +13,49 @@ namespace Abyss.Web.Helpers
     {
         private readonly RequestDelegate _next;
         private readonly IUserHelper _userHelper;
+        private readonly AuthenticationOptions _options;
 
-        public ErrorViewerMiddleware(RequestDelegate next, IUserHelper userHelper)
+        public ErrorViewerMiddleware(RequestDelegate next, IUserHelper userHelper, IOptions<AuthenticationOptions> options)
         {
             _next = next;
             _userHelper = userHelper;
+            _options = options.Value;
         }
 
         public async Task Invoke(HttpContext context)
         {
             if (context.Request.Path.StartsWithSegments(new PathString("/errors")))
             {
-                // todo no JWT in errors page so this doesn't work not sure what to do!!
-                if (_userHelper.HasPermission("ErrorViewer"))
+                if (context.Request.Query.TryGetValue("token", out var queryToken))
                 {
-                    await ExceptionalMiddleware.HandleRequestAsync(context);
+                    var user = _userHelper.GetClientUser(queryToken);
+                    if (_userHelper.HasPermission(user, Permissions.ErrorViewer))
+                    {
+                        context.Response.Cookies.Append(Permissions.ErrorViewer, queryToken, new CookieOptions
+                        {
+                            HttpOnly = true,
+                            Expires = DateTime.UtcNow.AddMinutes(_options.AccessToken.ValidMinutes),
+                            IsEssential = true,
+                            Secure = true
+                        });
+                        context.Response.Redirect("/errors");
+                        return;
+                    }
                 }
-                else
+                if (context.Request.Cookies.ContainsKey(Permissions.ErrorViewer))
                 {
-                    context.Response.StatusCode = 403;
-                    await context.Response.WriteAsync("Unauthorized");
+                    if (context.Request.Cookies.TryGetValue(Permissions.ErrorViewer, out var cookie))
+                    {
+                        var user = _userHelper.GetClientUser(cookie);
+                        if (_userHelper.HasPermission(user, Permissions.ErrorViewer))
+                        {
+                            await ExceptionalMiddleware.HandleRequestAsync(context);
+                            return;
+                        }
+                    }
                 }
+                context.Response.StatusCode = 403;
+                await context.Response.WriteAsync("No token specified");
             }
             else
             {

@@ -13,6 +13,7 @@ import { LoginComponent } from "./login.component";
 import { AuthGuard } from "./services/auth.guard";
 import { AuthInterceptor } from "./services/auth.interceptor";
 import { AuthService } from "./services/auth.service";
+import { ErrorService } from "./services/error.service";
 import { UserService } from "./services/user.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
 import { UserManagerComponent } from "./usermanager/usermanager.component";
@@ -74,6 +75,7 @@ export const ROUTES: Routes = [
     providers: [
         AuthService,
         UserService,
+        ErrorService,
         AuthGuard,
         {
             provide: HTTP_INTERCEPTORS,

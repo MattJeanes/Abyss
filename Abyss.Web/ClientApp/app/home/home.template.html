@@ -1,2 +1,4 @@
-<button mat-raised-button [disabled]="!authService.hasPermission('UserManager')" routerLink="/usermanager">User Manager</button>
+<button mat-raised-button [disabled]="!authService.hasPermission(Permissions.UserManager)" routerLink="/usermanager">User Manager</button>
+&nbsp;
+<button mat-raised-button [disabled]="!authService.hasPermission(Permissions.ErrorViewer)" (click)="errorService.openErrors()">Errors</button>
 <h1>Hey! This site is currently WIP but feel free to login.</h1>

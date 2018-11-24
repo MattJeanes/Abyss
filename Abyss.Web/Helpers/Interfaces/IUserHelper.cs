@@ -8,6 +8,7 @@ namespace Abyss.Web.Helpers.Interfaces
     public interface IUserHelper
     {
         Task<User> GetUser();
+        ClientUser GetClientUser(string token);
         Task<User> GetUser(ClientUser clientUser);
         Task<ClientUser> GetClientUser(User user);
         ClientUser GetClientUser();
@@ -18,6 +19,7 @@ namespace Abyss.Web.Helpers.Interfaces
         Task<User> VerifyRefreshToken(string token);
         Task Logout(bool allSessions);
         Task<RefreshToken> GetCurrentRefreshToken();
+        bool HasPermission(ClientUser user, string permission);
         bool HasPermission(string permission);
     }
 }

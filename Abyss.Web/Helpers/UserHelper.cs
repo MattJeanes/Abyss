@@ -87,9 +87,9 @@ namespace Abyss.Web.Helpers
             return null;
         }
 
-        public static ClientUser GetClientUser(HttpContext httpContext)
+        public static ClientUser GetClientUser(ClaimsPrincipal user)
         {
-            var encodedUser = httpContext.User.Claims.FirstOrDefault(x => x.Type == UserClaimField);
+            var encodedUser = user?.Claims.FirstOrDefault(x => x.Type == UserClaimField) ?? null;
             if (encodedUser != null)
             {
                 return JsonConvert.DeserializeObject<ClientUser>(encodedUser.Value);
@@ -97,9 +97,20 @@ namespace Abyss.Web.Helpers
             return null;
         }
 
+        public static ClientUser GetClientUser(HttpContext httpContext)
+        {
+            return GetClientUser(httpContext.User);
+        }
+
         public ClientUser GetClientUser()
         {
             return GetClientUser(_httpContextAccessor.HttpContext);
+        }
+
+        public ClientUser GetClientUser(string token)
+        {
+            var jwt = VerifyToken(token, TokenType.Access);
+            return GetClientUser(jwt);
         }
 
         public async Task<RefreshToken> AddRefreshToken(User user, RefreshToken currentToken)
@@ -273,10 +284,15 @@ namespace Abyss.Web.Helpers
             return null;
         }
 
+        public bool HasPermission(ClientUser user, string permission)
+        {
+            return user?.Permissions.Contains(permission) ?? false;
+        }
+
         public bool HasPermission(string permission)
         {
             var user = GetClientUser();
-            return user?.Permissions.Contains(permission) ?? false;
+            return HasPermission(user, permission);
         }
     }
 }

@@ -17,7 +17,6 @@ namespace Abyss.Web.Controllers
     [Authorize]
     public class UserController : BaseController
     {
-        private const string UserManagerPermission = "UserManager";
         private readonly IUserManager _userManager;
         private readonly IUserRepository _userRepository;
 
@@ -45,7 +44,7 @@ namespace Abyss.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizePermission(UserManagerPermission)]
+        [AuthorizePermission(Permissions.UserManager)]
         public async Task<List<User>> GetUsers()
         {
             return await _userRepository.GetAll().ToListAsync();

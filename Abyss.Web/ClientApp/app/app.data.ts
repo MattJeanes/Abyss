@@ -28,3 +28,8 @@ export interface IAuthScheme {
     ProfileUrl: string;
     IconUrl: string;
 }
+
+export enum Permissions {
+    UserManager = "UserManager",
+    ErrorViewer = "ErrorViewer",
+}
