@@ -26,41 +26,48 @@ namespace Abyss.Web.Helpers
         {
             if (context.Request.Path.StartsWithSegments(new PathString("/errors")))
             {
-                if (context.Request.Query.TryGetValue("token", out var queryToken))
+                var errorMessage = "No token specified";
+                if (context.Request.Query.TryGetValue("token", out var queryToken) && CheckToken(queryToken, out errorMessage))
                 {
-                    var user = _userHelper.GetClientUser(queryToken);
-                    if (_userHelper.HasPermission(user, Permissions.ErrorViewer))
+                    context.Response.Cookies.Append(Permissions.ErrorViewer, queryToken, new CookieOptions
                     {
-                        context.Response.Cookies.Append(Permissions.ErrorViewer, queryToken, new CookieOptions
-                        {
-                            HttpOnly = true,
-                            Expires = DateTime.UtcNow.AddMinutes(_options.AccessToken.ValidMinutes),
-                            IsEssential = true,
-                            Secure = true
-                        });
-                        context.Response.Redirect("/errors");
-                        return;
-                    }
+                        HttpOnly = true,
+                        Expires = DateTime.UtcNow.AddMinutes(_options.AccessToken.ValidMinutes),
+                        IsEssential = true,
+                        Secure = true
+                    });
+                    context.Response.Redirect("/errors");
+                    return;
                 }
-                if (context.Request.Cookies.ContainsKey(Permissions.ErrorViewer))
+                if (context.Request.Cookies.ContainsKey(Permissions.ErrorViewer) && context.Request.Cookies.TryGetValue(Permissions.ErrorViewer, out var cookie) && CheckToken(cookie, out errorMessage))
                 {
-                    if (context.Request.Cookies.TryGetValue(Permissions.ErrorViewer, out var cookie))
-                    {
-                        var user = _userHelper.GetClientUser(cookie);
-                        if (_userHelper.HasPermission(user, Permissions.ErrorViewer))
-                        {
-                            await ExceptionalMiddleware.HandleRequestAsync(context);
-                            return;
-                        }
-                    }
+                    await ExceptionalMiddleware.HandleRequestAsync(context);
+                    return;
                 }
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync("No token specified");
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                await context.Response.WriteAsync(errorMessage);
             }
             else
             {
                 await _next(context);
             }
+        }
+
+        private bool CheckToken(string token, out string errorMessage)
+        {
+            errorMessage = "";
+            var user = _userHelper.GetClientUser(token);
+            if (user == null)
+            {
+                errorMessage = "Invalid token specified";
+                return false;
+            }
+            if (!_userHelper.HasPermission(user, Permissions.ErrorViewer))
+            {
+                errorMessage = $"User does not have {Permissions.ErrorViewer} permission";
+                return false;
+            }
+            return true;
         }
     }
 
