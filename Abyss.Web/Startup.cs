@@ -40,11 +40,11 @@ namespace Abyss.Web
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             if (!env.IsDevelopment())
             {
-                builder.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                builder.AddJsonFile($"appsettings.Release.json", optional: false, reloadOnChange: true);
             }
 
             _config = builder.Build();
