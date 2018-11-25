@@ -9,8 +9,10 @@ import { IAuthResult, IAuthScheme, IClientUser, IToken } from "../app.data";
 @Injectable()
 export class AuthService {
     constructor(private httpClient: HttpClient, private jwtHelperService: JwtHelperService, private router: Router) { }
-    public getNewToken(scheme?: string) {
-        return this.httpClient.post<IAuthResult>(`/api/auth/token/${scheme ? scheme : ""}`, undefined).pipe(first()).toPromise();
+    public async getNewToken(scheme?: string) {
+        const result = await this.httpClient.post<IAuthResult>(`/api/auth/token/${scheme ? scheme : ""}`, undefined).pipe(first()).toPromise();
+        this.setToken(result.Token);
+        return result;
     }
     public getAuthSchemes() {
         return this.httpClient.get<IAuthScheme[]>("/api/auth/schemes").pipe(first()).toPromise();
@@ -32,8 +34,10 @@ export class AuthService {
     }
     public setToken(token?: string) {
         if (token) {
+            console.log(`Setting token ${token}`);
             localStorage.token = token;
         } else {
+            console.log("Deleting token");
             delete localStorage.token;
         }
     }

@@ -9,5 +9,6 @@ namespace Abyss.Web.Data
     {
         public const string UserManager = "UserManager";
         public const string ErrorViewer = "ErrorViewer";
+        public const string ServerManager = "ServerManager";
     }
 }

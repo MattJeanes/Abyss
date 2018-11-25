@@ -10,10 +10,12 @@ import { AppComponent } from "./app.component";
 import { PageNotFoundComponent } from "./errors/not-found.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login.component";
+import { ServerManagerComponent } from "./servermanager/servermanager.component";
 import { AuthGuard } from "./services/auth.guard";
 import { AuthInterceptor } from "./services/auth.interceptor";
 import { AuthService } from "./services/auth.service";
 import { ErrorService } from "./services/error.service";
+import { ServerService } from "./services/server.service";
 import { UserService } from "./services/user.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
 import { UserManagerComponent } from "./usermanager/usermanager.component";
@@ -23,6 +25,7 @@ import {
     MatDialogModule,
     MatIconModule,
     MatListModule,
+    MatOptionModule,
     MatSelectModule,
     MatSliderModule,
     MatTooltipModule,
@@ -40,6 +43,7 @@ export const ROUTES: Routes = [
     { path: "", component: HomeComponent },
     { path: "login/:scheme", component: LoginComponent },
     { path: "usermanager", component: UserManagerComponent, canActivate: [AuthGuard], data: { permissions: "UserManager" } },
+    { path: "servermanager", component: ServerManagerComponent, canActivate: [AuthGuard], data: { permissions: "ServerManager" } },
     { path: "**", component: PageNotFoundComponent },
 ];
 
@@ -59,6 +63,7 @@ export const ROUTES: Routes = [
         MatListModule,
         MatTooltipModule,
         MatIconModule,
+        MatOptionModule,
     ],
     declarations: [
         AppComponent,
@@ -67,6 +72,7 @@ export const ROUTES: Routes = [
         LoginComponent,
         AccountDialogComponent,
         UserManagerComponent,
+        ServerManagerComponent,
     ],
     entryComponents: [
         AccountDialogComponent,
@@ -75,6 +81,7 @@ export const ROUTES: Routes = [
     providers: [
         AuthService,
         UserService,
+        ServerService,
         ErrorService,
         AuthGuard,
         {

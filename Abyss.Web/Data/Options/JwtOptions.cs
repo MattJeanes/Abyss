@@ -1,4 +1,4 @@
-﻿namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data.Options
 {
     public class JwtOptions
     {

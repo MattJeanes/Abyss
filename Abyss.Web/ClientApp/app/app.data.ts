@@ -32,4 +32,23 @@ export interface IAuthScheme {
 export enum Permissions {
     UserManager = "UserManager",
     ErrorViewer = "ErrorViewer",
+    ServerManager = "ServerManager",
+}
+
+export enum ServerStatus {
+    Active,
+    Inactive,
+    Activating,
+    Deactivating,
+}
+
+export interface IServer {
+    Id: string;
+    Tag: string;
+    SnapshotId?: number;
+    Size?: string;
+    Region?: string;
+    DropletId?: number;
+    StatusId: ServerStatus;
+    IPAddress?: string;
 }

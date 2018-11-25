@@ -1,4 +1,4 @@
-﻿using Abyss.Web.Data;
+﻿using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;

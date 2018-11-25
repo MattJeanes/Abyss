@@ -1,13 +1,17 @@
 using Abyss.Web.Contexts;
 using Abyss.Web.Contexts.Interfaces;
 using Abyss.Web.Data;
+using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers;
 using Abyss.Web.Helpers.Interfaces;
+using Abyss.Web.Logging;
 using Abyss.Web.Managers;
 using Abyss.Web.Managers.Interfaces;
+using Abyss.Web.Middleware;
 using Abyss.Web.Repositories;
 using Abyss.Web.Repositories.Interfaces;
 using Abyss.Web.Services;
+using DigitalOcean.API;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -30,15 +34,21 @@ namespace Abyss.Web
     public class Startup
     {
         public readonly IConfiguration _config;
+        private readonly IHostingEnvironment _env;
 
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            if (!env.IsDevelopment())
+            {
+                builder.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+            }
+
             _config = builder.Build();
+            _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -101,28 +111,50 @@ namespace Abyss.Web
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserHelper, UserHelper>();
+            services.AddTransient<IDigitalOceanHelper, DigitalOceanHelper>();
+            services.AddTransient(_ => new DigitalOceanClient(_config["DigitalOcean:ApiKey"]));
+            services.AddTransient<IServerManager, ServerManager>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
             services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
+            services.Configure<DigitalOceanOptions>(_config.GetSection("DigitalOcean"));
             services.AddHttpContextAccessor();
             services.AddHostedService<CleanupService>();
 
-            var errorStore = new MongoDBErrorStore(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["ApplicationId"]);
+            ErrorStore errorStore;
+            var databaseLogging = _config.GetValue<bool>("Logging:Database");
+            if (databaseLogging)
+            {
+                errorStore = new MongoDBErrorStore(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["ApplicationId"]);
+            }
+            else
+            {
+                errorStore = new MemoryErrorStore();
+            }
             Exceptional.Configure(settings =>
             {
                 settings.DefaultStore = errorStore;
+                _config.GetSection("Exceptional").Bind(settings);
             });
             services.AddExceptional(settings =>
             {
                 settings.DefaultStore = errorStore;
+                _config.GetSection("Exceptional").Bind(settings);
+            });
+
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddDebug();
+                loggingBuilder.AddExceptional();
+                if (databaseLogging)
+                {
+                    loggingBuilder.AddMongoDB(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["Logging:CollectionName"], _config.GetValue<int>("Logging:MaxEntries"), _config);
+                }
             });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(_config.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -149,8 +181,6 @@ namespace Abyss.Web
             app.UseAuthentication();
 
             app.UseErrorHandlingMiddleware();
-
-            app.UseExceptional();
 
             app.UseErrorViewer();
 

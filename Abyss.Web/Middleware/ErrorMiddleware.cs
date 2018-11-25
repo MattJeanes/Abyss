@@ -8,7 +8,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Abyss.Web.Helpers
+namespace Abyss.Web.Middleware
 {
     public class ErrorHandlingMiddleware
     {

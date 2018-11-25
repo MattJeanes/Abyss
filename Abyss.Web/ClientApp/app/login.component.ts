@@ -14,8 +14,7 @@ export class LoginComponent implements OnInit {
     public async ngOnInit() {
         try {
             const params = await this.activatedRoute.params.pipe(first()).toPromise();
-            const token = await this.authService.getNewToken(params.scheme);
-            this.authService.setToken(token.Token);
+            await this.authService.getNewToken(params.scheme);
             this.router.navigate(["/"]);
         } catch (e) {
             this.dialogService.openAlert({

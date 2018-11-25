@@ -1,4 +1,5 @@
 ﻿using Abyss.Web.Data;
+using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +8,7 @@ using StackExchange.Exceptional;
 using System;
 using System.Threading.Tasks;
 
-namespace Abyss.Web.Helpers
+namespace Abyss.Web.Middleware
 {
     public class ErrorViewerMiddleware
     {
