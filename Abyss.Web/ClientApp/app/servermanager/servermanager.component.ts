@@ -66,7 +66,7 @@ export class ServerManagerComponent implements OnInit {
         }
     }
 
-    private async refresh() {
+    public async refresh() {
         const isLoading = this.loading;
         if (!isLoading) {
             this.loading = true;
