@@ -53,6 +53,7 @@ export class ServerManagerComponent implements OnInit {
     public async stop() {
         if (!this.selected || this.loading) { return; }
         try {
+            this.loading = true;
             await this.serverService.stop(this.selected.Id);
         } catch (e) {
             console.error(e);
