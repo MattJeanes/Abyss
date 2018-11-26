@@ -11,5 +11,6 @@ namespace Abyss.Web.Entities
         public int? DropletId { get; set; }
         public ServerStatus StatusId { get; set; }
         public string IPAddress { get; set; }
+        public string DNSRecord { get; set; }
     }
 }

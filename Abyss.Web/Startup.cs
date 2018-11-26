@@ -114,10 +114,12 @@ namespace Abyss.Web
             services.AddTransient<IDigitalOceanHelper, DigitalOceanHelper>();
             services.AddTransient(_ => new DigitalOceanClient(_config["DigitalOcean:ApiKey"]));
             services.AddTransient<IServerManager, ServerManager>();
+            services.AddTransient<ICloudflareHelper, CloudflareHelper>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
             services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
             services.Configure<DigitalOceanOptions>(_config.GetSection("DigitalOcean"));
+            services.Configure<CloudflareOptions>(_config.GetSection("Cloudflare"));
             services.AddHttpContextAccessor();
             services.AddHostedService<CleanupService>();
 
@@ -150,6 +152,13 @@ namespace Abyss.Web
                 {
                     loggingBuilder.AddMongoDB(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["Logging:CollectionName"], _config.GetValue<int>("Logging:MaxEntries"), _config);
                 }
+            });
+
+            services.AddHttpClient("cloudflare", options =>
+            {
+                options.BaseAddress = new Uri(_config["Cloudflare:BaseUrl"]);
+                options.DefaultRequestHeaders.Add("X-Auth-Email", _config["Cloudflare:Email"]);
+                options.DefaultRequestHeaders.Add("X-Auth-Key", _config["Cloudflare:ApiKey"]);
             });
         }
 

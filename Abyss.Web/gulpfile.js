@@ -78,19 +78,19 @@ gulp.task("vendor", () => {
 
 gulp.task("vendor_force", () => {
     return webpack("vendor");
-})
+});
 
 gulp.task("main", () => {
-    return webpack()
+    return webpack();
 });
 
 gulp.task("prod_var", () => {
     global.prod = true;
-})
+});
 
 gulp.task("analyse_var", () => {
     global.analyse = true;
-})
+});
 
 gulp.task("clean", () => {
     del.sync(outputDir, { force: true });
