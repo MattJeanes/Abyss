@@ -37,7 +37,6 @@ export class ServerManagerComponent implements OnInit {
         try {
             this.loading = true;
             await this.serverService.start(this.selected.Id);
-
         } catch (e) {
             console.error(e);
             this.dialogService.openAlert({

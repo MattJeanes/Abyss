@@ -58,15 +58,17 @@ namespace Abyss.Web.Managers
                 var droplet = await _digitalOceanHelper.CreateDropletFromServer(server);
                 _logger.LogInformation($"Created droplet from server id {server.Id}");
 
-                _logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {server.IPAddress}");
+                var ipAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
+
+                _logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
                 var dnsRecord = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
-                dnsRecord.Content = server.IPAddress;
+                dnsRecord.Content = ipAddress;
                 await _cloudflareHelper.UpdateDNSRecord(dnsRecord);
-                _logger.LogInformation($"Set DNS record for {server.DNSRecord} to {server.IPAddress}");
+                _logger.LogInformation($"Set DNS record for {server.DNSRecord} to {ipAddress}");
 
                 server.DropletId = droplet.Id;
                 server.StatusId = ServerStatus.Active;
-                server.IPAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
+                server.IPAddress = ipAddress;
                 await _serverRepository.Update(server);
                 _logger.LogInformation($"Successfully started server {server.Id}");
             }

@@ -30,6 +30,8 @@ namespace Abyss.Web.Helpers
         public async Task<Droplet> CreateDropletFromServer(Server server)
         {
             if (!server.SnapshotId.HasValue) { throw new ArgumentNullException(nameof(server.SnapshotId)); }
+            var servers = await _client.Droplets.GetAllByTag(server.Tag);
+            if (servers.Any()) { throw new Exception($"Droplet {server.Tag} already exists"); }
             var newDroplet = new Requests.Droplet
             {
                 ImageIdOrSlug = server.SnapshotId.Value,
