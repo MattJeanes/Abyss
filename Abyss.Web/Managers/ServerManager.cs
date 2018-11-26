@@ -75,6 +75,7 @@ namespace Abyss.Web.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to start server {server?.Id.ToString() ?? "N/A"}");
+                throw;
             }
             finally
             {
@@ -142,6 +143,7 @@ namespace Abyss.Web.Managers
             catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to stop server {server?.Id.ToString() ?? "N/A"}");
+                throw;
             }
             finally
             {
