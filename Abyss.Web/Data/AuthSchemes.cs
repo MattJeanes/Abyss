@@ -33,7 +33,6 @@ namespace Abyss.Web.Data
         {
             Id = "discord",
             Name = "Discord",
-            ProfileUrl = "https://plus.google.com/",
             IconUrl = "/images/discord.png"
         };
 

@@ -40,7 +40,9 @@ export class AccountDialogComponent implements OnInit {
     }
 
     public openProfile(scheme: IAuthScheme) {
-        window.open(`${scheme.ProfileUrl}${this.userSchemes[scheme.Id]}`, "_blank");
+        if (this.userSchemes[scheme.Id] && scheme.ProfileUrl) {
+            window.open(`${scheme.ProfileUrl}${this.userSchemes[scheme.Id]}`, "_blank");
+        }
     }
 
     public login(schemeId: string) {

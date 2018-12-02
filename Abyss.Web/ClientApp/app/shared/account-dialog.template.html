@@ -4,8 +4,8 @@
     <p class="schemes">{{schemes ? 'Auth schemes:' : 'Loading..'}}</p>
     <mat-list *ngIf="schemes">
         <mat-list-item *ngFor="let scheme of schemes">
-            <img class="provider-icon" [ngClass]="{'provider-loggedin':userSchemes[scheme.Id]}" src="{{scheme.IconUrl}}" alt="{{scheme.Name}}"
-                 matTooltip="{{scheme.Name}}{{userSchemes[scheme.Id] ? ' (click to open profile)' : ''}}" matTooltipPosition="left" (click)="openProfile(scheme)" />
+            <img class="provider-icon" [ngClass]="{'provider-profile':userSchemes[scheme.Id] && scheme.ProfileUrl}" src="{{scheme.IconUrl}}" alt="{{scheme.Name}}"
+                 matTooltip="{{scheme.Name}}{{userSchemes[scheme.Id] && scheme.ProfileUrl ? ' (click to open profile)' : ''}}" matTooltipPosition="left" (click)="openProfile(scheme)" />
             <button *ngIf="!userSchemes[scheme.Id]" class="button" mat-raised-button color="primary" (click)="login(scheme.Id)" [disabled]="loading">Login</button>
             <button *ngIf="userSchemes[scheme.Id]" class="button" mat-raised-button color="warn" (click)="deleteAuthScheme(scheme.Id)" [disabled]="onlyScheme || loading" [matTooltip]="onlyScheme ? 'You must have at least one login provider active' : 'Delete the ' + scheme.Name + ' login provider'">Delete</button>
         </mat-list-item>
