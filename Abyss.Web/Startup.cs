@@ -1,3 +1,5 @@
+using Abyss.Web.Commands.Discord;
+using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Contexts;
 using Abyss.Web.Contexts.Interfaces;
 using Abyss.Web.Data;
@@ -12,6 +14,7 @@ using Abyss.Web.Repositories;
 using Abyss.Web.Repositories.Interfaces;
 using Abyss.Web.Services;
 using DigitalOcean.API;
+using DSharpPlus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -85,7 +88,7 @@ namespace Abyss.Web
                         ValidateLifetime = true,
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = _config["Jwt:Issuer"],
-                        ValidAudience = TokenType.Access.ToString(),
+                        ValidAudience = Data.TokenType.Access.ToString(),
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])),
                         ClockSkew = TimeSpan.FromHours(DateTime.Now.Hour - DateTimeOffset.UtcNow.Hour)
                     };
@@ -115,13 +118,22 @@ namespace Abyss.Web
             services.AddTransient(_ => new DigitalOceanClient(_config["DigitalOcean:ApiKey"]));
             services.AddTransient<IServerManager, ServerManager>();
             services.AddTransient<ICloudflareHelper, CloudflareHelper>();
+            services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
+            {
+                Token = _config["Discord:Token"],
+                TokenType = DSharpPlus.TokenType.Bot
+            }));
+            services.AddTransient<IDiscordCommand, HelpCommand>();
+            services.AddTransient<IDiscordCommand, RegisterCommand>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
             services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
             services.Configure<DigitalOceanOptions>(_config.GetSection("DigitalOcean"));
             services.Configure<CloudflareOptions>(_config.GetSection("Cloudflare"));
+            services.Configure<DiscordOptions>(_config.GetSection("Discord"));
             services.AddHttpContextAccessor();
             services.AddHostedService<CleanupService>();
+            services.AddHostedService<DiscordService>();
 
             ErrorStore errorStore;
             var databaseLogging = _config.GetValue<bool>("Logging:Database");

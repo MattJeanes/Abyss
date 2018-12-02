@@ -30,7 +30,7 @@ namespace Abyss.Web.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Cleanup service is starting.");
+            _logger.LogInformation("Cleanup service is starting");
 
             _timer = new Timer(async (state) => { await Task.Run(DoWork); }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.IntervalSeconds));
 
@@ -61,7 +61,7 @@ namespace Abyss.Web.Services
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Cleanup service is stopping.");
+            _logger.LogInformation("Cleanup service is stopping");
 
             _timer?.Change(Timeout.Infinite, 0);
 

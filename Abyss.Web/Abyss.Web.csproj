@@ -13,6 +13,7 @@
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
     <PackageReference Include="Serilog.Sinks.MongoDB" Version="4.0.0" />
     <PackageReference Include="StackExchange.Exceptional.AspNetCore" Version="2.0.0-rc2.28" />
+    <PackageReference Include="DSharpPlus" Version="3.2.3" />
   </ItemGroup>
   <ItemGroup>
     <Content Remove="ClientApp\**" />
