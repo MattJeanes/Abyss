@@ -1,9 +1,12 @@
 ﻿using Abyss.Web.Data;
+using Abyss.Web.Data.GMod;
+using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -17,13 +20,23 @@ namespace Abyss.Web.Managers
     {
         private readonly IUserHelper _userHelper;
         private readonly IUserRepository _userRepository;
+        private readonly IGModHelper _gmodHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly DiscordOptions _discordOptions;
 
-        public UserManager(IUserHelper userHelper, IUserRepository userRepository, IHttpContextAccessor httpContextAccessor)
+        public UserManager(
+            IUserHelper userHelper,
+            IUserRepository userRepository,
+            IGModHelper gmodHelper,
+            IHttpContextAccessor httpContextAccessor,
+            IOptions<DiscordOptions> discordOptions
+            )
         {
             _userHelper = userHelper;
             _userRepository = userRepository;
+            _gmodHelper = gmodHelper;
             _httpContextAccessor = httpContextAccessor;
+            _discordOptions = discordOptions.Value;
         }
 
         public async Task<string> Login(string schemeId)
@@ -92,6 +105,19 @@ namespace Abyss.Web.Managers
             {
                 throw new Exception($"User does not have {schemeId} auth provider");
             }
+
+            var steamAndDiscord = new[] { AuthSchemes.Discord.Id, AuthSchemes.Steam.Id };
+            if (steamAndDiscord.Contains(schemeId) && steamAndDiscord.All(x => user.Authentication.ContainsKey(x)))
+            {
+                await _gmodHelper.ChangeRank(new ChangeRankDTO
+                {
+                    Rank = _discordOptions.GuestRankId,
+                    MaxRankForDemote = _discordOptions.MemberRankId,
+                    CanDemote = true,
+                    SteamId64 = user.Authentication[AuthSchemes.Steam.Id]
+                });
+            }
+
             user.Authentication.Remove(schemeId);
             await _userRepository.Update(user);
             return await _userHelper.GetAccessToken(user);

@@ -8,5 +8,6 @@ namespace Abyss.Web.Commands.Discord.Interfaces
     {
         string Command { get; }
         Task ProcessMessage(MessageCreateEventArgs e, List<string> args);
+        Task MemberRemoved(GuildMemberRemoveEventArgs e);
     }
 }

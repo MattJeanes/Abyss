@@ -29,10 +29,19 @@ namespace Abyss.Web.Data
             IconUrl = "/images/google.png"
         };
 
+        public static AuthScheme Discord = new AuthScheme
+        {
+            Id = "discord",
+            Name = "Discord",
+            ProfileUrl = "https://plus.google.com/",
+            IconUrl = "/images/discord.png"
+        };
+
         public static List<AuthScheme> ExternalSchemes = new List<AuthScheme>
         {
             Steam,
             Google,
+            Discord
         };
     }
 }

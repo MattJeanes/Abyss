@@ -36,6 +36,7 @@ namespace Abyss.Web.Services
             _logger.LogInformation("Discord service is starting");
 
             _client.MessageCreated += MessageCreated;
+            _client.GuildMemberRemoved += GuildMemberRemovedAsync;
 
             await _client.ConnectAsync();
         }
@@ -45,19 +46,33 @@ namespace Abyss.Web.Services
             if (!e.Message.Content.ToLower().StartsWith(_options.CommandPrefix)) { return; }
             var args = e.Message.Content.Replace(_options.CommandPrefix, "").Trim().Split(" ").ToList();
             var cmd = args.FirstOrDefault();
-            if (string.IsNullOrEmpty(cmd))
+            if (string.IsNullOrEmpty(cmd) || cmd == "help")
             {
-                cmd = "help";
+                await e.Message.RespondAsync($"Commands: {string.Join(", ", _commands.Where(x => !string.IsNullOrEmpty(x.Command)).Select(x => x.Command))}");
+                return;
             }
             args = args.Skip(1).ToList();
             var command = _commands.FirstOrDefault(x => x.Command == cmd.ToLower());
             if (command == null)
             {
-                await e.Message.RespondAsync($"Unknown command, try `{_options.CommandPrefix} help`");
+                await e.Message.RespondAsync($"Unknown command, type `{_options.CommandPrefix} help` for all commands");
                 return;
             }
             _logger.LogInformation($"Command {command} with args {string.Join(" ", args)} run by {e.Author.Username}");
-            await command.ProcessMessage(e, args);
+            try
+            {
+                await command.ProcessMessage(e, args);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation(ex, $"Failed to run {command} with args {string.Join(" ", args)} run by {e.Author.Username}");
+                await e.Message.RespondAsync($"Failed to run command: {ex.Message}");
+            }
+        }
+
+        private async Task GuildMemberRemovedAsync(GuildMemberRemoveEventArgs e)
+        {
+            await Task.WhenAll(_commands.Select(x => x.MemberRemoved(e)).ToArray());
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)

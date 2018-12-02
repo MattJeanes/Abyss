@@ -1,26 +1,96 @@
-﻿using Abyss.Web.Commands.Discord.Interfaces;
+﻿using Abyss.Web.Data;
+using Abyss.Web.Data.GMod;
+using Abyss.Web.Data.Options;
+using Abyss.Web.Entities;
+using Abyss.Web.Helpers.Interfaces;
+using Abyss.Web.Managers.Interfaces;
+using Abyss.Web.Repositories.Interfaces;
 using DSharpPlus.EventArgs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Commands.Discord
 {
-    public class RegisterCommand : IDiscordCommand
+    public class RegisterCommand : BaseCommand
     {
-        public string Command => "register";
+        public override string Command => "register";
 
-        private Regex _steamId64Regex = new Regex("^\\d{17}$");
+        private readonly IGModHelper _gmodHelper;
+        private readonly IUserManager _userManager;
+        private readonly IUserRepository _userRepository;
+        private readonly ILogger<RegisterCommand> _logger;
+        private readonly DiscordOptions _discordOptions;
 
-        public async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
+        public RegisterCommand(
+            IGModHelper gmodHelper,
+            IUserManager userManager,
+            IUserRepository userRepository,
+            ILogger<RegisterCommand> logger,
+            IOptions<DiscordOptions> discordOptions
+            )
         {
-            var steamId64 = args.FirstOrDefault();
-            if (string.IsNullOrEmpty(steamId64) || !_steamId64Regex.IsMatch(steamId64)) {
-                await e.Message.RespondAsync("Please enter your 64 bit SteamID (SteamId64) - you can find it here: https://steamid.io/");
+            _gmodHelper = gmodHelper;
+            _userManager = userManager;
+            _userRepository = userRepository;
+            _logger = logger;
+            _discordOptions = discordOptions.Value;
+        }
+
+        public override async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
+        {
+            var user = await _userRepository.GetByExternalIdentifier(AuthSchemes.Discord.Id, e.Author.Id.ToString());
+            if (user == null)
+            {
+                user = new User
+                {
+                    Name = e.Author.Username,
+                    Authentication = new Dictionary<string, string>
+                    {
+                        [AuthSchemes.Discord.Id] = e.Author.Id.ToString()
+                    }
+                };
+                await _userRepository.Update(user);
+            }
+
+            if (!user.Authentication.ContainsKey(AuthSchemes.Steam.Id))
+            {
+                await e.Message.RespondAsync("Your account is not linked with Steam, please visit https://server.mattjeanes.com and login with both Discord and Steam to link then try again");
                 return;
             }
-            await e.Message.RespondAsync($"Mate you want some registering: {steamId64}");
+
+            var resp = await _gmodHelper.ChangeRank(new ChangeRankDTO
+            {
+                SteamId64 = user.Authentication[AuthSchemes.Steam.Id],
+                Rank = _discordOptions.MemberRankId
+            });
+
+            if (string.IsNullOrEmpty(resp))
+            {
+                await e.Message.RespondAsync($"Your associated steam account ({user.Authentication[AuthSchemes.Steam.Id]}) has been updated to {_discordOptions.MemberRankName} on the GMod server");
+            }
+            else
+            {
+                await e.Message.RespondAsync($"No change was made: {resp}");
+            }
+        }
+
+        public override async Task MemberRemoved(GuildMemberRemoveEventArgs e)
+        {
+            try
+            {
+                var user = await _userRepository.GetByExternalIdentifier(AuthSchemes.Discord.Id, e.Member.Id.ToString());
+                if (user != null)
+                {
+                    await _userManager.DeleteAuthScheme(user, AuthSchemes.Discord.Id);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to handle removed Discord member: {e.Member.Id}");
+            }
         }
     }
 }

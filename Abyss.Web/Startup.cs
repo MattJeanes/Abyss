@@ -105,6 +105,14 @@ namespace Abyss.Web
                     options.ClientId = _config["Authentication:Google:ClientId"];
                     options.ClientSecret = _config["Authentication:Google:ClientSecret"];
                     options.SignInScheme = AuthSchemes.ExternalLogin;
+                })
+                .AddDiscord(AuthSchemes.Discord.Id, options =>
+                {
+                    options.CallbackPath = "/auth/discord";
+                    options.AppId = _config["Authentication:Discord:ClientId"];
+                    options.AppSecret = _config["Authentication:Discord:ClientSecret"];
+                    options.Scope.Add("identify");
+                    options.SignInScheme = AuthSchemes.ExternalLogin;
                 });
 
             services.AddTransient<IUserManager, UserManager>();
@@ -118,12 +126,13 @@ namespace Abyss.Web
             services.AddTransient(_ => new DigitalOceanClient(_config["DigitalOcean:ApiKey"]));
             services.AddTransient<IServerManager, ServerManager>();
             services.AddTransient<ICloudflareHelper, CloudflareHelper>();
+            services.AddTransient<IGModHelper, GModHelper>();
             services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
             {
                 Token = _config["Discord:Token"],
                 TokenType = DSharpPlus.TokenType.Bot
             }));
-            services.AddTransient<IDiscordCommand, HelpCommand>();
+            services.AddTransient<IDiscordCommand, AddonsCommand>();
             services.AddTransient<IDiscordCommand, RegisterCommand>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
@@ -132,6 +141,17 @@ namespace Abyss.Web
             services.Configure<CloudflareOptions>(_config.GetSection("Cloudflare"));
             services.Configure<DiscordOptions>(_config.GetSection("Discord"));
             services.AddHttpContextAccessor();
+            services.AddHttpClient("cloudflare", options =>
+            {
+                options.BaseAddress = new Uri(_config["Cloudflare:BaseUrl"]);
+                options.DefaultRequestHeaders.Add("X-Auth-Email", _config["Cloudflare:Email"]);
+                options.DefaultRequestHeaders.Add("X-Auth-Key", _config["Cloudflare:ApiKey"]);
+            });
+            services.AddHttpClient("gmod", options =>
+            {
+                options.BaseAddress = new Uri(_config["GMod:BaseUrl"]);
+                options.DefaultRequestHeaders.Add("ApiKey", _config["GMod:ApiKey"]);
+            });
             services.AddHostedService<CleanupService>();
             services.AddHostedService<DiscordService>();
 
@@ -164,13 +184,6 @@ namespace Abyss.Web
                 {
                     loggingBuilder.AddMongoDB(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["Logging:CollectionName"], _config.GetValue<int>("Logging:MaxEntries"), _config);
                 }
-            });
-
-            services.AddHttpClient("cloudflare", options =>
-            {
-                options.BaseAddress = new Uri(_config["Cloudflare:BaseUrl"]);
-                options.DefaultRequestHeaders.Add("X-Auth-Email", _config["Cloudflare:Email"]);
-                options.DefaultRequestHeaders.Add("X-Auth-Key", _config["Cloudflare:ApiKey"]);
             });
         }
 

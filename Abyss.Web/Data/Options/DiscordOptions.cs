@@ -4,5 +4,9 @@
     {
         public string Token { get; set; }
         public string CommandPrefix { get; set; }
+        public string MemberRankId { get; set; }
+        public string MemberRankName { get; set; }
+        public string GuestRankId { get; set; }
+        public string AddonsMessage { get; set; }
     }
 }
