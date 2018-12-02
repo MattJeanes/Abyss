@@ -52,7 +52,7 @@ namespace Abyss.Web.Commands.Discord
                         [AuthSchemes.Discord.Id] = e.Author.Id.ToString()
                     }
                 };
-                await _userRepository.Update(user);
+                await _userRepository.Add(user);
             }
 
             if (!user.Authentication.ContainsKey(AuthSchemes.Steam.Id))
