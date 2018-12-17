@@ -1,8 +1,11 @@
 import { Component, OnInit } from "@angular/core";
+import { MatDialog } from "@angular/material";
 import { TdDialogService } from "@covalent/core";
 
-import { MatDialog } from "@angular/material";
+import { Router } from "@angular/router";
+import { Permissions } from "./app.data";
 import { AuthService } from "./services/auth.service";
+import { ErrorService } from "./services/error.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
 
 @Component({
@@ -11,7 +14,8 @@ import { AccountDialogComponent } from "./shared/account-dialog.component";
     styleUrls: ["./app.style.scss"],
 })
 export class AppComponent implements OnInit {
-    constructor(public authService: AuthService, private dialog: MatDialog, private dialogService: TdDialogService) { }
+    public Permissions = Permissions;
+    constructor(public authService: AuthService, public errorService: ErrorService, public router: Router, private dialog: MatDialog, private dialogService: TdDialogService) { }
 
     public async ngOnInit() {
         try {

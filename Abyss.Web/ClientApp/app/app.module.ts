@@ -10,11 +10,13 @@ import { AppComponent } from "./app.component";
 import { PageNotFoundComponent } from "./errors/not-found.component";
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login.component";
+import { OnlineComponent } from "./online/online.component";
 import { ServerManagerComponent } from "./servermanager/servermanager.component";
 import { AuthGuard } from "./services/auth.guard";
 import { AuthInterceptor } from "./services/auth.interceptor";
 import { AuthService } from "./services/auth.service";
 import { ErrorService } from "./services/error.service";
+import { OnlineService } from "./services/online.service";
 import { ServerService } from "./services/server.service";
 import { UserService } from "./services/user.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
@@ -44,6 +46,7 @@ export const ROUTES: Routes = [
     { path: "login/:scheme", component: LoginComponent },
     { path: "usermanager", component: UserManagerComponent, canActivate: [AuthGuard], data: { permissions: "UserManager" } },
     { path: "servermanager", component: ServerManagerComponent, canActivate: [AuthGuard], data: { permissions: "ServerManager" } },
+    { path: "online", component: OnlineComponent },
     { path: "**", component: PageNotFoundComponent },
 ];
 
@@ -73,6 +76,7 @@ export const ROUTES: Routes = [
         AccountDialogComponent,
         UserManagerComponent,
         ServerManagerComponent,
+        OnlineComponent,
     ],
     entryComponents: [
         AccountDialogComponent,
@@ -83,6 +87,7 @@ export const ROUTES: Routes = [
         UserService,
         ServerService,
         ErrorService,
+        OnlineService,
         AuthGuard,
         {
             provide: HTTP_INTERCEPTORS,

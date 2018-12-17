@@ -52,3 +52,16 @@ export interface IServer {
     StatusId: ServerStatus;
     IPAddress?: string;
 }
+
+export interface ITeamSpeakClient {
+    Name: string;
+    ChannelId: number;
+    ConnectedSeconds: number;
+    IdleSeconds: number;
+}
+
+export interface ITeamSpeakChannel {
+    Id: number;
+    Name: string;
+    ParentId: number;
+}

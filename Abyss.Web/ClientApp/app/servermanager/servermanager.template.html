@@ -1,6 +1,4 @@
-<button mat-raised-button routerLink="/">Home</button>
-<br />
-<br />
+<h1>Server Manager</h1>
 <mat-form-field>
     <mat-select [disabled]="loading" placeholder="Select server" [(ngModel)]="selectedId">
         <mat-option *ngFor="let server of servers" [value]="server.Id">{{server.Tag}}</mat-option>

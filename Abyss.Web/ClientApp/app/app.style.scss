@@ -25,6 +25,7 @@
     display: flex;
     padding-top: 20px;
     padding-bottom: 10px;
+    flex-wrap: wrap;
 
     .title {
         font-size: 2em;
@@ -51,5 +52,15 @@
 
     .spacer {
         flex: 1 1 auto;
+    }
+}
+
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+
+    > * {
+        margin-right: 10px;
+        margin-bottom: 10px;
     }
 }

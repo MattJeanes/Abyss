@@ -116,6 +116,7 @@ namespace Abyss.Web
                 });
 
             services.AddTransient<IUserManager, UserManager>();
+            services.AddTransient<IOnlineManager, OnlineManager>();
             services.AddTransient<IAbyssContext, AbyssContext>();
             services.AddTransient<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
             services.AddTransient(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
@@ -127,6 +128,7 @@ namespace Abyss.Web
             services.AddTransient<IServerManager, ServerManager>();
             services.AddTransient<ICloudflareHelper, CloudflareHelper>();
             services.AddTransient<IGModHelper, GModHelper>();
+            services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
             services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
             {
                 Token = _config["Discord:Token"],
@@ -140,6 +142,7 @@ namespace Abyss.Web
             services.Configure<DigitalOceanOptions>(_config.GetSection("DigitalOcean"));
             services.Configure<CloudflareOptions>(_config.GetSection("Cloudflare"));
             services.Configure<DiscordOptions>(_config.GetSection("Discord"));
+            services.Configure<TeamSpeakOptions>(_config.GetSection("TeamSpeak"));
             services.AddHttpContextAccessor();
             services.AddHttpClient("cloudflare", options =>
             {
@@ -154,6 +157,7 @@ namespace Abyss.Web
             });
             services.AddHostedService<CleanupService>();
             services.AddHostedService<DiscordService>();
+            services.AddHostedService<TeamSpeakService>();
 
             ErrorStore errorStore;
             var databaseLogging = _config.GetValue<bool>("Logging:Database");
