@@ -47,7 +47,7 @@ export class AuthService {
             //return true;
             return token.exp <= (Date.now().valueOf() / 1000);
         } else {
-            throw new Error("Not logged in");
+            return false;
         }
     }
     public isLoggedIn() {
