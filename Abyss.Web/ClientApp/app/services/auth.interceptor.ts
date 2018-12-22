@@ -10,6 +10,9 @@ export class AuthInterceptor implements HttpInterceptor {
     private refreshing: Promise<void>;
     constructor(private authService: AuthService) { }
     public intercept(req: HttpRequest<any>, next: HttpHandler) {
+        if (!this.requestNeedsAuth(req)) {
+            return this.handle(req, next);
+        }
         if (this.refreshing) {
             console.log("Delaying request due to token refresh");
             return from(this.refreshing).pipe(mergeMap(() => {
@@ -48,5 +51,9 @@ export class AuthInterceptor implements HttpInterceptor {
             console.error(errMsg);
         }
         return new Error(errMsg);
+    }
+
+    private requestNeedsAuth(req: HttpRequest<any>) {
+        return !req.url.startsWith("/api/auth");
     }
 }
