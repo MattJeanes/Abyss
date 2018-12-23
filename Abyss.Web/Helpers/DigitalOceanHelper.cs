@@ -112,6 +112,10 @@ namespace Abyss.Web.Helpers
                 await Task.Delay(timeBetweenChecks.Value * 1000);
                 await check();
             }
+            if (timerElapsed)
+            {
+                throw new TimeoutException($"Wait exceeded timeout of {timeout.Value}s");
+            }
         }
     }
 }
