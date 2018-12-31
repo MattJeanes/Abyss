@@ -4,6 +4,7 @@ using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using DigitalOcean.API;
 using DigitalOcean.API.Models.Responses;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -20,11 +21,13 @@ namespace Abyss.Web.Helpers
 
         private readonly DigitalOceanClient _client;
         private readonly DigitalOceanOptions _options;
+        private readonly ILogger<DigitalOceanHelper> _logger;
 
-        public DigitalOceanHelper(DigitalOceanClient client, IOptions<DigitalOceanOptions> options)
+        public DigitalOceanHelper(DigitalOceanClient client, IOptions<DigitalOceanOptions> options, ILogger<DigitalOceanHelper> logger)
         {
             _client = client;
             _options = options.Value;
+            _logger = logger;
         }
 
         public async Task<Droplet> CreateDropletFromServer(Server server)
@@ -43,6 +46,15 @@ namespace Abyss.Web.Helpers
                 SshIdsOrFingerprints = new List<object> { _options.SshId }
             };
             var droplet = await WaitForDropletCreation(await _client.Droplets.Create(newDroplet));
+            if (!string.IsNullOrEmpty(server.Resize))
+            {
+                _logger.LogInformation($"Shutting down droplet id {droplet.Id} for resize");
+                await WaitForAction(await _client.DropletActions.Shutdown(droplet.Id));
+                _logger.LogInformation($"Resizing droplet id {droplet.Id} to {server.Resize}");
+                await WaitForAction(await _client.DropletActions.Resize(droplet.Id, server.Resize));
+                _logger.LogInformation($"Powering on droplet id {droplet.Id}");
+                await WaitForAction(await _client.DropletActions.PowerOn(droplet.Id));
+            }
             return droplet;
         }
 

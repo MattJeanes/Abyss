@@ -7,6 +7,7 @@ namespace Abyss.Web.Entities
         public string Tag { get; set; }
         public int? SnapshotId { get; set; }
         public string Size { get; set; }
+        public string Resize { get; set; }
         public string Region { get; set; }
         public int? DropletId { get; set; }
         public ServerStatus StatusId { get; set; }
