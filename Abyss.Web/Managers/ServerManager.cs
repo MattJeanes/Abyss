@@ -132,7 +132,14 @@ namespace Abyss.Web.Managers
                 _logger.LogInformation($"Deleted server {dropletName}");
 
                 server.SnapshotId = snapshot.Id;
-                server.Size = droplet.SizeSlug;
+                if (!string.IsNullOrEmpty(server.Resize))
+                {
+                    server.Resize = droplet.SizeSlug;
+                }
+                else
+                {
+                    server.Size = droplet.SizeSlug;
+                }
                 server.Region = droplet.Region.Slug;
                 server.DropletId = null;
                 server.IPAddress = null;
