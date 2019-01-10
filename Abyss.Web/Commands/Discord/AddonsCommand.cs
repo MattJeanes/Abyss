@@ -1,4 +1,5 @@
-﻿using Abyss.Web.Data.Options;
+﻿/*
+using Abyss.Web.Data.Options;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
@@ -23,3 +24,4 @@ namespace Abyss.Web.Commands.Discord
         }
     }
 }
+*/

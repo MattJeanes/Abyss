@@ -1,4 +1,5 @@
-﻿using Abyss.Web.Data;
+﻿/*
+using Abyss.Web.Data;
 using Abyss.Web.Data.GMod;
 using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
@@ -57,7 +58,7 @@ namespace Abyss.Web.Commands.Discord
 
             if (!user.Authentication.ContainsKey(AuthSchemes.Steam.Id))
             {
-                await e.Message.RespondAsync("Your account is not linked with Steam, please visit https://server.mattjeanes.com and login with both Discord and Steam to link then try again");
+                await e.Message.RespondAsync("Your account is not linked with Steam, please visit https://abyss.mattjeanes.com and login with both Discord and Steam to link then try again");
                 return;
             }
 
@@ -94,3 +95,4 @@ namespace Abyss.Web.Commands.Discord
         }
     }
 }
+*/
