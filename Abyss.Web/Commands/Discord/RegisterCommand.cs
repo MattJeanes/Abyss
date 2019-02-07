@@ -1,4 +1,4 @@
-﻿/*
+﻿
 using Abyss.Web.Data;
 using Abyss.Web.Data.GMod;
 using Abyss.Web.Data.Options;
@@ -19,23 +19,18 @@ namespace Abyss.Web.Commands.Discord
     {
         public override string Command => "register";
 
-        private readonly IGModHelper _gmodHelper;
         private readonly IUserManager _userManager;
-        private readonly IUserRepository _userRepository;
         private readonly ILogger<RegisterCommand> _logger;
         private readonly DiscordOptions _discordOptions;
 
         public RegisterCommand(
-            IGModHelper gmodHelper,
+            IServiceProvider serviceProvider,
             IUserManager userManager,
-            IUserRepository userRepository,
             ILogger<RegisterCommand> logger,
             IOptions<DiscordOptions> discordOptions
-            )
+            ) : base(serviceProvider)
         {
-            _gmodHelper = gmodHelper;
             _userManager = userManager;
-            _userRepository = userRepository;
             _logger = logger;
             _discordOptions = discordOptions.Value;
         }
@@ -54,28 +49,10 @@ namespace Abyss.Web.Commands.Discord
                     }
                 };
                 await _userRepository.Add(user);
-            }
-
-            if (!user.Authentication.ContainsKey(AuthSchemes.Steam.Id))
-            {
-                await e.Message.RespondAsync("Your account is not linked with Steam, please visit https://abyss.mattjeanes.com and login with both Discord and Steam to link then try again");
+                await e.Message.RespondAsync("User account created");
                 return;
             }
-
-            var resp = await _gmodHelper.ChangeRank(new ChangeRankDTO
-            {
-                SteamId64 = user.Authentication[AuthSchemes.Steam.Id],
-                Rank = _discordOptions.MemberRankId
-            });
-
-            if (string.IsNullOrEmpty(resp))
-            {
-                await e.Message.RespondAsync($"Your associated steam account ({user.Authentication[AuthSchemes.Steam.Id]}) has been updated to {_discordOptions.MemberRankName} on the GMod server");
-            }
-            else
-            {
-                await e.Message.RespondAsync($"No change was made: {resp}");
-            }
+            await e.Message.RespondAsync($"You are already registered as {user.Name}");
         }
 
         public override async Task MemberRemoved(GuildMemberRemoveEventArgs e)
@@ -95,4 +72,3 @@ namespace Abyss.Web.Commands.Discord
         }
     }
 }
-*/

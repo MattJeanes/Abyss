@@ -14,6 +14,8 @@ using Abyss.Web.Repositories;
 using Abyss.Web.Repositories.Interfaces;
 using Abyss.Web.Services;
 using DigitalOcean.API;
+using DontPanic.TumblrSharp;
+using DontPanic.TumblrSharp.Client;
 using DSharpPlus;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -134,9 +136,14 @@ namespace Abyss.Web
                 Token = _config["Discord:Token"],
                 TokenType = DSharpPlus.TokenType.Bot
             }));
+            services.AddSingleton<TumblrClientFactory>();
+            services.AddTransient(serviceProvider =>
+                serviceProvider.GetRequiredService<TumblrClientFactory>().Create<TumblrClient>(
+                    _config["Tumblr:ConsumerKey"], _config["Tumblr:ConsumerSecret"], new DontPanic.TumblrSharp.OAuth.Token(_config["Tumblr:Token"], _config["Tumblr:TokenSecret"])));
             //services.AddTransient<IDiscordCommand, AddonsCommand>();
-            //services.AddTransient<IDiscordCommand, RegisterCommand>();
+            services.AddTransient<IDiscordCommand, RegisterCommand>();
             services.AddTransient<IDiscordCommand, PingCommand>();
+            services.AddTransient<IDiscordCommand, QuoteCommand>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
             services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
@@ -144,6 +151,7 @@ namespace Abyss.Web
             services.Configure<CloudflareOptions>(_config.GetSection("Cloudflare"));
             services.Configure<DiscordOptions>(_config.GetSection("Discord"));
             services.Configure<TeamSpeakOptions>(_config.GetSection("TeamSpeak"));
+            services.Configure<TumblrOptions>(_config.GetSection("Tumblr"));
             services.AddHttpContextAccessor();
             services.AddHttpClient("cloudflare", options =>
             {

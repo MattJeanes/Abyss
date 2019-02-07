@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,7 +45,12 @@ namespace Abyss.Web.Services
         private async Task MessageCreated(MessageCreateEventArgs e)
         {
             if (!e.Message.Content.ToLower().StartsWith(_options.CommandPrefix)) { return; }
-            var args = e.Message.Content.Replace(_options.CommandPrefix, "").Trim().Split(" ").ToList();
+            var argString = e.Message.Content.Trim().Substring(_options.CommandPrefix.Length).Trim();
+            var args = argString.Split('"')
+                     .Select((element, index) => index % 2 == 0  // If even index
+                                           ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)  // Split the item
+                                           : new string[] { element })  // Keep the entire item
+                     .SelectMany(element => element).ToList();
             var cmd = args.FirstOrDefault();
             if (string.IsNullOrEmpty(cmd) || cmd == "help")
             {
