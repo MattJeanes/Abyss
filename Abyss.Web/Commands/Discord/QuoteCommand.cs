@@ -70,20 +70,27 @@ namespace Abyss.Web.Commands.Discord
                 return;
             }
             var post = await _client.CreatePostAsync(_options.BlogName, PostData.CreateQuote(quote, source));
-            _localPosts.Add(new QuotePost
+            var newQuote = new QuotePost
             {
                 Id = post.PostId,
                 Summary = quote,
-                Source = source
-            });
-            await e.Message.RespondAsync($"_‟{quote}“_ – {source}");
+                Source = source,
+                Timestamp = DateTime.Now
+            };
+            _localPosts.Add(newQuote);
+            await WriteQuote(e, newQuote);
         }
 
         private async Task GetQuote(MessageCreateEventArgs e)
         {
             var quotes = await GetAllQuotes();
             var quote = quotes.OrderBy(x => Guid.NewGuid()).First();
-            await e.Message.RespondAsync($"_‟{quote.Summary}“_ – {quote.Source}");
+            await WriteQuote(e, quote);
+        }
+
+        private static async Task WriteQuote(MessageCreateEventArgs e, QuotePost quote)
+        {
+            await e.Message.RespondAsync($"_‟{quote.Summary}“_ – {quote.Source}, {quote.Timestamp.ToString("yyyy")}");
         }
 
         private async Task<List<QuotePost>> GetAllQuotes()
