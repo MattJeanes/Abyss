@@ -1,5 +1,6 @@
 ﻿using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Data.Options;
+using Abyss.Web.Helpers.Interfaces;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,7 +10,6 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,14 +22,21 @@ namespace Abyss.Web.Services
         private readonly DiscordOptions _options;
         private readonly IServiceProvider _serviceProvider;
         private readonly IEnumerable<IDiscordCommand> _commands;
+        private readonly IUserHelper _userHelper;
 
-        public DiscordService(ILogger<DiscordService> logger, DiscordClient client, IOptions<DiscordOptions> options, IServiceProvider serviceProvider)
+        public DiscordService(
+            ILogger<DiscordService> logger,
+            DiscordClient client,
+            IOptions<DiscordOptions> options,
+            IServiceProvider serviceProvider,
+            IUserHelper userHelper)
         {
             _logger = logger;
             _client = client;
             _options = options.Value;
             _serviceProvider = serviceProvider;
             _commands = _serviceProvider.GetServices<IDiscordCommand>();
+            _userHelper = userHelper;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -63,6 +70,16 @@ namespace Abyss.Web.Services
             {
                 await e.Message.RespondAsync($"Unknown command, type `{_options.CommandPrefix} help` for all commands");
                 return;
+            }
+
+            if (!string.IsNullOrEmpty(command.Permission))
+            {
+                var user = await command.GetClientUser(e);
+                if (!_userHelper.HasPermission(user, command.Permission))
+                {
+                    await e.Message.RespondAsync($"You do not have permission to use this command");
+                    return;
+                };
             }
             _logger.LogInformation($"Command {command} with args {string.Join(" ", args)} run by {e.Author.Username}");
             try

@@ -21,6 +21,7 @@ namespace Abyss.Web.Commands.Discord
         protected readonly DiscordOptions _baseOptions;
 
         public virtual string Command => null;
+        public virtual string Permission => null;
 
         public BaseCommand(IServiceProvider serviceProvider) {
             _serviceProvider = serviceProvider;
@@ -39,17 +40,17 @@ namespace Abyss.Web.Commands.Discord
             return Task.CompletedTask;
         }
 
-        protected Task<ClientUser> GetClientUser(MessageCreateEventArgs e)
+        public Task<ClientUser> GetClientUser(MessageCreateEventArgs e)
         {
             return GetClientUser(e.Author);
         }
 
-        protected Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e)
+        public Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e)
         {
             return GetClientUser(e.Member);
         }
 
-        protected async Task<ClientUser> GetClientUser(DiscordUser discordUser)
+        public async Task<ClientUser> GetClientUser(DiscordUser discordUser)
         {
             var user = await _userRepository.GetByExternalIdentifier(AuthSchemes.Discord.Id, discordUser.Id.ToString());
             if(user == null)

@@ -144,6 +144,7 @@ namespace Abyss.Web
             services.AddTransient<IDiscordCommand, RegisterCommand>();
             services.AddTransient<IDiscordCommand, PingCommand>();
             services.AddTransient<IDiscordCommand, QuoteCommand>();
+            services.AddTransient<IDiscordCommand, ServerCommand>();
             services.Configure<JwtOptions>(_config.GetSection("Jwt"));
             services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
             services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));

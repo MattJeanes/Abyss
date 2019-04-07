@@ -13,5 +13,6 @@ namespace Abyss.Web.Entities
         public ServerStatus StatusId { get; set; }
         public string IPAddress { get; set; }
         public string DNSRecord { get; set; }
+        public string Name { get; set; }
     }
 }

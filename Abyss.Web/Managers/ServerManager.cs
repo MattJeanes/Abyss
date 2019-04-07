@@ -2,6 +2,7 @@
 using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
+using Abyss.Web.Logging;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -20,7 +21,7 @@ namespace Abyss.Web.Managers
         private readonly IRepository<Server> _serverRepository;
         private readonly CloudflareOptions _options;
         private readonly ICloudflareHelper _cloudflareHelper;
-        private readonly ILogger<ServerManager> _logger;
+        private readonly ILogger<ServerManager> _baseLogger;
 
         public ServerManager(
             IDigitalOceanHelper digitalOceanHelper,
@@ -34,7 +35,7 @@ namespace Abyss.Web.Managers
             _serverRepository = serverRepository;
             _options = options.Value;
             _cloudflareHelper = cloudflareHelper;
-            _logger = logger;
+            _baseLogger = logger;
         }
 
         public async Task<List<Server>> GetServers()
@@ -42,8 +43,13 @@ namespace Abyss.Web.Managers
             return await _serverRepository.GetAll().ToListAsync();
         }
 
-        public async Task Start(string serverId)
+        public async Task Start(string serverId, Func<LogItem, Task> logHandler = null)
         {
+            var logger = new TaskLogger(_baseLogger);
+            if (logHandler != null)
+            {
+                logger.AddLogHandler("server-start", logHandler);
+            }
             Server server = null;
             try
             {
@@ -54,27 +60,27 @@ namespace Abyss.Web.Managers
                 server.StatusId = ServerStatus.Activating;
                 await _serverRepository.Update(server);
 
-                _logger.LogInformation($"Creating droplet from server id {server.Id}");
+                logger.LogInformation($"Creating droplet from server id {server.Id}");
                 var droplet = await _digitalOceanHelper.CreateDropletFromServer(server);
-                _logger.LogInformation($"Created droplet from server id {server.Id}");
+                logger.LogInformation($"Created droplet from server id {server.Id}");
 
                 var ipAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
 
-                _logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
+                logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
                 var dnsRecord = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
                 dnsRecord.Content = ipAddress;
                 await _cloudflareHelper.UpdateDNSRecord(dnsRecord);
-                _logger.LogInformation($"Set DNS record for {server.DNSRecord} to {ipAddress}");
+                logger.LogInformation($"Set DNS record for {server.DNSRecord} to {ipAddress}");
 
                 server.DropletId = droplet.Id;
                 server.StatusId = ServerStatus.Active;
                 server.IPAddress = ipAddress;
                 await _serverRepository.Update(server);
-                _logger.LogInformation($"Successfully started server {server.Id}");
+                logger.LogInformation($"Successfully started server {server.Id}");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to start server {server?.Id.ToString() ?? "N/A"}");
+                logger.LogError(e, $"Failed to start server {server?.Id.ToString() ?? "N/A"}");
                 throw;
             }
             finally
@@ -88,8 +94,13 @@ namespace Abyss.Web.Managers
 
         }
 
-        public async Task Stop(string serverId)
+        public async Task Stop(string serverId, Func<LogItem, Task> logHandler = null)
         {
+            var logger = new TaskLogger(_baseLogger);
+            if (logHandler != null)
+            {
+                logger.AddLogHandler("server-stop", logHandler);
+            }
             Server server = null;
             try
             {
@@ -101,35 +112,34 @@ namespace Abyss.Web.Managers
                 var droplet = await _digitalOceanHelper.GetDroplet(server.DropletId.Value);
                 if (droplet == null) { throw new Exception($"Droplet id {server.DropletId} not valid"); }
                 var dropletName = $"{droplet.Name} (id {droplet.Id})";
-                _logger.LogDebug($"Found droplet {dropletName}");
                 if (!new[] { DigitalOceanEnums.DropletStatus.Active, DigitalOceanEnums.DropletStatus.Off }.Contains(droplet.Status)) { throw new Exception($"Server not in expected state, is in '{droplet.Status}'"); }
-                _logger.LogInformation($"Stopping server {server.Id}");
+                logger.LogInformation($"Stopping server {server.Id}");
                 server.StatusId = ServerStatus.Deactivating;
                 await _serverRepository.Update(server);
 
                 if (droplet.Status == DigitalOceanEnums.DropletStatus.Active)
                 {
-                    _logger.LogInformation($"Shutting down server {dropletName}");
+                    logger.LogInformation($"Shutting down server {dropletName}");
                     await _digitalOceanHelper.Shutdown(droplet.Id);
-                    _logger.LogInformation($"Shut down server {dropletName}");
+                    logger.LogInformation($"Shut down server {dropletName}");
                 }
 
                 var snapshotName = $"{droplet.Name}_{Guid.NewGuid()}";
-                _logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName}");
+                logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName}");
                 var snapshot = await _digitalOceanHelper.Snapshot(droplet.Id, snapshotName);
                 if (snapshot == null) { throw new Exception($"Couldn't find snapshot name {snapshotName} just created"); }
-                _logger.LogInformation($"Snapshotted server {dropletName} as {snapshot.Name} ({snapshot.Id})");
+                logger.LogInformation($"Snapshotted server {dropletName} as {snapshot.Name} ({snapshot.Id})");
 
                 if (server.SnapshotId.HasValue)
                 {
-                    _logger.LogInformation($"Deleting old snapshot id {server.SnapshotId}");
+                    logger.LogInformation($"Deleting old snapshot id {server.SnapshotId}");
                     await _digitalOceanHelper.DeleteSnapshot(server.SnapshotId.Value);
-                    _logger.LogInformation($"Deleted old snapshot id {server.SnapshotId}");
+                    logger.LogInformation($"Deleted old snapshot id {server.SnapshotId}");
                 }
 
-                _logger.LogInformation($"Deleting server {dropletName}");
+                logger.LogInformation($"Deleting server {dropletName}");
                 await _digitalOceanHelper.DeleteDroplet(droplet.Id);
-                _logger.LogInformation($"Deleted server {dropletName}");
+                logger.LogInformation($"Deleted server {dropletName}");
 
                 server.SnapshotId = snapshot.Id;
                 if (!string.IsNullOrEmpty(server.Resize))
@@ -145,11 +155,11 @@ namespace Abyss.Web.Managers
                 server.IPAddress = null;
                 server.StatusId = ServerStatus.Inactive;
                 await _serverRepository.Update(server);
-                _logger.LogInformation($"Successfully stopped server {server.Id}");
+                logger.LogInformation($"Successfully stopped server {server.Id}");
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Failed to stop server {server?.Id.ToString() ?? "N/A"}");
+                logger.LogError(e, $"Failed to stop server {server?.Id.ToString() ?? "N/A"}");
                 throw;
             }
             finally
