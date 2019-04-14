@@ -1,12 +1,12 @@
 <h1>Online</h1>
-<a mat-raised-button color="primary" href="ts3server://abyss.mattjeanes.com">Join</a>
+<a mat-raised-button color="primary" href="ts3server://abyss.mattjeanes.com">Join TeamSpeak</a>
 <br />
 <br />
-<div *ngFor="let client of clients">
+<div *ngFor="let client of clients; last as isLast">
     Name: {{ client.Name }}
     <br />
     Channel: {{ getChannelName(client.ChannelId) }}
     <br />
     Connected: {{ client.ConnectedSeconds | amDuration:'seconds' }}<span *ngIf="client.IdleSeconds > 60"> (Idle: {{ client.IdleSeconds | amDuration:'seconds' }})</span>
-    <hr />
+    <hr *ngIf="!isLast" />
 </div>
