@@ -1,5 +1,12 @@
 <h1>Online</h1>
-<h2>todo: autorefresh and proper ui</h2>
-<button mat-raised-button (click)="refresh()" [disabled]="loading">Refresh</button>
-<pre>{{ clients | json }}</pre>
-<pre>{{ channels | json }}</pre>
+<a mat-raised-button color="primary" href="ts3server://abyss.mattjeanes.com">Join</a>
+<br />
+<br />
+<div *ngFor="let client of clients">
+    Name: {{ client.Name }}
+    <br />
+    Channel: {{ getChannelName(client.ChannelId) }}
+    <br />
+    Connected: {{ client.ConnectedSeconds | amDuration:'seconds' }}<span *ngIf="client.IdleSeconds > 60"> (Idle: {{ client.IdleSeconds | amDuration:'seconds' }})</span>
+    <hr />
+</div>

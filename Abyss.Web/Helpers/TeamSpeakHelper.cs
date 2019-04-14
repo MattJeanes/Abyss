@@ -1,7 +1,8 @@
 ﻿using Abyss.Web.Data.Options;
 using Abyss.Web.Data.TeamSpeak;
+using Abyss.Web.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,13 +14,15 @@ namespace Abyss.Web.Helpers
     public class TeamSpeakHelper : ITeamSpeakHelper
     {
         private readonly TeamSpeakOptions _options;
+        private readonly IHubContext<OnlineHub> _onlineHub;
         private List<Client> _clients;
         private List<Channel> _channels;
         private Task _updateTask;
 
-        public TeamSpeakHelper(IOptions<TeamSpeakOptions> options)
+        public TeamSpeakHelper(IOptions<TeamSpeakOptions> options, IHubContext<OnlineHub> onlineHub)
         {
             _options = options.Value;
+            _onlineHub = onlineHub;
         }
 
         public async Task<List<Client>> GetClients()
@@ -71,6 +74,7 @@ namespace Abyss.Web.Helpers
 
                         _channels = channels;
                         _clients = clients;
+                        await _onlineHub.Clients.All.SendAsync("update", _clients, _channels);
                     }
                 }
                 finally

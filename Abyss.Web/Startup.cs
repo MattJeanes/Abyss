@@ -6,6 +6,7 @@ using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers;
 using Abyss.Web.Helpers.Interfaces;
+using Abyss.Web.Hubs;
 using Abyss.Web.Logging;
 using Abyss.Web.Managers;
 using Abyss.Web.Managers.Interfaces;
@@ -22,7 +23,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -207,9 +207,14 @@ namespace Abyss.Web
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+
+            services.AddSignalR().AddJsonProtocol(options =>
+            {
+                options.PayloadSerializerSettings.ContractResolver = new DefaultContractResolver();
+            });
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
@@ -236,6 +241,11 @@ namespace Abyss.Web
                 ContentTypeProvider = provider
             });
             app.UseSpaStaticFiles();
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<OnlineHub>("/hub/online");
+            });
 
             app.UseMvc(routes =>
             {

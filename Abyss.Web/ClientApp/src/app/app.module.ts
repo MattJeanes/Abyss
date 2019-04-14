@@ -5,6 +5,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule, Routes } from "@angular/router";
 import { JWT_OPTIONS, JwtHelperService, JwtInterceptor } from "@auth0/angular-jwt";
+import { MomentModule } from "ngx-moment";
 
 import { AppComponent } from "./app.component";
 import { PageNotFoundComponent } from "./errors/not-found.component";
@@ -67,6 +68,7 @@ export const ROUTES: Routes = [
         MatTooltipModule,
         MatIconModule,
         MatOptionModule,
+        MomentModule,
     ],
     declarations: [
         AppComponent,
