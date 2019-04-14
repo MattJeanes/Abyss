@@ -1,0 +1,5 @@
+<h1>Online</h1>
+<h2>todo: autorefresh and proper ui</h2>
+<button mat-raised-button (click)="refresh()" [disabled]="loading">Refresh</button>
+<pre>{{ clients | json }}</pre>
+<pre>{{ channels | json }}</pre>

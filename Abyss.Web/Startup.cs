@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
@@ -58,10 +59,12 @@ namespace Abyss.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().AddJsonOptions(options =>
-            {
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-            });
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                });
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
@@ -199,6 +202,11 @@ namespace Abyss.Web
                     loggingBuilder.AddMongoDB(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["Logging:CollectionName"], _config.GetValue<int>("Logging:MaxEntries"), _config);
                 }
             });
+
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/dist";
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -209,19 +217,7 @@ namespace Abyss.Web
             });
             app.UseHttpsRedirection();
 
-            if (env.IsDevelopment())
-            {
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ConfigFile = "webpack.config.ts",
-                    EnvParam = new
-                    {
-                        aot = false // can't use AOT with HMR currently https://github.com/angular/angular-cli/issues/6347
-                    }
-                });
-            }
-            else
+            if (!env.IsDevelopment())
             {
                 app.UseHsts();
             }
@@ -239,16 +235,23 @@ namespace Abyss.Web
             {
                 ContentTypeProvider = provider
             });
+            app.UseSpaStaticFiles();
 
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+            });
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp";
+
+                if (env.IsDevelopment())
+                {
+                    spa.UseProxyToSpaDevelopmentServer("http://localhost:34564");
+                }
             });
         }
     }

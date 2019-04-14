@@ -1,0 +1,21 @@
+<div class="wrapper">
+    <div class="content">
+        <div class="header">
+            <span class="title">Abyss</span>
+            <!--<span class="spacer"></span>-->
+
+            <span class="spacer"></span>
+            <a mat-icon-button (click)="showAccountDialog()" matTooltip="{{authService.isLoggedIn() ? 'Logged in as ' + username : 'Login'}}">
+                <mat-icon>account_circle</mat-icon>
+            </a>
+        </div>
+        <div class="nav">
+            <button mat-raised-button [disabled]="router.url == '/'" routerLink="/">Home</button>
+            <button mat-raised-button [disabled]="router.url == '/online'" routerLink="/online">Online</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.UserManager)" [disabled]="router.url == '/usermanager'" routerLink="/usermanager">User Manager</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ServerManager)" [disabled]="router.url == '/servermanager'" routerLink="/servermanager">Server Manager</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ErrorViewer)" (click)="errorService.openErrors()">Errors</button>
+        </div>
+        <router-outlet></router-outlet>
+    </div>
+</div>
