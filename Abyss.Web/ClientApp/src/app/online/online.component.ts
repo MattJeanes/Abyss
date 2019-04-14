@@ -74,7 +74,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             const channel = this.channels.find(x => x.Id === id);
             let channelName = channel.Name;
             if (channel.ParentId) {
-                channelName += ` / ${this.getChannelName(channel.ParentId)}`;
+                channelName = `${this.getChannelName(channel.ParentId)} / ${channelName}`;
             }
             return channelName;
         } catch (e) {
