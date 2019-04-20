@@ -61,7 +61,7 @@ namespace Abyss.Web.Managers
                 await _serverRepository.Update(server);
 
                 logger.LogInformation($"Creating droplet from server id {server.Id}");
-                var droplet = await _digitalOceanHelper.CreateDropletFromServer(server);
+                var droplet = await _digitalOceanHelper.CreateDropletFromServer(server, logger);
                 logger.LogInformation($"Created droplet from server id {server.Id}");
 
                 var ipAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");

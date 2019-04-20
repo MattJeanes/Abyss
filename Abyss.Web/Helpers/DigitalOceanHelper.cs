@@ -2,6 +2,7 @@
 using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
+using Abyss.Web.Logging;
 using DigitalOcean.API;
 using DigitalOcean.API.Models.Responses;
 using Microsoft.Extensions.Logging;
@@ -23,14 +24,13 @@ namespace Abyss.Web.Helpers
         private readonly DigitalOceanOptions _options;
         private readonly ILogger<DigitalOceanHelper> _logger;
 
-        public DigitalOceanHelper(DigitalOceanClient client, IOptions<DigitalOceanOptions> options, ILogger<DigitalOceanHelper> logger)
+        public DigitalOceanHelper(DigitalOceanClient client, IOptions<DigitalOceanOptions> options)
         {
             _client = client;
             _options = options.Value;
-            _logger = logger;
         }
 
-        public async Task<Droplet> CreateDropletFromServer(Server server)
+        public async Task<Droplet> CreateDropletFromServer(Server server, TaskLogger logger)
         {
             if (!server.SnapshotId.HasValue) { throw new ArgumentNullException(nameof(server.SnapshotId)); }
             var servers = await _client.Droplets.GetAllByTag(server.Tag);
@@ -48,13 +48,13 @@ namespace Abyss.Web.Helpers
             var droplet = await WaitForDropletCreation(await _client.Droplets.Create(newDroplet));
             if (!string.IsNullOrEmpty(server.Resize))
             {
-                _logger.LogInformation($"Waiting {_options.TimeBetweenActions} for server startup (pre-resize)");
+                logger.LogInformation($"Waiting {_options.TimeBetweenActions} for server startup (pre-resize)");
                 await Task.Delay(TimeSpan.FromSeconds(_options.TimeBetweenActions));
-                _logger.LogInformation($"Shutting down droplet id {droplet.Id} for resize");
+                logger.LogInformation($"Shutting down droplet id {droplet.Id} for resize");
                 await WaitForAction(await _client.DropletActions.Shutdown(droplet.Id));
-                _logger.LogInformation($"Resizing droplet id {droplet.Id} to {server.Resize}");
+                logger.LogInformation($"Resizing droplet id {droplet.Id} to {server.Resize}");
                 await WaitForAction(await _client.DropletActions.Resize(droplet.Id, server.Resize));
-                _logger.LogInformation($"Powering on droplet id {droplet.Id}");
+                logger.LogInformation($"Powering on droplet id {droplet.Id}");
                 await WaitForAction(await _client.DropletActions.PowerOn(droplet.Id));
             }
             return droplet;
