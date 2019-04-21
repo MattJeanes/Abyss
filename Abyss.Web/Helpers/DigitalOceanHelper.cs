@@ -48,7 +48,7 @@ namespace Abyss.Web.Helpers
             var droplet = await WaitForDropletCreation(await _client.Droplets.Create(newDroplet));
             if (!string.IsNullOrEmpty(server.Resize))
             {
-                logger.LogInformation($"Waiting {_options.TimeBetweenActions} for server startup (pre-resize)");
+                logger.LogInformation($"Waiting {_options.TimeBetweenActions} seconds for server startup (pre-resize)");
                 await Task.Delay(TimeSpan.FromSeconds(_options.TimeBetweenActions));
                 logger.LogInformation($"Shutting down droplet id {droplet.Id} for resize");
                 await WaitForAction(await _client.DropletActions.Shutdown(droplet.Id));

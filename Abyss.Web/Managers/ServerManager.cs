@@ -70,7 +70,6 @@ namespace Abyss.Web.Managers
                 var dnsRecord = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
                 dnsRecord.Content = ipAddress;
                 await _cloudflareHelper.UpdateDNSRecord(dnsRecord);
-                logger.LogInformation($"Set DNS record for {server.DNSRecord} to {ipAddress}");
 
                 server.DropletId = droplet.Id;
                 server.StatusId = ServerStatus.Active;
@@ -134,12 +133,10 @@ namespace Abyss.Web.Managers
                 {
                     logger.LogInformation($"Deleting old snapshot id {server.SnapshotId}");
                     await _digitalOceanHelper.DeleteSnapshot(server.SnapshotId.Value);
-                    logger.LogInformation($"Deleted old snapshot id {server.SnapshotId}");
                 }
 
                 logger.LogInformation($"Deleting server {dropletName}");
                 await _digitalOceanHelper.DeleteDroplet(droplet.Id);
-                logger.LogInformation($"Deleted server {dropletName}");
 
                 server.SnapshotId = snapshot.Id;
                 if (!string.IsNullOrEmpty(server.Resize))
