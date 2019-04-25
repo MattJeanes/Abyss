@@ -60,7 +60,7 @@ namespace Abyss.Web.Managers
                 server.StatusId = ServerStatus.Activating;
                 await _serverRepository.Update(server);
 
-                logger.LogInformation($"Creating droplet from server id {server.Id}");
+                logger.LogInformation($"Creating droplet from server id {server.Id} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
                 var droplet = await _digitalOceanHelper.CreateDropletFromServer(server, logger);
                 logger.LogInformation($"Created droplet from server id {server.Id}");
 
@@ -124,7 +124,7 @@ namespace Abyss.Web.Managers
                 }
 
                 var snapshotName = $"{droplet.Name}_{Guid.NewGuid()}";
-                logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName}");
+                logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
                 var snapshot = await _digitalOceanHelper.Snapshot(droplet.Id, snapshotName);
                 if (snapshot == null) { throw new Exception($"Couldn't find snapshot name {snapshotName} just created"); }
                 logger.LogInformation($"Snapshotted server {dropletName} as {snapshot.Name} ({snapshot.Id})");

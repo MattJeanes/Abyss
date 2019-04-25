@@ -43,7 +43,12 @@ namespace Abyss.Web.Services
         {
             _logger.LogInformation("Discord service is starting");
 
-            _client.MessageCreated += MessageCreated;
+            _client.MessageCreated += (e) =>
+            {
+                Task.Run(async () => { await MessageCreated(e); });
+                return Task.CompletedTask;
+            }
+;
             _client.GuildMemberRemoved += GuildMemberRemovedAsync;
 
             await _client.ConnectAsync();
