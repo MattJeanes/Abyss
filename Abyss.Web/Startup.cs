@@ -28,6 +28,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Newtonsoft.Json.Serialization;
 using StackExchange.Exceptional;
@@ -156,6 +159,7 @@ namespace Abyss.Web
             services.Configure<DiscordOptions>(_config.GetSection("Discord"));
             services.Configure<TeamSpeakOptions>(_config.GetSection("TeamSpeak"));
             services.Configure<TumblrOptions>(_config.GetSection("Tumblr"));
+            services.Configure<ReminderOptions>(_config.GetSection("Reminder"));
             services.AddHttpContextAccessor();
             services.AddHttpClient("cloudflare", options =>
             {
@@ -171,6 +175,7 @@ namespace Abyss.Web
             services.AddHostedService<CleanupService>();
             services.AddHostedService<DiscordService>();
             services.AddHostedService<TeamSpeakService>();
+            services.AddHostedService<ReminderService>();
 
             ErrorStore errorStore;
             var databaseLogging = _config.GetValue<bool>("Logging:Database");
@@ -212,6 +217,12 @@ namespace Abyss.Web
             {
                 options.PayloadSerializerSettings.ContractResolver = new DefaultContractResolver();
             });
+
+            var pack = new ConventionPack
+            {
+                new IgnoreExtraElementsConvention(true)
+            };
+            ConventionRegistry.Register("Abyss Conventions", pack, t => true);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

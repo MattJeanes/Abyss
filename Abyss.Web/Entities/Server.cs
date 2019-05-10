@@ -1,4 +1,5 @@
 ﻿using Abyss.Web.Data;
+using System;
 
 namespace Abyss.Web.Entities
 {
@@ -14,5 +15,8 @@ namespace Abyss.Web.Entities
         public string IPAddress { get; set; }
         public string DNSRecord { get; set; }
         public string Name { get; set; }
+        public int? RemindAfterMinutes { get; set; }
+        public int? ReminderIntervalMinutes { get; set; }
+        public DateTime? NextReminder { get; set; }
     }
 }

@@ -74,6 +74,10 @@ namespace Abyss.Web.Managers
                 server.DropletId = droplet.Id;
                 server.StatusId = ServerStatus.Active;
                 server.IPAddress = ipAddress;
+                if (server.RemindAfterMinutes.HasValue)
+                {
+                    server.NextReminder = DateTime.UtcNow.AddMinutes(server.RemindAfterMinutes.Value);
+                }
                 await _serverRepository.Update(server);
                 logger.LogInformation($"Successfully started server {server.Id}");
             }
@@ -122,7 +126,7 @@ namespace Abyss.Web.Managers
                     await _digitalOceanHelper.Shutdown(droplet.Id);
                     logger.LogInformation($"Shut down server {dropletName}");
                 }
-
+ 
                 var snapshotName = $"{droplet.Name}_{Guid.NewGuid()}";
                 logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
                 var snapshot = await _digitalOceanHelper.Snapshot(droplet.Id, snapshotName);
@@ -150,6 +154,7 @@ namespace Abyss.Web.Managers
                 server.Region = droplet.Region.Slug;
                 server.DropletId = null;
                 server.IPAddress = null;
+                server.NextReminder = null;
                 server.StatusId = ServerStatus.Inactive;
                 await _serverRepository.Update(server);
                 logger.LogInformation($"Successfully stopped server {server.Id}");
