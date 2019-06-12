@@ -62,7 +62,10 @@ namespace Abyss.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
+            services.AddMvc(options =>
+            {
+                options.InputFormatters.Add(new TextPlainInputFormatter());
+            })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
                 .AddJsonOptions(options =>
                 {
@@ -125,6 +128,7 @@ namespace Abyss.Web
 
             services.AddTransient<IUserManager, UserManager>();
             services.AddTransient<IOnlineManager, OnlineManager>();
+            services.AddTransient<IWhoSaidManager, WhoSaidManager>();
             services.AddTransient<IAbyssContext, AbyssContext>();
             services.AddTransient<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
             services.AddTransient(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
@@ -137,6 +141,7 @@ namespace Abyss.Web
             services.AddTransient<ICloudflareHelper, CloudflareHelper>();
             services.AddTransient<IGModHelper, GModHelper>();
             services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
+            services.AddSingleton<IWhoSaidHelper, WhoSaidHelper>();
             services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
             {
                 Token = _config["Discord:Token"],

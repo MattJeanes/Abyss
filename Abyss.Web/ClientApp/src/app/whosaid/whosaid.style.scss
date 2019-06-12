@@ -1,0 +1,23 @@
+
+.main {
+    display: flex;
+    flex-direction: row;
+    > * {
+        padding-left: 10px;
+    }
+}
+
+.name {
+    align-self: center;
+    flex: 1;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.field {
+    flex: 10;
+}
+
+.button {
+    align-self: center;
+}

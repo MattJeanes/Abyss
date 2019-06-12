@@ -33,6 +33,7 @@ export enum Permissions {
     UserManager = "UserManager",
     ErrorViewer = "ErrorViewer",
     ServerManager = "ServerManager",
+    WhoSaid = "WhoSaid",
 }
 
 export enum ServerStatus {
@@ -64,4 +65,9 @@ export interface ITeamSpeakChannel {
     Id: number;
     Name: string;
     ParentId: number;
+}
+
+export interface IWhoSaid {
+    Name: string;
+    Message: string;
 }

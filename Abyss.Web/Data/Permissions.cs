@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data
 {
     public static class Permissions
     {
@@ -11,5 +6,6 @@ namespace Abyss.Web.Data
         public const string ErrorViewer = "ErrorViewer";
         public const string ServerManager = "ServerManager";
         public const string QuoteManager = "QuoteManager";
+        public const string WhoSaid = "WhoSaid";
     }
 }

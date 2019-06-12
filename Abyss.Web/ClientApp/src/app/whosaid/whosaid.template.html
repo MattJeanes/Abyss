@@ -1,0 +1,10 @@
+<h1>Who Said It?</h1>
+<div class="main">
+    <div class="name">{{ name }}:</div>
+    <mat-form-field class="field">
+        <input class="input" matInput placeholder="Message" type="text" #input (keyup.enter)="whoSaid(input.value)" />
+    </mat-form-field>
+    <div class="button">
+        <button mat-raised-button (click)="whoSaid(input.value)">Submit</button>
+    </div>
+</div>

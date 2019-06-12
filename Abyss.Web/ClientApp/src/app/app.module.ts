@@ -20,13 +20,16 @@ import { ErrorService } from "./services/error.service";
 import { OnlineService } from "./services/online.service";
 import { ServerService } from "./services/server.service";
 import { UserService } from "./services/user.service";
+import { WhoSaidService } from "./services/whosaid.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
 import { UserManagerComponent } from "./usermanager/usermanager.component";
+import { WhoSaidComponent } from "./whosaid/whosaid.component";
 
 import {
     MatButtonModule,
     MatDialogModule,
     MatIconModule,
+    MatInputModule,
     MatListModule,
     MatOptionModule,
     MatSelectModule,
@@ -48,6 +51,7 @@ export const ROUTES: Routes = [
     { path: "usermanager", component: UserManagerComponent, canActivate: [AuthGuard], data: { permissions: "UserManager" } },
     { path: "servermanager", component: ServerManagerComponent, canActivate: [AuthGuard], data: { permissions: "ServerManager" } },
     { path: "online", component: OnlineComponent },
+    { path: "whosaid", component: WhoSaidComponent, canActivate: [AuthGuard], data: { permissions: "WhoSaid" } },
     { path: "**", component: PageNotFoundComponent },
 ];
 
@@ -69,6 +73,7 @@ export const ROUTES: Routes = [
         MatIconModule,
         MatOptionModule,
         MomentModule,
+        MatInputModule,
     ],
     declarations: [
         AppComponent,
@@ -79,6 +84,7 @@ export const ROUTES: Routes = [
         UserManagerComponent,
         ServerManagerComponent,
         OnlineComponent,
+        WhoSaidComponent,
     ],
     entryComponents: [
         AccountDialogComponent,
@@ -90,6 +96,7 @@ export const ROUTES: Routes = [
         ServerService,
         ErrorService,
         OnlineService,
+        WhoSaidService,
         AuthGuard,
         {
             provide: HTTP_INTERCEPTORS,
