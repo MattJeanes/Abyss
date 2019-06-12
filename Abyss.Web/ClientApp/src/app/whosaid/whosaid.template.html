@@ -5,7 +5,7 @@
         <input class="input" matInput placeholder="Message" type="text" #input (keyup.enter)="whoSaid(input.value)" />
     </mat-form-field>
     <div class="button">
-        <button mat-raised-button (click)="whoSaid(input.value)">Submit</button>
+        <button [disabled]="loading" mat-raised-button (click)="whoSaid(input.value)">Submit</button>
     </div>
 </div>
 <div class="log">

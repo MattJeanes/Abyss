@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import { TdDialogService } from "@covalent/core";
 
 import { IWhoSaid } from "../app.data";
 import { WhoSaidService } from "../services/whosaid.service";
@@ -10,14 +11,25 @@ import { WhoSaidService } from "../services/whosaid.service";
 export class WhoSaidComponent {
     public name = "Someone";
     public log: IWhoSaid[] = [];
+    public loading = false;
 
-    constructor(private whoSaidService: WhoSaidService) { }
+    constructor(private whoSaidService: WhoSaidService, private dialogService: TdDialogService) { }
 
     public async whoSaid(message: string) {
-        if (!message) { return; }
-        const whoSaid = await this.whoSaidService.whoSaid(message);
-        this.log = [...this.log, whoSaid];
-        this.name = whoSaid.Name;
+        try {
+            if ((!message) || this.loading) { return; }
+            this.loading = true;
+            const whoSaid = await this.whoSaidService.whoSaid(message);
+            this.log = [...this.log, whoSaid];
+            this.name = whoSaid.Name;
+        } catch (e) {
+            this.dialogService.openAlert({
+                title: "Failed to get who said it",
+                message: e.toString(),
+            });
+        } finally {
+            this.loading = false;
+        }
     }
 
     public clear() {
