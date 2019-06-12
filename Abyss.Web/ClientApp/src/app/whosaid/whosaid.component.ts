@@ -13,7 +13,6 @@ export class WhoSaidComponent {
 
     public async whoSaid(message: string) {
         const whoSaid = await this.whoSaidService.whoSaid(message);
-        console.log(whoSaid);
         this.name = whoSaid.Name;
     }
 }
