@@ -8,3 +8,13 @@
         <button mat-raised-button (click)="whoSaid(input.value)">Submit</button>
     </div>
 </div>
+<div class="log">
+    <button mat-raised-button (click)="clear()" *ngIf="log.length">Clear</button>
+    &nbsp;
+    <button mat-raised-button (click)="undo()" *ngIf="log.length">Undo</button>
+    <br />
+    <br />
+    <div *ngFor="let logItem of log">
+       {{ {logItem.Nam }}}:{{ {logItem.Messag }}}
+    </div>
+</div>
