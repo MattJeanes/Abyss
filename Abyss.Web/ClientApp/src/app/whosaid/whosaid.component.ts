@@ -12,14 +12,15 @@ export class WhoSaidComponent {
     public name = "Someone";
     public log: IWhoSaid[] = [];
     public loading = false;
+    public message = "";
 
     constructor(private whoSaidService: WhoSaidService, private dialogService: TdDialogService) { }
 
-    public async whoSaid(message: string) {
+    public async whoSaid() {
         try {
-            if ((!message) || this.loading) { return; }
+            if ((!this.message) || this.loading) { return; }
             this.loading = true;
-            const whoSaid = await this.whoSaidService.whoSaid(message);
+            const whoSaid = await this.whoSaidService.whoSaid(this.message);
             this.log = [...this.log, whoSaid];
             this.name = whoSaid.Name;
         } catch (e) {

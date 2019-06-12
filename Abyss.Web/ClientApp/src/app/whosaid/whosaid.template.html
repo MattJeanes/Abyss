@@ -2,10 +2,14 @@
 <div class="main">
     <div class="name">{{ name }}:</div>
     <mat-form-field class="field">
-        <input class="input" matInput placeholder="Message" type="text" #input (keyup.enter)="whoSaid(input.value)" />
+        <input class="input" matInput placeholder="Message" type="text" [(ngModel)]="message"
+            (keyup.enter)="whoSaid()" />
+        <button mat-button *ngIf="message" matSuffix mat-icon-button aria-label="Clear" (click)="message=''">
+            <mat-icon>close</mat-icon>
+        </button>
     </mat-form-field>
     <div class="button">
-        <button [disabled]="loading" mat-raised-button (click)="whoSaid(input.value)">Submit</button>
+        <button [disabled]="loading || !message" mat-raised-button (click)="whoSaid()">Submit</button>
     </div>
 </div>
 <div class="log">
@@ -15,6 +19,6 @@
     <br />
     <br />
     <div *ngFor="let logItem of log">
-       {{ logItem.Name }}: {{ logItem.Message }}
+        {{ logItem.Name }}: {{ logItem.Message }}
     </div>
 </div>
