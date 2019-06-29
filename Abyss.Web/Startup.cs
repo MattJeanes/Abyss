@@ -27,6 +27,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -141,7 +142,10 @@ namespace Abyss.Web
             services.AddTransient<ICloudflareHelper, CloudflareHelper>();
             services.AddTransient<IGModHelper, GModHelper>();
             services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
-            services.AddSingleton<IWhoSaidHelper, WhoSaidHelper>();
+            services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
+
+            services.AddPredictionEnginePool<InputData, Prediction>().FromFile("Models/whosaidit.zip");
+
             services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
             {
                 Token = _config["Discord:Token"],
