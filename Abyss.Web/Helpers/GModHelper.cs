@@ -3,6 +3,8 @@ using Abyss.Web.Helpers.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Helpers
@@ -20,7 +22,7 @@ namespace Abyss.Web.Helpers
 
         public async Task<string> ChangeRank(ChangeRankDTO request)
         {
-            return await HandleResponse<string>(await _client.PostAsJsonAsync("rank", request));
+            return await HandleResponse<string>(await _client.PostAsync("rank", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")));
         }
 
         private async Task<T> HandleResponse<T>(HttpResponseMessage message)
@@ -28,7 +30,7 @@ namespace Abyss.Web.Helpers
             GModResponse<T> resp;
             try
             {
-                resp = await message.Content.ReadAsAsync<GModResponse<T>>();
+                resp = await JsonSerializer.DeserializeAsync<GModResponse<T>>(await message.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
             }
             catch (Exception e)
             {

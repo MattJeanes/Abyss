@@ -1,11 +1,13 @@
 ﻿using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers.Interfaces;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Helpers
@@ -29,7 +31,7 @@ namespace Abyss.Web.Helpers
 
         public async Task<CloudflareDNSRecord> UpdateDNSRecord(CloudflareDNSRecord record)
         {
-            var resp = await _client.PutAsJsonAsync($"zones/{record.ZoneId}/dns_records/{record.Id}", record);
+            var resp = await _client.PutAsync($"zones/{record.ZoneId}/dns_records/{record.Id}", new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json"));
             var newRecord = await GetResponse<CloudflareDNSRecord>(resp);
             return newRecord;
         }
@@ -37,7 +39,7 @@ namespace Abyss.Web.Helpers
         private async Task<CloudflareZone> GetZone(string name)
         {
             var resp = await _client.GetAsync($"zones?name={name}");
-            var zones = await resp.Content.ReadAsAsync<CloudflareResponse<List<CloudflareZone>>>();
+            var zones = await JsonSerializer.DeserializeAsync<CloudflareResponse<List<CloudflareZone>>>(await resp.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
             var zone = zones.Result.FirstOrDefault();
             return zone;
         }
@@ -51,7 +53,7 @@ namespace Abyss.Web.Helpers
 
         private async Task<T> GetResponse<T>(HttpResponseMessage message)
         {
-            var resp = await message.Content.ReadAsAsync<CloudflareResponse<T>>();
+            var resp = await JsonSerializer.DeserializeAsync<CloudflareResponse<T>>(await message.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
             if (!resp.Success)
             {
                 throw new Exception(resp.Errors.Any() ? string.Join(", ", resp.Errors.Select(x => x.Message)) : "Unknown Cloudflare error");
@@ -82,43 +84,43 @@ namespace Abyss.Web.Helpers
 
     public class CloudflareDNSRecord
     {
-        [JsonProperty(PropertyName = "id")]
+        [JsonPropertyName("id")]
         public string Id { get; set; }
 
-        [JsonProperty(PropertyName = "type")]
+        [JsonPropertyName("type")]
         public string Type { get; set; }
 
-        [JsonProperty(PropertyName = "name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "content")]
+        [JsonPropertyName("content")]
         public string Content { get; set; }
 
-        [JsonProperty(PropertyName = "proxiable")]
+        [JsonPropertyName("proxiable")]
         public bool Proxiable { get; set; }
 
-        [JsonProperty(PropertyName = "proxied")]
+        [JsonPropertyName("proxied")]
         public bool Proxied { get; set; }
 
-        [JsonProperty(PropertyName = "ttl")]
+        [JsonPropertyName("ttl")]
         public int Ttl { get; set; }
 
-        [JsonProperty(PropertyName = "locked")]
+        [JsonPropertyName("locked")]
         public bool Locked { get; set; }
 
-        [JsonProperty(PropertyName = "zone_id")]
+        [JsonPropertyName("zone_id")]
         public string ZoneId { get; set; }
 
-        [JsonProperty(PropertyName = "zone_name")]
+        [JsonPropertyName("zone_name")]
         public string ZoneName { get; set; }
 
-        [JsonProperty(PropertyName = "created_on")]
+        [JsonPropertyName("created_on")]
         public DateTime Created_on { get; set; }
 
-        [JsonProperty(PropertyName = "modified_on")]
+        [JsonPropertyName("modified_on")]
         public DateTime ModifiedOn { get; set; }
 
-        [JsonProperty(PropertyName = "data")]
+        [JsonPropertyName("data")]
         public object Data { get; set; }
     }
 }

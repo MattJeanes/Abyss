@@ -1,4 +1,5 @@
 ﻿using Abyss.Web.Data;
+using Microsoft.Azure.Management.Compute.Fluent;
 using System;
 
 namespace Abyss.Web.Entities
@@ -18,5 +19,7 @@ namespace Abyss.Web.Entities
         public int? RemindAfterMinutes { get; set; }
         public int? ReminderIntervalMinutes { get; set; }
         public DateTime? NextReminder { get; set; }
+        public CloudType CloudType { get; set; }
+        public string ResourceId { get; set; }
     }
 }

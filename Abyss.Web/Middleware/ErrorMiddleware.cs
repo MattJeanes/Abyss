@@ -2,19 +2,18 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Middleware
 {
     public class ErrorHandlingMiddleware
     {
-        private static readonly JsonSerializerSettings errorSerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerOptions errorSerializerOptions = new JsonSerializerOptions
         {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
         private readonly RequestDelegate _next;
         public ErrorHandlingMiddleware(RequestDelegate next)
@@ -65,7 +64,7 @@ namespace Abyss.Web.Middleware
 
         public static string GetErrorResponse(Exception e)
         {
-            return JsonConvert.SerializeObject(new { Error = e.Message }, errorSerializerSettings);
+            return JsonSerializer.Serialize(new { Error = e.Message }, errorSerializerOptions);
         }
     }
 

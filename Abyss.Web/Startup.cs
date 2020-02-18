@@ -24,29 +24,36 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Azure.Management.Fluent;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using Newtonsoft.Json.Serialization;
 using StackExchange.Exceptional;
 using StackExchange.Exceptional.Stores;
 using System;
 using System.Text;
+using System.Text.Json;
 
 namespace Abyss.Web
 {
     public class Startup
     {
         public readonly IConfiguration _config;
-        private readonly IHostingEnvironment _env;
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IHostingEnvironment env)
+        public static JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            PropertyNamingPolicy = null,
+            DictionaryKeyPolicy = null
+        };
+
+        public Startup(IWebHostEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -65,12 +72,15 @@ namespace Abyss.Web
         {
             services.AddMvc(options =>
             {
+                options.EnableEndpointRouting = true;
                 options.InputFormatters.Add(new TextPlainInputFormatter());
             })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                .AddJsonOptions(options =>
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddJsonOptions(o =>
                 {
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                    o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    o.JsonSerializerOptions.PropertyNamingPolicy = null;
+                    o.JsonSerializerOptions.DictionaryKeyPolicy = null;
                 });
             services.AddHttpsRedirection(options =>
             {
@@ -140,6 +150,7 @@ namespace Abyss.Web
             services.AddTransient(_ => new DigitalOceanClient(_config["DigitalOcean:ApiKey"]));
             services.AddTransient<IServerManager, ServerManager>();
             services.AddTransient<ICloudflareHelper, CloudflareHelper>();
+            services.AddTransient<IAzureHelper, AzureHelper>();
             services.AddTransient<IGModHelper, GModHelper>();
             services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
             services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
@@ -155,6 +166,7 @@ namespace Abyss.Web
             services.AddTransient(serviceProvider =>
                 serviceProvider.GetRequiredService<TumblrClientFactory>().Create<TumblrClient>(
                     _config["Tumblr:ConsumerKey"], _config["Tumblr:ConsumerSecret"], new DontPanic.TumblrSharp.OAuth.Token(_config["Tumblr:Token"], _config["Tumblr:TokenSecret"])));
+            services.AddTransient(serviceProvider => Azure.Authenticate("azure.json").WithSubscription(_config["Azure:SubscriptionId"]));
             //services.AddTransient<IDiscordCommand, AddonsCommand>();
             services.AddTransient<IDiscordCommand, RegisterCommand>();
             services.AddTransient<IDiscordCommand, PingCommand>();
@@ -169,6 +181,7 @@ namespace Abyss.Web
             services.Configure<TeamSpeakOptions>(_config.GetSection("TeamSpeak"));
             services.Configure<TumblrOptions>(_config.GetSection("Tumblr"));
             services.Configure<ReminderOptions>(_config.GetSection("Reminder"));
+            services.Configure<AzureOptions>(_config.GetSection("Azure"));
             services.AddHttpContextAccessor();
             services.AddHttpClient("cloudflare", options =>
             {
@@ -224,8 +237,10 @@ namespace Abyss.Web
 
             services.AddSignalR().AddJsonProtocol(options =>
             {
-                options.PayloadSerializerSettings.ContractResolver = new DefaultContractResolver();
+                options.PayloadSerializerOptions = JsonSerializerOptions;
             });
+
+            services.AddRouting();
 
             var pack = new ConventionPack
             {
@@ -234,7 +249,7 @@ namespace Abyss.Web
             ConventionRegistry.Register("Abyss Conventions", pack, t => true);
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
@@ -262,16 +277,12 @@ namespace Abyss.Web
             });
             app.UseSpaStaticFiles();
 
-            app.UseSignalR(routes =>
+            app.UseRouting();
+
+            app.UseEndpoints(routes =>
             {
                 routes.MapHub<OnlineHub>("/hub/online");
-            });
-
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                routes.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
 
             app.UseSpa(spa =>

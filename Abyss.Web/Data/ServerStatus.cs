@@ -2,9 +2,9 @@
 {
     public enum ServerStatus
     {
-        Active,
-        Inactive,
-        Activating,
-        Deactivating,
+        Active = 0,
+        Inactive = 1,
+        Activating = 2,
+        Deactivating = 3,
     }
 }

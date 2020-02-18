@@ -21,12 +21,14 @@ namespace Abyss.Web.Managers
         private readonly IRepository<Server> _serverRepository;
         private readonly CloudflareOptions _options;
         private readonly ICloudflareHelper _cloudflareHelper;
+        private readonly IAzureHelper _azureHelper;
         private readonly ILogger<ServerManager> _baseLogger;
 
         public ServerManager(
             IDigitalOceanHelper digitalOceanHelper,
             IRepository<Server> serverRepository,
             IOptions<CloudflareOptions> options,
+            IAzureHelper azureHelper,
             ICloudflareHelper cloudflareHelper,
             ILogger<ServerManager> logger
             )
@@ -35,6 +37,7 @@ namespace Abyss.Web.Managers
             _serverRepository = serverRepository;
             _options = options.Value;
             _cloudflareHelper = cloudflareHelper;
+            _azureHelper = azureHelper;
             _baseLogger = logger;
         }
 
@@ -60,18 +63,37 @@ namespace Abyss.Web.Managers
                 server.StatusId = ServerStatus.Activating;
                 await _serverRepository.Update(server);
 
-                logger.LogInformation($"Creating droplet from server id {server.Id} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
-                var droplet = await _digitalOceanHelper.CreateDropletFromServer(server, logger);
-                logger.LogInformation($"Created droplet from server id {server.Id}");
+                string ipAddress;
+                if (server.CloudType == CloudType.DigitalOcean)
+                {
+                    logger.LogInformation($"Creating droplet from server id {server.Id} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
+                    var droplet = await _digitalOceanHelper.CreateDropletFromServer(server, logger);
+                    logger.LogInformation($"Created droplet from server id {server.Id}");
+                    server.DropletId = droplet.Id;
+                    ipAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
+                }
+                else if (server.CloudType == CloudType.Azure)
+                {
+                    var vm = await _azureHelper.StartServer(server, logger);
+                    ipAddress = vm.GetPrimaryPublicIPAddress().IPAddress;
+                }
+                else
+                {
+                    throw new Exception($"Unsupported cloud type {server.CloudType}");
+                }
 
-                var ipAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
-
-                logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
                 var dnsRecord = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
-                dnsRecord.Content = ipAddress;
-                await _cloudflareHelper.UpdateDNSRecord(dnsRecord);
+                if (dnsRecord.Content != ipAddress)
+                {
+                    logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
+                    dnsRecord.Content = ipAddress;
+                    await _cloudflareHelper.UpdateDNSRecord(dnsRecord);
+                }
+                else
+                {
+                    logger.LogInformation($"DNS record for {server.DNSRecord} already set to {ipAddress}");
+                }
 
-                server.DropletId = droplet.Id;
                 server.StatusId = ServerStatus.Active;
                 server.IPAddress = ipAddress;
                 if (server.RemindAfterMinutes.HasValue)
@@ -111,48 +133,59 @@ namespace Abyss.Web.Managers
                 if (server == null) { throw new Exception($"Server id {server} not found"); }
 
                 if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot delete server that is not active"); }
-                if (!server.DropletId.HasValue) { throw new Exception("Server has no droplet id"); }
-                var droplet = await _digitalOceanHelper.GetDroplet(server.DropletId.Value);
-                if (droplet == null) { throw new Exception($"Droplet id {server.DropletId} not valid"); }
-                var dropletName = $"{droplet.Name} (id {droplet.Id})";
-                if (!new[] { DigitalOceanEnums.DropletStatus.Active, DigitalOceanEnums.DropletStatus.Off }.Contains(droplet.Status)) { throw new Exception($"Server not in expected state, is in '{droplet.Status}'"); }
                 logger.LogInformation($"Stopping server {server.Id}");
                 server.StatusId = ServerStatus.Deactivating;
                 await _serverRepository.Update(server);
-
-                if (droplet.Status == DigitalOceanEnums.DropletStatus.Active)
+                if (server.CloudType == CloudType.DigitalOcean)
                 {
-                    logger.LogInformation($"Shutting down server {dropletName}");
-                    await _digitalOceanHelper.Shutdown(droplet.Id);
-                    logger.LogInformation($"Shut down server {dropletName}");
+                    if (!server.DropletId.HasValue) { throw new Exception("Server has no droplet id"); }
+                    var droplet = await _digitalOceanHelper.GetDroplet(server.DropletId.Value);
+                    if (droplet == null) { throw new Exception($"Droplet id {server.DropletId} not valid"); }
+                    var dropletName = $"{droplet.Name} (id {droplet.Id})";
+                    if (!new[] { DigitalOceanEnums.DropletStatus.Active, DigitalOceanEnums.DropletStatus.Off }.Contains(droplet.Status)) { throw new Exception($"Server not in expected state, is in '{droplet.Status}'"); }
+                    if (droplet.Status == DigitalOceanEnums.DropletStatus.Active)
+                    {
+                        logger.LogInformation($"Shutting down server {dropletName}");
+                        await _digitalOceanHelper.Shutdown(droplet.Id);
+                        logger.LogInformation($"Shut down server {dropletName}");
+                    }
+
+                    var snapshotName = $"{droplet.Name}_{Guid.NewGuid()}";
+                    logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
+                    var snapshot = await _digitalOceanHelper.Snapshot(droplet.Id, snapshotName);
+                    if (snapshot == null) { throw new Exception($"Couldn't find snapshot name {snapshotName} just created"); }
+                    logger.LogInformation($"Snapshotted server {dropletName} as {snapshot.Name} ({snapshot.Id})");
+
+                    if (server.SnapshotId.HasValue)
+                    {
+                        logger.LogInformation($"Deleting old snapshot id {server.SnapshotId}");
+                        await _digitalOceanHelper.DeleteSnapshot(server.SnapshotId.Value);
+                    }
+
+                    logger.LogInformation($"Deleting server {dropletName}");
+                    await _digitalOceanHelper.DeleteDroplet(droplet.Id);
+
+                    server.SnapshotId = snapshot.Id;
+                    if (!string.IsNullOrEmpty(server.Resize))
+                    {
+                        server.Resize = droplet.SizeSlug;
+                    }
+                    else
+                    {
+                        server.Size = droplet.SizeSlug;
+                    }
+                    server.Region = droplet.Region.Slug;
+                    server.DropletId = null;
                 }
- 
-                var snapshotName = $"{droplet.Name}_{Guid.NewGuid()}";
-                logger.LogInformation($"Snapshotting server {dropletName} as {snapshotName} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
-                var snapshot = await _digitalOceanHelper.Snapshot(droplet.Id, snapshotName);
-                if (snapshot == null) { throw new Exception($"Couldn't find snapshot name {snapshotName} just created"); }
-                logger.LogInformation($"Snapshotted server {dropletName} as {snapshot.Name} ({snapshot.Id})");
 
-                if (server.SnapshotId.HasValue)
+                else if (server.CloudType == CloudType.Azure)
                 {
-                    logger.LogInformation($"Deleting old snapshot id {server.SnapshotId}");
-                    await _digitalOceanHelper.DeleteSnapshot(server.SnapshotId.Value);
-                }
-
-                logger.LogInformation($"Deleting server {dropletName}");
-                await _digitalOceanHelper.DeleteDroplet(droplet.Id);
-
-                server.SnapshotId = snapshot.Id;
-                if (!string.IsNullOrEmpty(server.Resize))
-                {
-                    server.Resize = droplet.SizeSlug;
+                    await _azureHelper.StopServer(server, logger);
                 }
                 else
                 {
-                    server.Size = droplet.SizeSlug;
+                    throw new Exception($"Unsupported cloud type {server.CloudType}");
                 }
-                server.Region = droplet.Region.Slug;
-                server.DropletId = null;
                 server.IPAddress = null;
                 server.NextReminder = null;
                 server.StatusId = ServerStatus.Inactive;

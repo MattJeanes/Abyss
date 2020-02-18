@@ -9,13 +9,13 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Helpers
@@ -93,7 +93,7 @@ namespace Abyss.Web.Helpers
             var encodedUser = user?.Claims.FirstOrDefault(x => x.Type == UserClaimField) ?? null;
             if (encodedUser != null)
             {
-                return JsonConvert.DeserializeObject<ClientUser>(encodedUser.Value);
+                return JsonSerializer.Deserialize<ClientUser>(encodedUser.Value);
             }
             return null;
         }
@@ -141,7 +141,7 @@ namespace Abyss.Web.Helpers
                 refreshToken = await AddRefreshToken(user, refreshToken);
             }
             var clientUser = await GetClientUser(user);
-            var clientUserSerialized = JsonConvert.SerializeObject(clientUser);
+            var clientUserSerialized = JsonSerializer.Serialize(clientUser);
             var claims = new List<Claim>
             {
                 new Claim(UserClaimField, clientUserSerialized),

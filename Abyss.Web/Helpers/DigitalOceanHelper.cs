@@ -5,7 +5,6 @@ using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Logging;
 using DigitalOcean.API;
 using DigitalOcean.API.Models.Responses;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -22,7 +21,6 @@ namespace Abyss.Web.Helpers
 
         private readonly DigitalOceanClient _client;
         private readonly DigitalOceanOptions _options;
-        private readonly ILogger<DigitalOceanHelper> _logger;
 
         public DigitalOceanHelper(DigitalOceanClient client, IOptions<DigitalOceanOptions> options)
         {

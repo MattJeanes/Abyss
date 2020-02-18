@@ -1,0 +1,19 @@
+{
+  "ConnectionStrings": {
+    "Abyss": "mongodb://abyss:Ux6LMPaBhd9dBX3R4pgc@localhost"
+  },
+  "Discord": {
+    "CommandPrefix": "!abyssbot"
+  },
+  "TeamSpeak": {
+    "Host": "127.0.0.1"
+  },
+  "Logging": {
+    "Database": true,
+    "LogLevel": {
+      "Default": "Information",
+      "System": "Error",
+      "Microsoft": "Error"
+    }
+  }
+}
