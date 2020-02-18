@@ -279,6 +279,8 @@ namespace Abyss.Web
 
             app.UseRouting();
 
+            app.UseAuthorization();
+
             app.UseEndpoints(routes =>
             {
                 routes.MapHub<OnlineHub>("/hub/online");

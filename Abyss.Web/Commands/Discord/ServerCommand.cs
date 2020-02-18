@@ -34,7 +34,7 @@ namespace Abyss.Web.Commands.Discord
                     await StopServer(e, args.Skip(1).FirstOrDefault());
                     break;
                 default:
-                    await e.Message.RespondAsync("Unknown sub-command, try: (none), add");
+                    await e.Message.RespondAsync("Unknown sub-command, try: (none), start, stop");
                     break;
             }
         }
