@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
 using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,10 +22,10 @@ namespace Abyss.Web.Helpers
 
         public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
         {
-            string data = null;
-            using (var streamReader = context.ReaderFactory(context.HttpContext.Request.Body, encoding))
+            string data;
+            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
             {
-                data = await streamReader.ReadToEndAsync();
+                data = await reader.ReadToEndAsync();
             }
             return InputFormatterResult.Success(data);
         }
