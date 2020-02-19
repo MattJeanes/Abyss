@@ -46,12 +46,7 @@ namespace Abyss.Web
         public readonly IConfiguration _config;
         private readonly IWebHostEnvironment _env;
 
-        public static JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true,
-            PropertyNamingPolicy = null,
-            DictionaryKeyPolicy = null
-        };
+        public static JsonSerializerOptions JsonSerializerOptions = ConfigureJsonOptions(new JsonSerializerOptions());
 
         public Startup(IWebHostEnvironment env)
         {
@@ -76,12 +71,7 @@ namespace Abyss.Web
                 options.InputFormatters.Add(new TextPlainInputFormatter());
             })
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddJsonOptions(o =>
-                {
-                    o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                    o.JsonSerializerOptions.PropertyNamingPolicy = null;
-                    o.JsonSerializerOptions.DictionaryKeyPolicy = null;
-                });
+                .AddJsonOptions(o => ConfigureJsonOptions(o.JsonSerializerOptions));
             services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
@@ -247,6 +237,15 @@ namespace Abyss.Web
                 new IgnoreExtraElementsConvention(true)
             };
             ConventionRegistry.Register("Abyss Conventions", pack, t => true);
+        }
+
+        private static JsonSerializerOptions ConfigureJsonOptions(JsonSerializerOptions o)
+        {
+            o.PropertyNameCaseInsensitive = true;
+            o.PropertyNamingPolicy = null;
+            o.DictionaryKeyPolicy = null;
+            o.Converters.Add(new ObjectIdConverter());
+            return o;
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
