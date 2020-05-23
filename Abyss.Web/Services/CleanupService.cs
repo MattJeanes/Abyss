@@ -32,7 +32,16 @@ namespace Abyss.Web.Services
         {
             _logger.LogInformation("Cleanup service is starting");
 
-            _timer = new Timer(async (state) => { await Task.Run(DoWork); }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.IntervalSeconds));
+            _timer = new Timer(async (state) => {
+                try
+                {
+                    await DoWork();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Failed to run {nameof(DoWork)}");
+                }
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.IntervalSeconds));
 
             return Task.CompletedTask;
         }

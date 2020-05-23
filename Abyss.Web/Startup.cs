@@ -131,8 +131,8 @@ namespace Abyss.Web
             services.AddTransient<IOnlineManager, OnlineManager>();
             services.AddTransient<IWhoSaidManager, WhoSaidManager>();
             services.AddTransient<IAbyssContext, AbyssContext>();
-            services.AddTransient<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
-            services.AddTransient(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
+            services.AddSingleton<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
+            services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
             services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserHelper, UserHelper>();

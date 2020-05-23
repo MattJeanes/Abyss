@@ -9,8 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +39,17 @@ namespace Abyss.Web.Services
         {
             _logger.LogInformation("Reminder service is starting");
 
-            _timer = new Timer(async (state) => { await Task.Run(DoWork); }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.CheckIntervalSeconds));
+            _timer = new Timer(async (state) =>
+            {
+                try
+                {
+                    await DoWork();
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Failed to run {nameof(DoWork)}");
+                }
+            }, null, TimeSpan.Zero, TimeSpan.FromSeconds(_options.CheckIntervalSeconds));
 
             return Task.CompletedTask;
         }
