@@ -24,8 +24,8 @@ jobs:
         for appname in Abyss.Web; do
           app=`echo $appname | tr '[:upper:]' '[:lower:]'`
           echo "Deploying $appname"
-          docker tag $app docker.pkg.github.com/mattjeanes/abyss/$appname:latest
-          docker push docker.pkg.github.com/mattjeanes/abyss/$appname:latest
+          docker tag $app docker.pkg.github.com/mattjeanes/abyss/$app:latest
+          docker push docker.pkg.github.com/mattjeanes/abyss/$app:latest
         done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
