@@ -70,7 +70,7 @@ namespace Abyss.Web.Managers
                     var droplet = await _digitalOceanHelper.CreateDropletFromServer(server, logger);
                     logger.LogInformation($"Created droplet from server id {server.Id}");
                     server.DropletId = droplet.Id;
-                    ipAddress = droplet.Networks.v4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
+                    ipAddress = droplet.Networks.V4.FirstOrDefault()?.IpAddress ?? throw new Exception("Droplet has no IPv4 address");
                 }
                 else if (server.CloudType == CloudType.Azure)
                 {

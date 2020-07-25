@@ -8,10 +8,10 @@ namespace Abyss.Web.Helpers.Interfaces
     public interface IDigitalOceanHelper
     {
         Task<Droplet> CreateDropletFromServer(Server server, TaskLogger logger);
-        Task<Droplet> GetDroplet(int value);
-        Task Shutdown(int dropletId);
-        Task<Image> Snapshot(int dropletId, string snapshotName);
-        Task DeleteSnapshot(int id);
-        Task DeleteDroplet(int id);
+        Task<Droplet> GetDroplet(long value);
+        Task Shutdown(long dropletId);
+        Task<Image> Snapshot(long dropletId, string snapshotName);
+        Task DeleteSnapshot(long id);
+        Task DeleteDroplet(long id);
     }
 }

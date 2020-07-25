@@ -35,13 +35,13 @@ namespace Abyss.Web.Helpers
             if (servers.Any()) { throw new Exception($"Droplet {server.Tag} already exists"); }
             var newDroplet = new Requests.Droplet
             {
-                ImageIdOrSlug = server.SnapshotId.Value,
+                Image = server.SnapshotId.Value,
                 Name = server.Tag,
-                SizeSlug = server.Size,
-                RegionSlug = server.Region,
+                Size = server.Size,
+                Region = server.Region,
                 Backups = true,
-                Tags = new List<object> { server.Tag },
-                SshIdsOrFingerprints = new List<object> { _options.SshId }
+                Tags = new List<string> { server.Tag },
+                SshKeys = new List<object> { _options.SshId }
             };
             var droplet = await WaitForDropletCreation(await _client.Droplets.Create(newDroplet));
             if (!string.IsNullOrEmpty(server.Resize))
@@ -58,17 +58,17 @@ namespace Abyss.Web.Helpers
             return droplet;
         }
 
-        public async Task<Droplet> GetDroplet(int id)
+        public async Task<Droplet> GetDroplet(long id)
         {
             return await _client.Droplets.Get(id);
         }
 
-        public async Task Shutdown(int dropletId)
+        public async Task Shutdown(long dropletId)
         {
             await WaitForAction(await _client.DropletActions.Shutdown(dropletId));
         }
 
-        public async Task<Image> Snapshot(int dropletId, string snapshotName)
+        public async Task<Image> Snapshot(long dropletId, string snapshotName)
         {
             await WaitForAction(await _client.DropletActions.Snapshot(dropletId, snapshotName));
             var images = await _client.Images.GetAll(Requests.ImageType.Private);
@@ -76,12 +76,12 @@ namespace Abyss.Web.Helpers
             return snapshot;
         }
 
-        public async Task DeleteSnapshot(int id)
+        public async Task DeleteSnapshot(long id)
         {
             await _client.Images.Delete(id);
         }
 
-        public async Task DeleteDroplet(int id)
+        public async Task DeleteDroplet(long id)
         {
             await _client.Droplets.Delete(id);
         }
