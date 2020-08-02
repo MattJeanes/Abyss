@@ -1,6 +1,8 @@
 ﻿using Abyss.Web.Data.GMod;
+using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -13,16 +15,27 @@ namespace Abyss.Web.Helpers
     {
         private readonly HttpClient _client;
         private readonly ILogger<GModHelper> _logger;
+        private readonly GModOptions _options;
 
-        public GModHelper(IHttpClientFactory httpClientFactory, ILogger<GModHelper> logger)
+        public GModHelper(
+            IHttpClientFactory httpClientFactory,
+            ILogger<GModHelper> logger,
+            IOptions<GModOptions> options
+            )
         {
             _client = httpClientFactory.CreateClient("gmod");
             _logger = logger;
+            _options = options.Value;
         }
 
         public async Task<string> ChangeRank(ChangeRankDTO request)
         {
             return await HandleResponse<string>(await _client.PostAsync("rank", new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")));
+        }
+
+        public bool IsActive()
+        {
+            return _options.Active;
         }
 
         private async Task<T> HandleResponse<T>(HttpResponseMessage message)

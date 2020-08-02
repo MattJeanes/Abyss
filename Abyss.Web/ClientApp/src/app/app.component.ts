@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material";
-import { TdDialogService } from "@covalent/core";
+import { MatDialog } from "@angular/material/dialog";
+import { TdDialogService } from "@covalent/core/dialogs";
 
 import { Router } from "@angular/router";
 import { Permissions } from "./app.data";
@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
         if (user) {
             return user.Name;
         } else {
-            return undefined;
+            return "Unknown";
         }
     }
 

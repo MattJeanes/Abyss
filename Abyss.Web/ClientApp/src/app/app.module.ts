@@ -1,51 +1,50 @@
-import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
-import { NgModule } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { RouterModule, Routes } from "@angular/router";
-import { JWT_OPTIONS, JwtHelperService, JwtInterceptor } from "@auth0/angular-jwt";
-import { MomentModule } from "ngx-moment";
+import { NgModule } from "@angular/core";
+import { RouterModule, Routes } from '@angular/router';
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from "./app.component";
-import { PageNotFoundComponent } from "./errors/not-found.component";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+
+import { MatButtonModule } from "@angular/material/button";
+import { MatDialogModule } from "@angular/material/dialog";
+import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
+import { MatListModule } from "@angular/material/list";
+import { MatSelectModule } from "@angular/material/select";
+import { MatSliderModule } from "@angular/material/slider";
+import { MatTooltipModule } from "@angular/material/tooltip";
+
+import { CovalentDialogsModule } from "@covalent/core/dialogs";
+
+import { MomentModule } from "ngx-moment";
+
+import { JWT_OPTIONS, JwtHelperService, JwtInterceptor } from "@auth0/angular-jwt";
+
 import { HomeComponent } from "./home/home.component";
 import { LoginComponent } from "./login.component";
-import { OnlineComponent } from "./online/online.component";
-import { ServerManagerComponent } from "./servermanager/servermanager.component";
-import { AuthGuard } from "./services/auth.guard";
-import { AuthInterceptor } from "./services/auth.interceptor";
-import { AuthService } from "./services/auth.service";
-import { ErrorService } from "./services/error.service";
-import { OnlineService } from "./services/online.service";
-import { ServerService } from "./services/server.service";
-import { UserService } from "./services/user.service";
-import { WhoSaidService } from "./services/whosaid.service";
-import { AccountDialogComponent } from "./shared/account-dialog.component";
 import { UserManagerComponent } from "./usermanager/usermanager.component";
+import { AuthGuard } from "./services/auth.guard";
+import { ServerManagerComponent } from "./servermanager/servermanager.component";
+import { OnlineComponent } from "./online/online.component";
 import { WhoSaidComponent } from "./whosaid/whosaid.component";
+import { PageNotFoundComponent } from "./errors/not-found.component";
+import { AccountDialogComponent } from './shared/account-dialog.component';
 
-import {
-    MatButtonModule,
-    MatDialogModule,
-    MatIconModule,
-    MatInputModule,
-    MatListModule,
-    MatOptionModule,
-    MatSelectModule,
-    MatSliderModule,
-    MatTooltipModule,
-} from "@angular/material";
-
-import {
-    CovalentDialogsModule,
-} from "@covalent/core";
+import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
+import { ServerService } from './services/server.service';
+import { ErrorService } from './services/error.service';
+import { OnlineService } from './services/online.service';
+import { WhoSaidService } from './services/whosaid.service';
+import { AuthInterceptor } from "./services/auth.interceptor";
 
 export function JwtTokenGetter(): string {
     return localStorage.token;
 }
 
-export const ROUTES: Routes = [
+const routes: Routes = [
     { path: "", component: HomeComponent },
     { path: "login/:scheme", component: LoginComponent },
     { path: "usermanager", component: UserManagerComponent, canActivate: [AuthGuard], data: { permissions: "UserManager" } },
@@ -56,25 +55,6 @@ export const ROUTES: Routes = [
 ];
 
 @NgModule({
-    imports: [
-        RouterModule.forRoot(ROUTES),
-        BrowserModule,
-        BrowserAnimationsModule,
-        FormsModule,
-        HttpClientModule,
-        MatButtonModule,
-        MatSliderModule,
-        CovalentDialogsModule,
-        MatSelectModule,
-        MatDialogModule,
-        CovalentDialogsModule,
-        MatListModule,
-        MatTooltipModule,
-        MatIconModule,
-        MatOptionModule,
-        MomentModule,
-        MatInputModule,
-    ],
     declarations: [
         AppComponent,
         HomeComponent,
@@ -86,10 +66,23 @@ export const ROUTES: Routes = [
         OnlineComponent,
         WhoSaidComponent,
     ],
-    entryComponents: [
-        AccountDialogComponent,
+    imports: [
+        RouterModule.forRoot(routes),
+        BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatSliderModule,
+        CovalentDialogsModule,
+        MatSelectModule,
+        MatDialogModule,
+        MatListModule,
+        MatTooltipModule,
+        MatIconModule,
+        MomentModule,
+        MatInputModule,
     ],
-    bootstrap: [AppComponent],
     providers: [
         AuthService,
         UserService,
@@ -116,5 +109,9 @@ export const ROUTES: Routes = [
         },
         JwtHelperService,
     ],
+    entryComponents: [
+        AccountDialogComponent
+    ],
+    bootstrap: [AppComponent],
 })
 export class AppModule { }

@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { TdDialogService } from "@covalent/core";
+import { TdDialogService } from "@covalent/core/dialogs";
 
 import { IServer, ServerStatus } from "../app.data";
 import { ServerService } from "../services/server.service";
@@ -8,10 +8,10 @@ import { ServerService } from "../services/server.service";
     templateUrl: "./servermanager.template.html",
 })
 export class ServerManagerComponent implements OnInit {
-    public servers: IServer[];
+    public servers?: IServer[];
     public ServerStatus = ServerStatus;
     public selectedId?: string;
-    public loading: boolean;
+    public loading: boolean = false;
 
     public get selected() { return this.servers ? this.servers.find(x => x.Id === this.selectedId) : undefined; }
 

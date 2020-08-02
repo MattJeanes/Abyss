@@ -7,7 +7,7 @@ import { AuthService } from "./auth.service";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    private refreshing: Promise<void>;
+    private refreshing?: Promise<void>;
     constructor(private authService: AuthService) { }
     public intercept(req: HttpRequest<any>, next: HttpHandler) {
         if (!this.requestNeedsAuth(req)) {

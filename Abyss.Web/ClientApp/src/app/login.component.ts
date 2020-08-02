@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { TdDialogService } from "@covalent/core";
+import { TdDialogService } from "@covalent/core/dialogs";
 import { first } from "rxjs/operators";
 
 import { AuthService } from "./services/auth.service";

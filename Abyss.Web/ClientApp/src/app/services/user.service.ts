@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { TdDialogService } from "@covalent/core";
+import { TdDialogService } from "@covalent/core/dialogs";
 import { first } from "rxjs/operators";
 
 import { IAuthResult, IUser } from "../app.data";

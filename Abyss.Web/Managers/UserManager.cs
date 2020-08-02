@@ -107,7 +107,7 @@ namespace Abyss.Web.Managers
             }
 
             var steamAndDiscord = new[] { AuthSchemes.Discord.Id, AuthSchemes.Steam.Id };
-            if (steamAndDiscord.Contains(schemeId) && steamAndDiscord.All(x => user.Authentication.ContainsKey(x)))
+            if (_gmodHelper.IsActive() && steamAndDiscord.Contains(schemeId) && steamAndDiscord.All(x => user.Authentication.ContainsKey(x)))
             {
                 await _gmodHelper.ChangeRank(new ChangeRankDTO
                 {

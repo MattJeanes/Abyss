@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { TdDialogService } from "@covalent/core";
+import { TdDialogService } from "@covalent/core/dialogs";
 
 import { IUser } from "../app.data";
 import { UserService } from "../services/user.service";
@@ -8,7 +8,7 @@ import { UserService } from "../services/user.service";
     templateUrl: "./usermanager.template.html",
 })
 export class UserManagerComponent implements OnInit {
-    public users: IUser[];
+    public users: IUser[] = [];
 
     constructor(public userService: UserService, public dialogService: TdDialogService) { }
 

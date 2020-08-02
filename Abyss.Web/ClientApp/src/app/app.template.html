@@ -10,11 +10,11 @@
             </a>
         </div>
         <div class="nav">
-            <button mat-raised-button [color]="router.url == '/' ? 'accent' : ''" routerLink="/">Home</button>
-            <button mat-raised-button [color]="router.url == '/online' ? 'accent' : ''" routerLink="/online">Online</button>
-            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.UserManager)" [color]="router.url == '/usermanager' ? 'accent' : ''" routerLink="/usermanager">User Manager</button>
-            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ServerManager)" [color]="router.url == '/servermanager' ? 'accent' : ''" routerLink="/servermanager">Server Manager</button>
-            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.WhoSaid)" [color]="router.url == '/whosaid' ? 'accent' : ''" routerLink="/whosaid">Who Said</button>
+            <button mat-raised-button [color]="router.url == '/' ? 'accent' : undefined" routerLink="/">Home</button>
+            <button mat-raised-button [color]="router.url == '/online' ? 'accent' : undefined" routerLink="/online">Online</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.UserManager)" [color]="router.url == '/usermanager' ? 'accent' : undefined" routerLink="/usermanager">User Manager</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ServerManager)" [color]="router.url == '/servermanager' ? 'accent' : undefined" routerLink="/servermanager">Server Manager</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.WhoSaid)" [color]="router.url == '/whosaid' ? 'accent' : undefined" routerLink="/whosaid">Who Said</button>
             <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ErrorViewer)" (click)="errorService.openErrors()">Errors</button>
         </div>
         <router-outlet></router-outlet>

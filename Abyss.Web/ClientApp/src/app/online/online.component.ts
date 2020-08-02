@@ -1,6 +1,6 @@
 import { Component, NgZone, OnDestroy, OnInit } from "@angular/core";
 import { HttpTransportType, HubConnectionBuilder } from "@aspnet/signalr";
-import { TdDialogService } from "@covalent/core";
+import { TdDialogService } from "@covalent/core/dialogs";
 
 import { ITeamSpeakChannel, ITeamSpeakClient } from "../app.data";
 import { OnlineService } from "../services/online.service";
@@ -72,6 +72,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
     public getChannelName(id: number) {
         try {
             const channel = this.channels.find(x => x.Id === id);
+            if (!channel) { return "Unknown"; }
             let channelName = channel.Name;
             if (channel.ParentId) {
                 channelName = `${this.getChannelName(channel.ParentId)} / ${channelName}`;

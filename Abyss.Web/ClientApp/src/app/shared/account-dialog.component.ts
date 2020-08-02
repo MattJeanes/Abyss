@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { MatDialogRef } from "@angular/material";
-import { TdDialogService } from "@covalent/core";
+import { MatDialogRef } from "@angular/material/dialog";
+import { TdDialogService } from "@covalent/core/dialogs";
 
-import { IAuthScheme } from "../app.data";
+import { IAuthScheme, IClientUser } from "../app.data";
 import { AuthService } from "../services/auth.service";
 import { UserService } from "../services/user.service";
 
@@ -11,14 +11,14 @@ import { UserService } from "../services/user.service";
     styleUrls: ["./account-dialog.style.scss"],
 })
 export class AccountDialogComponent implements OnInit {
-    public schemes: IAuthScheme[];
-    public selected: IAuthScheme;
+    public schemes?: IAuthScheme[];
+    public selected?: IAuthScheme;
     public loading = false;
     public get user() {
         return this.authService.getUser();
     }
     public get userSchemes() {
-        return this.user ? this.user.Authentication : [];
+        return this.user ? this.user.Authentication : {};
     }
     public get onlyScheme() {
         return Object.keys(this.userSchemes).length <= 1;

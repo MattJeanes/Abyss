@@ -1,5 +1,5 @@
 import { Component } from "@angular/core";
-import { TdDialogService } from "@covalent/core";
+import { TdDialogService } from "@covalent/core/dialogs";
 
 import { IWhoSaid } from "../app.data";
 import { WhoSaidService } from "../services/whosaid.service";

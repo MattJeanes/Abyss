@@ -172,6 +172,7 @@ namespace Abyss.Web
             services.Configure<TumblrOptions>(_config.GetSection("Tumblr"));
             services.Configure<ReminderOptions>(_config.GetSection("Reminder"));
             services.Configure<AzureOptions>(_config.GetSection("Azure"));
+            services.Configure<GModOptions>(_config.GetSection("GMod"));
             services.AddHttpContextAccessor();
             services.AddHttpClient("cloudflare", options =>
             {
