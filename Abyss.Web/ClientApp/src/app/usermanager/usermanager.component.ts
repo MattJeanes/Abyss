@@ -2,19 +2,19 @@ import { Component, OnInit } from "@angular/core";
 import { TdDialogService } from "@covalent/core/dialogs";
 
 import { IUser } from "../app.data";
-import { UserService } from "../services/user.service";
+import { UserManagerService } from "./usermanager.service";
 
 @Component({
-    templateUrl: "./usermanager.template.html",
+    templateUrl: "./usermanager.component.html",
 })
 export class UserManagerComponent implements OnInit {
     public users: IUser[] = [];
 
-    constructor(public userService: UserService, public dialogService: TdDialogService) { }
+    constructor(public userManagerService: UserManagerService, public dialogService: TdDialogService) { }
 
     public async ngOnInit() {
         try {
-            this.users = await this.userService.getUsers();
+            this.users = await this.userManagerService.getUsers();
         } catch (e) {
             this.dialogService.openAlert({
                 title: "Failed to load user manager",

@@ -1,0 +1,33 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@angular-eslint/recommended"
+  ],
+  "parserOptions": {
+    "project": "angular.json"
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "@angular-eslint/eslint-plugin",
+    "@angular-eslint/template"
+  ],
+  "overrides": [
+    {
+      "files": ["*.component.html"],
+      "parser": "@angular-eslint/template-parser",
+      "rules": {
+        // TODO use recommended when available
+        "@angular-eslint/template/banana-in-a-box": "error",
+        "@angular-eslint/template/cyclomatic-complexity": "error",
+        "@angular-eslint/template/no-call-expression": "error",
+        "@angular-eslint/template/no-negated-async": "error"
+      }
+    }
+  ]
+}

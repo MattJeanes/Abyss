@@ -5,7 +5,7 @@ import { first } from "rxjs/operators";
 import { IServer } from "../app.data";
 
 @Injectable()
-export class ServerService {
+export class ServerManagerService {
     constructor(private httpClient: HttpClient) { }
     public getServers() {
         return this.httpClient.get<IServer[]>("/api/server").pipe(first()).toPromise();

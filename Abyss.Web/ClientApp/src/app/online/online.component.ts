@@ -3,11 +3,11 @@ import { HttpTransportType, HubConnectionBuilder } from "@aspnet/signalr";
 import { TdDialogService } from "@covalent/core/dialogs";
 
 import { ITeamSpeakChannel, ITeamSpeakClient } from "../app.data";
-import { OnlineService } from "../services/online.service";
+import { OnlineService } from "./online.service";
 
 @Component({
-    templateUrl: "./online.template.html",
-    styleUrls: ["./online.style.scss"],
+    templateUrl: "./online.component.html",
+    styleUrls: ["./online.component.scss"],
 })
 export class OnlineComponent implements OnInit, OnDestroy {
     public clients: ITeamSpeakClient[] = [];

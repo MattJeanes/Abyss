@@ -1,21 +1,44 @@
 import { Component, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { TdDialogService } from "@covalent/core/dialogs";
+import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
+import { filter, map } from 'rxjs/operators';
 
-import { Router } from "@angular/router";
+import { TitleService, AuthService } from './services';
 import { Permissions } from "./app.data";
-import { AuthService } from "./services/auth.service";
 import { ErrorService } from "./services/error.service";
 import { AccountDialogComponent } from "./shared/account-dialog.component";
 
 @Component({
-    selector: "app-abyss",
-    templateUrl: "./app.template.html",
-    styleUrls: ["./app.style.scss"],
+    selector: "app-root",
+    templateUrl: "./app.component.html",
+    styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
     public Permissions = Permissions;
-    constructor(public authService: AuthService, public errorService: ErrorService, public router: Router, private dialog: MatDialog, private dialogService: TdDialogService) { }
+    constructor(
+        public authService: AuthService,
+        public errorService: ErrorService,
+        public router: Router,
+        private dialog: MatDialog,
+        private dialogService: TdDialogService,
+        private titleService: TitleService,
+        private activatedRoute: ActivatedRoute,
+    ) {
+        this.router.events
+            .pipe(
+                filter(event => event instanceof NavigationEnd),
+                map(() => this.activatedRoute),
+                map((route: ActivatedRoute) => {
+                    while (route.firstChild) route = route.firstChild;
+                    return route;
+                }),
+                filter(route => route.outlet === 'primary'),
+            )
+            .subscribe((route: ActivatedRoute) => {
+                this.setPageTitle(route);
+            });
+    }
 
     public async ngOnInit() {
         try {
@@ -49,5 +72,14 @@ export class AppComponent implements OnInit {
 
     public showAccountDialog() {
         this.dialog.open(AccountDialogComponent);
+    }
+
+    private setPageTitle(route: ActivatedRoute): void {
+        const snapshot = route.snapshot;
+        const data = snapshot.data;
+        const pageTitle = data.pageTitle;
+        if (pageTitle) {
+            this.titleService.setTitle(pageTitle);
+        }
     }
 }

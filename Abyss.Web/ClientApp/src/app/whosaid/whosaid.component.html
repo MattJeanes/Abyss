@@ -4,7 +4,7 @@
     <mat-form-field class="field">
         <input class="input" matInput placeholder="Message" type="text" [(ngModel)]="message"
             (keyup.enter)="whoSaid()" />
-        <button mat-button *ngIf="message" matSuffix mat-icon-button aria-label="Clear" (click)="message=''">
+        <button mat-icon-button matSuffix *ngIf="message" aria-label="Clear" (click)="message=''">
             <mat-icon>close</mat-icon>
         </button>
     </mat-form-field>

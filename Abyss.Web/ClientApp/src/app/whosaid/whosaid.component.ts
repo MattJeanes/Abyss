@@ -2,11 +2,11 @@ import { Component } from "@angular/core";
 import { TdDialogService } from "@covalent/core/dialogs";
 
 import { IWhoSaid } from "../app.data";
-import { WhoSaidService } from "../services/whosaid.service";
+import { WhoSaidService } from "./whosaid.service";
 
 @Component({
-    templateUrl: "./whosaid.template.html",
-    styleUrls: ["./whosaid.style.scss"],
+    templateUrl: "./whosaid.component.html",
+    styleUrls: ["./whosaid.component.scss"],
 })
 export class WhoSaidComponent {
     public name = "Someone";
