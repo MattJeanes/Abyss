@@ -109,7 +109,7 @@ namespace Abyss.Web
                 {
                     options.CallbackPath = "/auth/steam";
                     options.ApplicationKey = _config["Authentication:Steam:ApplicationKey"];
-                    options.SignInScheme = AuthSchemes.ExternalLogin;
+                    options.SignInScheme = AuthSchemes.ExternalLogin; 
                 })
                 .AddGoogle(AuthSchemes.Google.Id, options =>
                 {
@@ -121,8 +121,8 @@ namespace Abyss.Web
                 .AddDiscord(AuthSchemes.Discord.Id, options =>
                 {
                     options.CallbackPath = "/auth/discord";
-                    options.AppId = _config["Authentication:Discord:ClientId"];
-                    options.AppSecret = _config["Authentication:Discord:ClientSecret"];
+                    options.ClientId = _config["Authentication:Discord:ClientId"];
+                    options.ClientSecret = _config["Authentication:Discord:ClientSecret"];
                     options.Scope.Add("identify");
                     options.SignInScheme = AuthSchemes.ExternalLogin;
                 });
