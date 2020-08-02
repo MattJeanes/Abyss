@@ -58,6 +58,8 @@ namespace Abyss.Web
             {
                 builder.AddJsonFile($"appsettings.Release.json", optional: false, reloadOnChange: true);
             }
+            
+            builder.AddEnvironmentVariables();
 
             _config = builder.Build();
             _env = env;
