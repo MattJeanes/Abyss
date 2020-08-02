@@ -1,29 +1,32 @@
-import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { from, throwError } from "rxjs";
-import { catchError, map, mergeMap } from "rxjs/operators";
+import { HttpErrorResponse, HttpHandler, HttpInterceptor, HttpRequest, HttpEvent } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { from, throwError, Observable } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 
-import { AuthService } from "./auth.service";
+import { AuthService } from './auth.service';
+
+// The nature of this interceptor means the type of request cannot be determined
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
     private refreshing?: Promise<void>;
     constructor(private authService: AuthService) { }
-    public intercept(req: HttpRequest<any>, next: HttpHandler) {
+    public intercept(req: HttpRequest<any>, next: HttpHandler): Observable<any> {
         if (!this.requestNeedsAuth(req)) {
             return this.handle(req, next);
         }
         if (this.refreshing) {
-            console.log("Delaying request due to token refresh");
+            console.log('Delaying request due to token refresh');
             return from(this.refreshing).pipe(mergeMap(() => {
-                console.log("Starting delayed request");
+                console.log('Starting delayed request');
                 return this.handle(req, next);
             }));
         } else if (this.authService.tokenNeedsRefresh()) {
             let resolve: () => void;
             this.refreshing = new Promise((r) => resolve = r);
-            console.log("Token needs refreshing");
-            return from(this.authService.getNewToken()).pipe(mergeMap((result) => {
+            console.log('Token needs refreshing');
+            return from(this.authService.getNewToken()).pipe(mergeMap(() => {
                 resolve();
                 delete this.refreshing;
                 return this.handle(req, next);
@@ -32,8 +35,8 @@ export class AuthInterceptor implements HttpInterceptor {
         return this.handle(req, next);
     }
 
-    private handle(req: HttpRequest<any>, next: HttpHandler) {
-        return next.handle(req).pipe(map((resp: any) => resp), catchError((resp: any) => {
+    private handle(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        return next.handle(req).pipe(map((resp) => resp), catchError((resp: any) => {
             return throwError(this.handleError(resp));
         }));
     }
@@ -53,7 +56,7 @@ export class AuthInterceptor implements HttpInterceptor {
         return new Error(errMsg);
     }
 
-    private requestNeedsAuth(req: HttpRequest<any>) {
-        return !req.url.startsWith("/api/auth");
+    private requestNeedsAuth(req: HttpRequest<any>): boolean {
+        return !req.url.startsWith('/api/auth');
     }
 }

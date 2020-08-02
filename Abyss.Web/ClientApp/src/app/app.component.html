@@ -8,11 +8,11 @@
             </a>
         </div>
         <div class="nav">
-            <button mat-raised-button [color]="router.url == '/' ? 'accent' : undefined" routerLink="/">Home</button>
-            <button mat-raised-button [color]="router.url == '/online' ? 'accent' : undefined" routerLink="/online">Online</button>
-            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.UserManager)" [color]="router.url == '/usermanager' ? 'accent' : undefined" routerLink="/usermanager">User Manager</button>
-            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ServerManager)" [color]="router.url == '/servermanager' ? 'accent' : undefined" routerLink="/servermanager">Server Manager</button>
-            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.WhoSaid)" [color]="router.url == '/whosaid' ? 'accent' : undefined" routerLink="/whosaid">Who Said</button>
+            <button mat-raised-button [color]="getTabColor('/')" routerLink="/">Home</button>
+            <button mat-raised-button [color]="getTabColor('/online')" routerLink="/online">Online</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.UserManager)" [color]="getTabColor('/usermanager')" routerLink="/usermanager">User Manager</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ServerManager)" [color]="getTabColor('/servermanager')" routerLink="/servermanager">Server Manager</button>
+            <button mat-raised-button *ngIf="authService.hasPermission(Permissions.WhoSaid)" [color]="getTabColor('/whosaid')" routerLink="/whosaid">Who Said</button>
             <button mat-raised-button *ngIf="authService.hasPermission(Permissions.ErrorViewer)" (click)="errorService.openErrors()">Errors</button>
         </div>
         <router-outlet></router-outlet>

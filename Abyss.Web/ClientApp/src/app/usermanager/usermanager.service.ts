@@ -1,13 +1,13 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { first } from "rxjs/operators";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { first } from 'rxjs/operators';
 
-import { IUser } from "../app.data";
+import { IUser } from '../app.data';
 
 @Injectable()
 export class UserManagerService {
     constructor(private httpClient: HttpClient) { }
-    public getUsers() {
-        return this.httpClient.get<IUser[]>("/api/user").pipe(first()).toPromise();
+    public getUsers(): Promise<IUser[]> {
+        return this.httpClient.get<IUser[]>('/api/user').pipe(first()).toPromise();
     }
 }

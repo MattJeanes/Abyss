@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 
 import { MatButtonModule } from '@angular/material/button';
 
-import { MomentModule } from "ngx-moment";
+import { MomentModule } from 'ngx-moment';
 
 import { OnlineComponent } from './online.component';
 import { OnlineService } from './online.service';

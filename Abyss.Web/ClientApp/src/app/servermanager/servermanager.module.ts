@@ -3,7 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { MatSelectModule } from "@angular/material/select"
+import { MatSelectModule } from '@angular/material/select'
 import { MatButtonModule } from '@angular/material/button';
 
 import { ServerManagerComponent } from './servermanager.component';
@@ -16,7 +16,7 @@ export const routes: Routes = [
         path: '',
         component: ServerManagerComponent,
         canActivate: [AuthGuard],
-        data: { permissions: "ServerManager" },
+        data: { permissions: 'ServerManager' },
     },
 ];
 

@@ -1,18 +1,19 @@
-import { Component, OnInit } from "@angular/core";
-import { MatDialog } from "@angular/material/dialog";
-import { TdDialogService } from "@covalent/core/dialogs";
-import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ThemePalette } from '@angular/material/core';
+import { TdDialogService } from '@covalent/core/dialogs';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 
 import { TitleService, AuthService } from './services';
-import { Permissions } from "./app.data";
-import { ErrorService } from "./services/error.service";
-import { AccountDialogComponent } from "./shared/account-dialog.component";
+import { Permissions } from './app.data';
+import { ErrorService } from './services/error.service';
+import { AccountDialogComponent } from './shared/account-dialog.component';
 
 @Component({
-    selector: "app-root",
-    templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"],
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit {
     public Permissions = Permissions;
@@ -40,38 +41,42 @@ export class AppComponent implements OnInit {
             });
     }
 
-    public async ngOnInit() {
+    public async ngOnInit(): Promise<void> {
         try {
             if (this.authService.isLoggedIn()) {
                 await this.authService.getNewToken();
             }
         } catch (e) {
             this.dialogService.openAlert({
-                title: "Failed to get new auth token, forcing logout",
+                title: 'Failed to get new auth token, forcing logout',
                 message: e.toString(),
             });
             try {
                 await this.authService.logout();
             } catch (e) {
                 this.dialogService.openAlert({
-                    title: "Failed to log out",
+                    title: 'Failed to log out',
                     message: e.toString(),
                 });
             }
         }
     }
 
-    public get username() {
+    public get username(): string {
         const user = this.authService.getUser();
         if (user) {
             return user.Name;
         } else {
-            return "Unknown";
+            return 'Unknown';
         }
     }
 
-    public showAccountDialog() {
+    public showAccountDialog(): void {
         this.dialog.open(AccountDialogComponent);
+    }
+
+    public getTabColor(url: string): ThemePalette {
+        return this.router.url == url ? 'accent' : undefined;
     }
 
     private setPageTitle(route: ActivatedRoute): void {

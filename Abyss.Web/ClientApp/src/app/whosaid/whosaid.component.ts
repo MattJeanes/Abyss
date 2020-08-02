@@ -1,22 +1,22 @@
-import { Component } from "@angular/core";
-import { TdDialogService } from "@covalent/core/dialogs";
+import { Component } from '@angular/core';
+import { TdDialogService } from '@covalent/core/dialogs';
 
-import { IWhoSaid } from "../app.data";
-import { WhoSaidService } from "./whosaid.service";
+import { IWhoSaid } from '../app.data';
+import { WhoSaidService } from './whosaid.service';
 
 @Component({
-    templateUrl: "./whosaid.component.html",
-    styleUrls: ["./whosaid.component.scss"],
+    templateUrl: './whosaid.component.html',
+    styleUrls: ['./whosaid.component.scss'],
 })
 export class WhoSaidComponent {
-    public name = "Someone";
+    public name = 'Someone';
     public log: IWhoSaid[] = [];
     public loading = false;
-    public message = "";
+    public message = '';
 
     constructor(private whoSaidService: WhoSaidService, private dialogService: TdDialogService) { }
 
-    public async whoSaid() {
+    public async whoSaid(): Promise<void> {
         try {
             if ((!this.message) || this.loading) { return; }
             this.loading = true;
@@ -25,7 +25,7 @@ export class WhoSaidComponent {
             this.name = whoSaid.Name;
         } catch (e) {
             this.dialogService.openAlert({
-                title: "Failed to get who said it",
+                title: 'Failed to get who said it',
                 message: e.toString(),
             });
         } finally {
@@ -33,11 +33,11 @@ export class WhoSaidComponent {
         }
     }
 
-    public clear() {
+    public clear(): void {
         this.log = [];
     }
 
-    public undo() {
+    public undo(): void {
         this.log.pop();
     }
 }

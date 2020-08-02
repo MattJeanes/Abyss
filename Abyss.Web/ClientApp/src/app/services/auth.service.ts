@@ -1,30 +1,30 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { JwtHelperService } from "@auth0/angular-jwt";
-import { first } from "rxjs/operators";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { first } from 'rxjs/operators';
 
-import { IAuthResult, IAuthScheme, IClientUser, IToken } from "../app.data";
+import { IAuthResult, IAuthScheme, IClientUser, IToken } from '../app.data';
 
 @Injectable()
 export class AuthService {
     constructor(private httpClient: HttpClient, private jwtHelperService: JwtHelperService, private router: Router) { }
-    public async getNewToken(scheme?: string) {
-        const result = await this.httpClient.post<IAuthResult>(`/api/auth/token/${scheme ? scheme : ""}`, undefined).pipe(first()).toPromise();
+    public async getNewToken(scheme?: string): Promise<IAuthResult> {
+        const result = await this.httpClient.post<IAuthResult>(`/api/auth/token/${scheme ? scheme : ''}`, undefined).pipe(first()).toPromise();
         this.setToken(result.Token);
         return result;
     }
-    public getAuthSchemes() {
-        return this.httpClient.get<IAuthScheme[]>("/api/auth/schemes").pipe(first()).toPromise();
+    public getAuthSchemes(): Promise<IAuthScheme[]> {
+        return this.httpClient.get<IAuthScheme[]>('/api/auth/schemes').pipe(first()).toPromise();
     }
-    public getRawToken() {
+    public getRawToken(): string | undefined {
         return localStorage.token as string | undefined;
     }
-    public getUser() {
+    public getUser(): IClientUser | undefined {
         const token = this.getToken();
         return token && this.isLoggedIn() ? JSON.parse(token.User) as IClientUser : undefined;
     }
-    public getToken() {
+    public getToken(): IToken | undefined {
         const token = this.getRawToken();
         if (token) {
             const decodedToken = this.jwtHelperService.decodeToken();
@@ -32,16 +32,16 @@ export class AuthService {
         }
         return undefined;
     }
-    public setToken(token?: string) {
+    public setToken(token?: string): void {
         if (token) {
             console.log(`Setting token ${token}`);
             localStorage.token = token;
         } else {
-            console.log("Deleting token");
+            console.log('Deleting token');
             delete localStorage.token;
         }
     }
-    public tokenNeedsRefresh() {
+    public tokenNeedsRefresh(): boolean {
         const token = this.getToken();
         if (token) {
             // return true;
@@ -50,7 +50,7 @@ export class AuthService {
             return false;
         }
     }
-    public isLoggedIn() {
+    public isLoggedIn(): boolean {
         const token = this.getToken();
         if (token) {
             const refreshExp = parseInt(token.RefreshExpiry);
@@ -59,14 +59,14 @@ export class AuthService {
             return false;
         }
     }
-    public async logout(allSessions?: boolean) {
-        await this.httpClient.delete<boolean>(`/api/auth/${allSessions !== undefined ? allSessions.toString() : ""}`).pipe(first()).toPromise();
+    public async logout(allSessions?: boolean): Promise<void> {
+        await this.httpClient.delete<boolean>(`/api/auth/${allSessions !== undefined ? allSessions.toString() : ''}`).pipe(first()).toPromise();
         this.setToken();
-        this.router.navigate(["/"]);
+        this.router.navigate(['/']);
     }
-    public hasPermission(permissions: string) {
+    public hasPermission(permissions: string): boolean {
         const user = this.getUser();
-        if (user && permissions.split(",").map(x => x.trim()).some(x => user.Permissions.includes(x))) {
+        if (user && permissions.split(',').map(x => x.trim()).some(x => user.Permissions.includes(x))) {
             return true;
         }
         return false;

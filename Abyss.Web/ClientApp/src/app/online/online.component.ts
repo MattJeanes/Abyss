@@ -1,24 +1,24 @@
-import { Component, NgZone, OnDestroy, OnInit } from "@angular/core";
-import { HttpTransportType, HubConnectionBuilder } from "@aspnet/signalr";
-import { TdDialogService } from "@covalent/core/dialogs";
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { HttpTransportType, HubConnectionBuilder } from '@aspnet/signalr';
+import { TdDialogService } from '@covalent/core/dialogs';
 
-import { ITeamSpeakChannel, ITeamSpeakClient } from "../app.data";
-import { OnlineService } from "./online.service";
+import { ITeamSpeakChannel, ITeamSpeakClient } from '../app.data';
+import { OnlineService } from './online.service';
 
 @Component({
-    templateUrl: "./online.component.html",
-    styleUrls: ["./online.component.scss"],
+    templateUrl: './online.component.html',
+    styleUrls: ['./online.component.scss'],
 })
 export class OnlineComponent implements OnInit, OnDestroy {
     public clients: ITeamSpeakClient[] = [];
     public channels: ITeamSpeakChannel[] = [];
     public loading = false;
     private hub = new HubConnectionBuilder()
-        .withUrl("hub/online", { transport: HttpTransportType.WebSockets })
+        .withUrl('hub/online', { transport: HttpTransportType.WebSockets })
         .build();
     private hubReady = false;
     constructor(public onlineService: OnlineService, public dialogService: TdDialogService, private ngZone: NgZone) {
-        this.hub.on("update", (clients: ITeamSpeakClient[], channels: ITeamSpeakChannel[]) => {
+        this.hub.on('update', (clients: ITeamSpeakClient[], channels: ITeamSpeakChannel[]) => {
             // Because this is a call from the server, Angular change detection won't detect it so we must force ngZone to run
             this.ngZone.run(() => {
                 this.channels = channels;
@@ -27,7 +27,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
         });
     }
 
-    public async ngOnInit() {
+    public async ngOnInit(): Promise<void> {
         try {
             this.loading = true;
             await this.refresh();
@@ -35,7 +35,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             this.hubReady = true;
         } catch (e) {
             this.dialogService.openAlert({
-                title: "Failed to load online",
+                title: 'Failed to load online',
                 message: e.toString(),
             });
         } finally {
@@ -43,13 +43,13 @@ export class OnlineComponent implements OnInit, OnDestroy {
         }
     }
 
-    public ngOnDestroy() {
+    public ngOnDestroy(): void {
         if (this.hubReady) {
             this.hub.stop();
         }
     }
 
-    public async refresh() {
+    public async refresh(): Promise<void> {
         const isLoading = this.loading;
         if (!isLoading) {
             this.loading = true;
@@ -59,7 +59,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             this.clients = await this.onlineService.getClients();
         } catch (e) {
             this.dialogService.openAlert({
-                title: "Failed to refresh",
+                title: 'Failed to refresh',
                 message: e.toString(),
             });
         } finally {
@@ -69,10 +69,10 @@ export class OnlineComponent implements OnInit, OnDestroy {
         }
     }
 
-    public getChannelName(id: number) {
+    public getChannelName(id: number): string {
         try {
             const channel = this.channels.find(x => x.Id === id);
-            if (!channel) { return "Unknown"; }
+            if (!channel) { return 'Unknown'; }
             let channelName = channel.Name;
             if (channel.ParentId) {
                 channelName = `${this.getChannelName(channel.ParentId)} / ${channelName}`;
@@ -80,7 +80,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             return channelName;
         } catch (e) {
             console.error(e);
-            return "Error";
+            return 'Error';
         }
     }
 }

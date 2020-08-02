@@ -11,7 +11,7 @@ export const routes: Routes = [
         path: '',
         component: UserManagerComponent,
         canActivate: [AuthGuard],
-        data: { permissions: "UserManager" },
+        data: { permissions: 'UserManager' },
     },
 ];
 

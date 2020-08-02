@@ -2,12 +2,14 @@ export interface IAuthResult {
     Token: string;
 }
 
+export interface IClientUserAuthentication {
+    [key: string]: string;
+}
+
 export interface IClientUser {
     Id: string;
     Name: string;
-    Authentication: {
-        [key: string]: string;
-    };
+    Authentication: IClientUserAuthentication;
     Permissions: string[];
 }
 
@@ -30,10 +32,10 @@ export interface IAuthScheme {
 }
 
 export enum Permissions {
-    UserManager = "UserManager",
-    ErrorViewer = "ErrorViewer",
-    ServerManager = "ServerManager",
-    WhoSaid = "WhoSaid",
+    UserManager = 'UserManager',
+    ErrorViewer = 'ErrorViewer',
+    ServerManager = 'ServerManager',
+    WhoSaid = 'WhoSaid',
 }
 
 export enum ServerStatus {

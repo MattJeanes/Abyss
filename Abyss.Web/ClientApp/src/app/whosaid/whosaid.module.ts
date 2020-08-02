@@ -3,8 +3,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
-import { MatIconModule } from "@angular/material/icon";
-import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatIconModule } from '@angular/material/icon';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -18,7 +18,7 @@ export const routes: Routes = [
         path: '',
         component: WhoSaidComponent,
         canActivate: [AuthGuard],
-        data: { permissions: "WhoSaid" },
+        data: { permissions: 'WhoSaid' },
     },
 ];
 
