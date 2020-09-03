@@ -1,3 +1,5 @@
+using Abyss.Web.Clients;
+using Abyss.Web.Clients.Interfaces;
 using Abyss.Web.Commands.Discord;
 using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Contexts;
@@ -132,6 +134,7 @@ namespace Abyss.Web
             services.AddTransient<IUserManager, UserManager>();
             services.AddTransient<IOnlineManager, OnlineManager>();
             services.AddTransient<IWhoSaidManager, WhoSaidManager>();
+            services.AddTransient<IGPTManager, GPTManager>();
             services.AddTransient<IAbyssContext, AbyssContext>();
             services.AddSingleton<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
             services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
@@ -146,6 +149,11 @@ namespace Abyss.Web
             services.AddTransient<IGModHelper, GModHelper>();
             services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
             services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
+            services.AddHttpClient();
+            services.AddHttpClient<IGPTClient, GPTClient>(client =>
+            {
+                client.BaseAddress = new Uri(_config["GPTClient:BaseUrl"]);
+            });
 
             services.AddPredictionEnginePool<InputData, Prediction>().FromFile("Models/whosaidit.zip");
 

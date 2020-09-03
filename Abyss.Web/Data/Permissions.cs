@@ -7,5 +7,6 @@
         public const string ServerManager = "ServerManager";
         public const string QuoteManager = "QuoteManager";
         public const string WhoSaid = "WhoSaid";
+        public const string GPT = "GPT";
     }
 }

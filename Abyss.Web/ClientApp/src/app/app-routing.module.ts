@@ -35,6 +35,11 @@ const routes: Routes = [
     data: { pageTitle: 'Who Said' },
   },
   {
+    path: 'gpt',
+    loadChildren: () => import('./gpt/gpt.module').then((m) => m.GPTModule),
+    data: { pageTitle: 'GPT' },
+  },
+  {
     path: '**',
     component: PageNotFoundComponent,
   },

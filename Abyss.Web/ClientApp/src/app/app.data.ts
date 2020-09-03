@@ -36,6 +36,7 @@ export enum Permissions {
     ErrorViewer = 'ErrorViewer',
     ServerManager = 'ServerManager',
     WhoSaid = 'WhoSaid',
+    GPT = 'GPT',
 }
 
 export enum ServerStatus {
@@ -72,4 +73,9 @@ export interface ITeamSpeakChannel {
 export interface IWhoSaid {
     Name: string;
     Message: string;
+}
+
+export interface IGPTMessage {
+    text: string;
+    human: boolean;
 }
