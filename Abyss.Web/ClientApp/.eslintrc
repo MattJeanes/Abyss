@@ -29,7 +29,7 @@
       "rules": {
         // TODO use recommended when available
         "@angular-eslint/template/banana-in-a-box": "error",
-        "@angular-eslint/template/cyclomatic-complexity": "error",
+        "@angular-eslint/template/cyclomatic-complexity": "off",
         "@angular-eslint/template/no-call-expression": "off",
         "@angular-eslint/template/no-negated-async": "error"
       }
