@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { TdDialogService } from '@covalent/core/dialogs';
 
 import { GPTService } from './gpt.service';
-import { IGPTMessage } from '../app.data';
+import { IGPTMessage, GPTModel } from '../app.data';
 
 @Component({
     templateUrl: './gpt.component.html',
@@ -13,15 +13,17 @@ export class GPTComponent {
     public log: IGPTMessage[] = [];
     public loading = false;
     public message = '';
+    public model: GPTModel = GPTModel.Boys;
+    public models = GPTModel;
 
     constructor(private gptService: GPTService, private dialogService: TdDialogService) { }
 
     public async generate(): Promise<void> {
         try {
             const currentText = this.log.map(x => x.text).join();
-            if ((!currentText) || this.loading) { return; }
+            if ((!currentText) || (!this.model) || this.loading) { return; }
             this.loading = true;
-            const response = await this.gptService.generate(currentText);
+            const response = await this.gptService.generate({text: currentText, model: this.model});
             response.text = this.removeLastLine(response.text).trimRight();
             this.log = [...this.log, response];
         } catch (e) {

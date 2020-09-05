@@ -5,6 +5,6 @@ namespace Abyss.Web.Managers.Interfaces
 {
     public interface IGPTManager
     {
-        Task<GPTMessage> Generate(string message);
+        Task<GPTMessage> Generate(GPTMessage message);
     }
 }

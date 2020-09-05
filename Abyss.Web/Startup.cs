@@ -40,6 +40,7 @@ using StackExchange.Exceptional.Stores;
 using System;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Abyss.Web
 {
@@ -256,6 +257,7 @@ namespace Abyss.Web
             o.PropertyNamingPolicy = null;
             o.DictionaryKeyPolicy = null;
             o.Converters.Add(new ObjectIdConverter());
+            o.Converters.Add(new JsonStringEnumConverter());
             return o;
         }
 

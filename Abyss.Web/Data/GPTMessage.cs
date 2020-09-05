@@ -6,5 +6,8 @@ namespace Abyss.Web.Data
     {
         [JsonPropertyName("text")]
         public string Text { get; set; }
+
+        [JsonPropertyName("model")]
+        public GPTModel Model { get; set; }
     }
 }

@@ -18,13 +18,15 @@ namespace Abyss.Web.Clients
             _httpClient = httpClient;
         }
 
-        public async Task<GPTMessage> Generate(string message)
+        public async Task<GPTMessage> Generate(GPTMessage message)
         {
-            var httpContent = new StringContent(JsonSerializer.Serialize(new GPTMessage { Text = message }));
+            var serializerOptions = new JsonSerializerOptions();
+            serializerOptions.Converters.Add(new JsonStringEnumConverter());
+            var httpContent = new StringContent(JsonSerializer.Serialize(new { text = message.Text, model = message.Model.ToString().ToLower() }, serializerOptions));
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             var resp = await _httpClient.PostAsync("/api/generate", httpContent);
             resp.EnsureSuccessStatusCode();
-            var generated = await JsonSerializer.DeserializeAsync<GPTMessage>(await resp.Content.ReadAsStreamAsync());
+            var generated = await JsonSerializer.DeserializeAsync<GPTMessage>(await resp.Content.ReadAsStreamAsync(), serializerOptions);
             return generated;
         }
     }

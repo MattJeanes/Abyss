@@ -17,7 +17,7 @@ namespace Abyss.Web.Managers
             _gptClient = gptClient;
         }
 
-        public async Task<GPTMessage> Generate(string message)
+        public async Task<GPTMessage> Generate(GPTMessage message)
         {
             var response = await _gptClient.Generate(message);
             _logger.LogInformation($"GPT: {response}");

@@ -77,5 +77,11 @@ export interface IWhoSaid {
 
 export interface IGPTMessage {
     text: string;
-    human: boolean;
+    human?: boolean;
+    model?: GPTModel;
+}
+
+export enum GPTModel {
+    Boys = 'Boys',
+    DanBot = 'DanBot',
 }

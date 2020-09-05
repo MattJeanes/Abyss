@@ -18,7 +18,7 @@ namespace Abyss.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<GPTMessage> Generate([FromBody]string message)
+        public async Task<GPTMessage> Generate([FromBody] GPTMessage message)
         {
             return await _gptManager.Generate(message);
         }

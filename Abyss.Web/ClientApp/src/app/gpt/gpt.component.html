@@ -1,4 +1,10 @@
 <h1>Generative Pre-trained Transformer</h1>
+<mat-form-field>
+    <mat-label>Model</mat-label>
+    <mat-select [(value)]="model">
+        <mat-option [value]="option.value" *ngFor="let option of models | keyvalue">{{ option.key }}</mat-option>
+    </mat-select>
+</mat-form-field>
 <div class="main">
     <mat-form-field class="field">
         <textarea class="input" matInput placeholder="Message" type="text" [(ngModel)]="message"></textarea>

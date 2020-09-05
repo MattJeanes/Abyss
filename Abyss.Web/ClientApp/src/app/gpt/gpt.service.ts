@@ -7,7 +7,7 @@ import { IGPTMessage } from '../app.data';
 @Injectable()
 export class GPTService {
     constructor(private httpClient: HttpClient) { }
-    public generate(message: string): Promise<IGPTMessage> {
+    public generate(message: IGPTMessage): Promise<IGPTMessage> {
         return this.httpClient.post<IGPTMessage>('/api/gpt', message).pipe(first()).toPromise();
     }
 }
