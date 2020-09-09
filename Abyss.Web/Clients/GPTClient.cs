@@ -20,7 +20,7 @@ namespace Abyss.Web.Clients
         {
             var serializerOptions = new JsonSerializerOptions();
             serializerOptions.PropertyNameCaseInsensitive = true;
-            var json = JsonSerializer.Serialize(new { test = message, model }, serializerOptions);
+            var json = JsonSerializer.Serialize(new { text = message, model }, serializerOptions);
             var httpContent = new StringContent(json);
             httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             var resp = await _httpClient.PostAsync("/api/generate", httpContent);
