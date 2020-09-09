@@ -67,7 +67,8 @@ namespace Abyss.Web.Helpers
                 Id = user.Id.ToString(),
                 Name = user.Name,
                 Authentication = user.Authentication,
-                Permissions = permissionList
+                Permissions = permissionList,
+                RoleId = user.RoleId.ToString()
             };
         }
 
@@ -294,6 +295,20 @@ namespace Abyss.Web.Helpers
         {
             var user = GetClientUser();
             return HasPermission(user, permission);
+        }
+
+        public async Task<IList<Permission>> GetPermissions()
+        {
+            var user = GetClientUser();
+            return await GetPermissions(user);
+        }
+
+        public async Task<IList<Permission>> GetPermissions(ClientUser user)
+        {
+            if (user?.RoleId == null) { return new List<Permission>(); }
+            var role = await _roleRepository.GetById(user.RoleId);
+            var permissions = await _permissionRepository.GetAll().Where(x => role.Permissions.Contains(x.Id)).ToListAsync();
+            return permissions;
         }
     }
 }

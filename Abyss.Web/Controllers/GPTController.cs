@@ -1,12 +1,12 @@
 ﻿using Abyss.Web.Data;
-using Abyss.Web.Helpers;
+using Abyss.Web.Entities;
 using Abyss.Web.Managers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Abyss.Web.Controllers
 {
-    [AuthorizePermission(Permissions.GPT)]
     [Route("api/gpt")]
     public class GPTController
     {
@@ -17,8 +17,14 @@ namespace Abyss.Web.Controllers
             _gptManager = gptManager;
         }
 
+        [HttpGet("models")]
+        public async Task<IList<GPTModel>> GetModels()
+        {
+            return await _gptManager.GetModels();
+        }
+
         [HttpPost]
-        public async Task<GPTMessage> Generate([FromBody] GPTMessage message)
+        public async Task<GPTResponse> Generate([FromBody] GPTRequest message)
         {
             return await _gptManager.Generate(message);
         }

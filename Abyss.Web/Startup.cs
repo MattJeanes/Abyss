@@ -257,7 +257,6 @@ namespace Abyss.Web
             o.PropertyNamingPolicy = null;
             o.DictionaryKeyPolicy = null;
             o.Converters.Add(new ObjectIdConverter());
-            o.Converters.Add(new JsonStringEnumConverter());
             return o;
         }
 

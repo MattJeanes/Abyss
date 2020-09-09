@@ -1,8 +1,8 @@
 <h1>Generative Pre-trained Transformer</h1>
 <mat-form-field>
     <mat-label>Model</mat-label>
-    <mat-select [(value)]="model">
-        <mat-option [value]="option.value" *ngFor="let option of models | keyvalue">{{ option.key }}</mat-option>
+    <mat-select [(value)]="model" required>
+        <mat-option [value]="model.Id" *ngFor="let model of models">{{ model.Name }}</mat-option>
     </mat-select>
 </mat-form-field>
 <div class="main">
@@ -13,7 +13,7 @@
         </button>
     </mat-form-field>
     <div class="button">
-        <button [disabled]="loading || !message" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
+        <button [disabled]="loading || !message || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
         &nbsp;
         <button [disabled]="loading || !log.length" mat-raised-button (click)="add('\n'+message); generate()">Add to existing</button>
     </div>
@@ -26,5 +26,5 @@
     <button mat-raised-button [disabled]="loading" (click)="undo(); generate()" *ngIf="log.length">Retry Last</button>
     <br />
     <br />
-    <span *ngFor="let logItem of log" [class.human]="logItem.human">{{ logItem.text }}</span>
+    <span *ngFor="let logItem of log" [class.human]="logItem.Human">{{ logItem.Text }}</span>
 </div>

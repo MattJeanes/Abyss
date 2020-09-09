@@ -36,7 +36,6 @@ export enum Permissions {
     ErrorViewer = 'ErrorViewer',
     ServerManager = 'ServerManager',
     WhoSaid = 'WhoSaid',
-    GPT = 'GPT',
 }
 
 export enum ServerStatus {
@@ -75,13 +74,22 @@ export interface IWhoSaid {
     Message: string;
 }
 
-export interface IGPTMessage {
-    text: string;
-    human?: boolean;
-    model?: GPTModel;
+export interface IGPTRequest {
+    Text: string;
+    ModelId: string;
 }
 
-export enum GPTModel {
-    Boys = 'Boys',
-    DanBot = 'DanBot',
+export interface IGPTResponse {
+    Text: string;
+}
+
+export interface IGPTMessage {
+    Text: string;
+    Human?: boolean;
+}
+
+export interface IGPTModel {
+    Id: string;
+    Name: string;
+    Identifier: string;
 }

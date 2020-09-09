@@ -1,5 +1,6 @@
 ﻿using Abyss.Web.Data;
 using Abyss.Web.Entities;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -21,5 +22,7 @@ namespace Abyss.Web.Helpers.Interfaces
         Task<RefreshToken> GetCurrentRefreshToken();
         bool HasPermission(ClientUser user, string permission);
         bool HasPermission(string permission);
+        Task<IList<Permission>> GetPermissions();
+        Task<IList<Permission>> GetPermissions(ClientUser user);
     }
 }

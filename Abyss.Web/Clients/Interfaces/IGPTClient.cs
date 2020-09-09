@@ -5,6 +5,6 @@ namespace Abyss.Web.Clients.Interfaces
 {
     public interface IGPTClient
     {
-        Task<GPTMessage> Generate(GPTMessage message);
+        Task<GPTResponse> Generate(string model, string message);
     }
 }
