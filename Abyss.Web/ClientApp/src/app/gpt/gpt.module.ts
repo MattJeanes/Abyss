@@ -9,17 +9,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 
-import { AuthGuard } from '../services/auth.guard';
-
 import { GPTComponent } from './gpt.component';
 import { GPTService } from './gpt.service';
 
 export const routes: Routes = [
     {
         path: '',
-        component: GPTComponent,
-        canActivate: [AuthGuard],
-        data: { permissions: 'WhoSaid' },
+        component: GPTComponent
     },
 ];
 
