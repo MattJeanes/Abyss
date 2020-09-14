@@ -13,7 +13,7 @@
         </button>
     </mat-form-field>
     <div class="button">
-        <button [disabled]="loading || !message || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
+        <button [disabled]="loading || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
         &nbsp;
         <button [disabled]="loading || !log.length" mat-raised-button (click)="add('\n'+message); generate()">Add to existing</button>
     </div>

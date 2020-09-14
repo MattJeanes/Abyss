@@ -107,7 +107,7 @@ namespace Abyss.Web
                         ValidIssuer = _config["Jwt:Issuer"],
                         ValidAudience = Data.TokenType.Access.ToString(),
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"])),
-                        ClockSkew = TimeSpan.FromHours(DateTime.Now.Hour - DateTimeOffset.UtcNow.Hour)
+                        ClockSkew = TimeSpan.FromMinutes(5)
                     };
                 })
                 .AddSteam(AuthSchemes.Steam.Id, options =>

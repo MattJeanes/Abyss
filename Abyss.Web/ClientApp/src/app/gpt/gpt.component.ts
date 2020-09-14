@@ -36,7 +36,7 @@ export class GPTComponent implements OnInit {
     public async generate(): Promise<void> {
         try {
             const currentText = this.log.map(x => x.Text).join();
-            if ((!currentText) || (!this.model) || this.loading) { return; }
+            if ((!this.model) || this.loading) { return; }
             this.loading = true;
             const response = await this.gptService.generate({ Text: currentText, ModelId: this.model });
             response.Text = this.removeLastLine(response.Text).trimRight();
@@ -52,6 +52,7 @@ export class GPTComponent implements OnInit {
     }
 
     public add(message: string): void {
+        if (!message) { return; }
         this.log = [...this.log, { Text: message, Human: true }];
     }
 
