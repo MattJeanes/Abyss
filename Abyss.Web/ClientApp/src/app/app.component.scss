@@ -7,10 +7,14 @@
 
 .content {
     grid-column: span 12;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 @include medium {
     .content {
+        padding-left: initial;
+        padding-right: initial;
         grid-column: 2 / span 10;
     }
 }

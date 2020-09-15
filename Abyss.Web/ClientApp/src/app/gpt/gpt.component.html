@@ -1,30 +1,28 @@
 <h1>Generative Pre-trained Transformer</h1>
-<mat-form-field>
-    <mat-label>Model</mat-label>
-    <mat-select [(value)]="model" required>
-        <mat-option [value]="model.Id" *ngFor="let model of models">{{ model.Name }}</mat-option>
-    </mat-select>
-</mat-form-field>
+<div class="options">
+    <mat-form-field>
+        <mat-label>Model</mat-label>
+        <mat-select [(value)]="model" required>
+            <mat-option [value]="model.Id" *ngFor="let model of models">{{ model.Name }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-checkbox name="removeIncompleteLine" [(ngModel)]="removeIncompleteLine">Remove Incomplete Lines</mat-checkbox>
+</div>
 <div class="main">
     <mat-form-field class="field">
-        <textarea class="input" matInput placeholder="Message" type="text" [(ngModel)]="message"></textarea>
+        <textarea class="input" matInput placeholder="Model Input" type="text" [(ngModel)]="message"></textarea>
         <button mat-icon-button matSuffix *ngIf="message" aria-label="Clear" (click)="message=''">
             <mat-icon>close</mat-icon>
         </button>
     </mat-form-field>
-    <div class="button">
-        <button [disabled]="loading || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
-        &nbsp;
-        <button [disabled]="loading || !log.length" mat-raised-button (click)="add('\n'+message); generate()">Add to existing</button>
-    </div>
+</div>
+<div class="buttons">
+    <button [disabled]="loading || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
+    <button [disabled]="loading || !log.length" mat-raised-button (click)="add('\n'+message); generate()">Add to existing</button>
+    <button mat-raised-button [disabled]="!log.length || loading" (click)="undo()">Undo</button>
+    <button mat-raised-button [disabled]="!log.length || loading" (click)="generate()">Continue</button>
+    <button mat-raised-button [disabled]="!log.length || loading" (click)="undo(); generate()">Retry Last</button>
 </div>
 <div class="log">
-    <button mat-raised-button [disabled]="loading" (click)="undo()" *ngIf="log.length">Undo</button>
-    &nbsp;
-    <button mat-raised-button [disabled]="loading" (click)="generate()" *ngIf="log.length">Continue</button>
-    &nbsp;
-    <button mat-raised-button [disabled]="loading" (click)="undo(); generate()" *ngIf="log.length">Retry Last</button>
-    <br />
-    <br />
     <span *ngFor="let logItem of log" [class.human]="logItem.Human">{{ logItem.Text }}</span>
 </div>

@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { GPTComponent } from './gpt.component';
 import { GPTService } from './gpt.service';
@@ -29,6 +30,7 @@ export const routes: Routes = [
         MatInputModule,
         MatButtonModule,
         MatSelectModule,
+        MatCheckboxModule,
     ],
     declarations: [
         GPTComponent,
