@@ -305,8 +305,9 @@ namespace Abyss.Web.Helpers
 
         public async Task<IList<Permission>> GetPermissions(ClientUser user)
         {
-            if (user?.RoleId == null) { return new List<Permission>(); }
+            if (string.IsNullOrEmpty(user?.RoleId)) { return new List<Permission>(); }
             var role = await _roleRepository.GetById(user.RoleId);
+            if (role?.Permissions == null) { return new List<Permission>(); }
             var permissions = await _permissionRepository.GetAll().Where(x => role.Permissions.Contains(x.Id)).ToListAsync();
             return permissions;
         }
