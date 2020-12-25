@@ -59,13 +59,13 @@ namespace Abyss.Web.Managers
                 server = await _serverRepository.GetById(serverId);
                 if (server == null) { throw new Exception($"Server id {server} not found"); }
                 if (server.StatusId != ServerStatus.Inactive) { throw new Exception("Cannot create server that is active"); }
-                if (!server.SnapshotId.HasValue) { throw new Exception("Server has no snapshot id"); }
                 server.StatusId = ServerStatus.Activating;
                 await _serverRepository.Update(server);
 
                 string ipAddress;
                 if (server.CloudType == CloudType.DigitalOcean)
                 {
+                    if (!server.SnapshotId.HasValue) { throw new Exception("Server has no snapshot id"); }
                     logger.LogInformation($"Creating droplet from server id {server.Id} - this may take a while... https://tenor.com/view/call-calling-dial-up-internet-modem-gif-8187684");
                     var droplet = await _digitalOceanHelper.CreateDropletFromServer(server, logger);
                     logger.LogInformation($"Created droplet from server id {server.Id}");
