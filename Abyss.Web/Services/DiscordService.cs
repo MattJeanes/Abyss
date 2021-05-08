@@ -43,7 +43,7 @@ namespace Abyss.Web.Services
         {
             _logger.LogInformation("Discord service is starting");
 
-            _client.MessageCreated += async (e) =>
+            _client.MessageCreated += async (c, e) =>
             {
                 try
                 {
@@ -104,7 +104,7 @@ namespace Abyss.Web.Services
             }
         }
 
-        private async Task GuildMemberRemovedAsync(GuildMemberRemoveEventArgs e)
+        private async Task GuildMemberRemovedAsync(DiscordClient client, GuildMemberRemoveEventArgs e)
         {
             await Task.WhenAll(_commands.Select(x => x.MemberRemoved(e)).ToArray());
         }
