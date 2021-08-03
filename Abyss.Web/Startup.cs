@@ -184,6 +184,7 @@ namespace Abyss.Web
             services.Configure<ReminderOptions>(_config.GetSection("Reminder"));
             services.Configure<AzureOptions>(_config.GetSection("Azure"));
             services.Configure<GModOptions>(_config.GetSection("GMod"));
+            services.Configure<PushoverOptions>(_config.GetSection("Pushover"));
             services.AddHttpContextAccessor();
             services.AddHttpClient("cloudflare", options =>
             {
@@ -196,6 +197,7 @@ namespace Abyss.Web
                 options.BaseAddress = new Uri(_config["GMod:BaseUrl"]);
                 options.DefaultRequestHeaders.Add("ApiKey", _config["GMod:ApiKey"]);
             });
+            services.AddHttpClient<INotificationHelper, PushoverHelper>(x => x.BaseAddress = new Uri(_config.GetValue<string>("Pushover:BaseUrl")));
             services.AddHostedService<CleanupService>();
             services.AddHostedService<DiscordService>();
             services.AddHostedService<TeamSpeakService>();

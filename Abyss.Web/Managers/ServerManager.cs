@@ -19,25 +19,25 @@ namespace Abyss.Web.Managers
     {
         private readonly IDigitalOceanHelper _digitalOceanHelper;
         private readonly IRepository<Server> _serverRepository;
-        private readonly CloudflareOptions _options;
         private readonly ICloudflareHelper _cloudflareHelper;
         private readonly IAzureHelper _azureHelper;
+        private readonly INotificationHelper _notificationHelper;
         private readonly ILogger<ServerManager> _baseLogger;
 
         public ServerManager(
             IDigitalOceanHelper digitalOceanHelper,
             IRepository<Server> serverRepository,
-            IOptions<CloudflareOptions> options,
             IAzureHelper azureHelper,
+            INotificationHelper notificationHelper,
             ICloudflareHelper cloudflareHelper,
             ILogger<ServerManager> logger
             )
         {
             _digitalOceanHelper = digitalOceanHelper;
             _serverRepository = serverRepository;
-            _options = options.Value;
             _cloudflareHelper = cloudflareHelper;
             _azureHelper = azureHelper;
+            _notificationHelper = notificationHelper;
             _baseLogger = logger;
         }
 
@@ -58,7 +58,9 @@ namespace Abyss.Web.Managers
             {
                 server = await _serverRepository.GetById(serverId);
                 if (server == null) { throw new Exception($"Server id {server} not found"); }
-                if (server.StatusId != ServerStatus.Inactive) { throw new Exception("Cannot create server that is active"); }
+                if (server.StatusId != ServerStatus.Inactive) { throw new Exception("Cannot start server that is active"); }
+                logger.LogInformation($"Starting server {server.Id}");
+                await _notificationHelper.SendMessage($"Starting server {server.Name}", MessagePriority.HighPriority);
                 server.StatusId = ServerStatus.Activating;
                 await _serverRepository.Update(server);
 
@@ -102,10 +104,12 @@ namespace Abyss.Web.Managers
                 }
                 await _serverRepository.Update(server);
                 logger.LogInformation($"Successfully started server {server.Id}");
+                await _notificationHelper.SendMessage($"Started server {server.Name}", MessagePriority.HighPriority);
             }
             catch (Exception e)
             {
                 logger.LogError(e, $"Failed to start server {server?.Id.ToString() ?? "N/A"}");
+                await _notificationHelper.SendMessage($"Failed to start server {server.Name}", MessagePriority.HighPriority);
                 throw;
             }
             finally
@@ -131,9 +135,9 @@ namespace Abyss.Web.Managers
             {
                 server = await _serverRepository.GetById(serverId);
                 if (server == null) { throw new Exception($"Server id {server} not found"); }
-
-                if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot delete server that is not active"); }
+                if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot stop server that is not active"); }
                 logger.LogInformation($"Stopping server {server.Id}");
+                await _notificationHelper.SendMessage($"Stopping server {server.Name}", MessagePriority.HighPriority);
                 server.StatusId = ServerStatus.Deactivating;
                 await _serverRepository.Update(server);
                 if (server.CloudType == CloudType.DigitalOcean)
@@ -191,10 +195,12 @@ namespace Abyss.Web.Managers
                 server.StatusId = ServerStatus.Inactive;
                 await _serverRepository.Update(server);
                 logger.LogInformation($"Successfully stopped server {server.Id}");
+                await _notificationHelper.SendMessage($"Stopped server {server.Name}", MessagePriority.HighPriority);
             }
             catch (Exception e)
             {
                 logger.LogError(e, $"Failed to stop server {server?.Id.ToString() ?? "N/A"}");
+                await _notificationHelper.SendMessage($"Failed to stop server {server.Name}", MessagePriority.HighPriority);
                 throw;
             }
             finally
