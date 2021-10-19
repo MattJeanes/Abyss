@@ -2,7 +2,9 @@
 using Abyss.Web.Data.TeamSpeak;
 using Abyss.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,18 +13,25 @@ using TeamSpeak3QueryApi.Net.Specialized.Responses;
 
 namespace Abyss.Web.Helpers
 {
-    public class TeamSpeakHelper : ITeamSpeakHelper
+    public class TeamSpeakHelper : ITeamSpeakHelper, IDisposable
     {
         private readonly TeamSpeakOptions _options;
         private readonly IHubContext<OnlineHub> _onlineHub;
+        private readonly ILogger<TeamSpeakHelper> _logger;
         private List<Client> _clients;
         private List<Channel> _channels;
         private Task _updateTask;
+        private TeamSpeakClient _teamspeak;
 
-        public TeamSpeakHelper(IOptions<TeamSpeakOptions> options, IHubContext<OnlineHub> onlineHub)
+        public TeamSpeakHelper(
+            IOptions<TeamSpeakOptions> options,
+            IHubContext<OnlineHub> onlineHub,
+            ILogger<TeamSpeakHelper> logger
+            )
         {
             _options = options.Value;
             _onlineHub = onlineHub;
+            _logger = logger;
         }
 
         public async Task<List<Client>> GetClients()
@@ -52,30 +61,46 @@ namespace Abyss.Web.Helpers
             }
             return _updateTask = Task.Run(async () =>
             {
+                if (_teamspeak == null)
+                {
+                    _teamspeak = new TeamSpeakClient(_options.Host);
+                }
                 try
                 {
-                    using (var teamspeak = new TeamSpeakClient(_options.Host))
+                    if (!_teamspeak.Client.IsConnected)
                     {
-                        await teamspeak.Connect();
-                        await teamspeak.UseServer(_options.ServerId);
-                        var rawChannels = await teamspeak.GetChannels();
-                        var channels = new List<Channel>();
-                        foreach (var rawChannel in rawChannels)
+                        try
                         {
-                            channels.Add(ConvertChannel(rawChannel, rawChannels, channels));
+                            await _teamspeak.Connect();
                         }
-                        var rawClients = await teamspeak.GetClients();
-                        var rawDetailedClients = new List<GetClientDetailedInfo>();
-                        foreach (var rawClient in rawClients.Where(x => x.Type == ClientType.FullClient))
+                        catch (Exception ex)
                         {
-                            rawDetailedClients.Add(await teamspeak.GetClientInfo(rawClient));
+                            _logger.LogWarning(ex, $"Failed to connect to TeamSpeak, disposing and creating new client");
+                            _teamspeak.Dispose();
+                            _teamspeak = null;
+                            _teamspeak = new TeamSpeakClient(_options.Host);
+                            await _teamspeak.Connect();
                         }
-                        var clients = rawDetailedClients.Select(x => ConvertClient(x, channels)).ToList();
-
-                        _channels = channels;
-                        _clients = clients;
-                        await _onlineHub.Clients.All.SendAsync("update", _clients, _channels);
+                        await _teamspeak.UseServer(_options.ServerId);
+                        await _teamspeak.ChangeNickName(_options.ClientName);
                     }
+                    var rawChannels = await _teamspeak.GetChannels();
+                    var channels = new List<Channel>();
+                    foreach (var rawChannel in rawChannels)
+                    {
+                        channels.Add(ConvertChannel(rawChannel, rawChannels, channels));
+                    }
+                    var rawClients = await _teamspeak.GetClients();
+                    var rawDetailedClients = new List<GetClientDetailedInfo>();
+                    foreach (var rawClient in rawClients.Where(x => x.Type == ClientType.FullClient))
+                    {
+                        rawDetailedClients.Add(await _teamspeak.GetClientInfo(rawClient));
+                    }
+                    var clients = rawDetailedClients.Select(x => ConvertClient(x, channels)).ToList();
+
+                    _channels = channels;
+                    _clients = clients;
+                    await _onlineHub.Clients.All.SendAsync("update", _clients, _channels);
                 }
                 finally
                 {
@@ -103,6 +128,11 @@ namespace Abyss.Web.Helpers
                 ConnectedSeconds = (int)rawClient.ConnectionTime.TotalSeconds,
                 IdleSeconds = (int)rawClient.IdleTime.TotalSeconds
             };
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)_teamspeak)?.Dispose();
         }
     }
 }

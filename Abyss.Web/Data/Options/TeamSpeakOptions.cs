@@ -5,5 +5,6 @@
         public int UpdateIntervalSeconds { get; set; }
         public string Host { get; set; }
         public int ServerId { get; set; }
+        public string ClientName { get; set; }
     }
 }
