@@ -14,6 +14,7 @@
     <PackageReference Include="AspNet.Security.OpenId.Steam" Version="5.0.0" />
     <PackageReference Include="DigitalOcean.API" Version="5.2.0" />
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="5.0.15" />
+    <PackageReference Include="Cronos" Version="0.7.1" />
     <PackageReference Include="Microsoft.Extensions.ML" Version="1.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.10" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.10" />

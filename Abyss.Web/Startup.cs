@@ -149,6 +149,7 @@ namespace Abyss.Web
             services.AddTransient<IAzureHelper, AzureHelper>();
             services.AddTransient<IGModHelper, GModHelper>();
             services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
+            services.AddSingleton<IQuoteHelper, QuoteHelper>();
             services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
             services.AddHttpClient();
             services.AddHttpClient<IGPTClient, GPTClient>(client =>
@@ -182,6 +183,7 @@ namespace Abyss.Web
             services.Configure<TeamSpeakOptions>(_config.GetSection("TeamSpeak"));
             services.Configure<TumblrOptions>(_config.GetSection("Tumblr"));
             services.Configure<ReminderOptions>(_config.GetSection("Reminder"));
+            services.Configure<QuoteOfTheDayOptions>(_config.GetSection("QuoteOfTheDay"));
             services.Configure<AzureOptions>(_config.GetSection("Azure"));
             services.Configure<GModOptions>(_config.GetSection("GMod"));
             services.Configure<PushoverOptions>(_config.GetSection("Pushover"));
@@ -202,6 +204,11 @@ namespace Abyss.Web
             services.AddHostedService<DiscordService>();
             services.AddHostedService<TeamSpeakService>();
             services.AddHostedService<ReminderService>();
+            services.AddCronJob<QuoteOfTheDayService>(c =>
+            {
+                c.TimeZoneInfo = TimeZoneInfo.Utc;
+                c.CronExpression = _config["QuoteOfTheDay:CronExpression"];
+            });
 
             ErrorStore errorStore;
             var databaseLogging = _config.GetValue<bool>("Logging:Database");

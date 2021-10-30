@@ -1,31 +1,23 @@
-﻿using System;
+﻿using Abyss.Web.Data;
+using Abyss.Web.Helpers.Interfaces;
+using DontPanic.TumblrSharp.Client;
+using DSharpPlus.EventArgs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Abyss.Web.Data;
-using Abyss.Web.Data.Options;
-using Abyss.Web.Helpers.Interfaces;
-using DontPanic.TumblrSharp;
-using DontPanic.TumblrSharp.Client;
-using DSharpPlus.EventArgs;
-using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Commands.Discord
 {
     public class QuoteCommand : BaseCommand
     {
-        private readonly TumblrClient _client;
-        private readonly TumblrOptions _options;
-        private List<QuotePost> _posts = new List<QuotePost>();
-        private List<QuotePost> _localPosts = new List<QuotePost>();
-        private DateTime _cacheExpiry = DateTime.UtcNow;
+        private readonly IQuoteHelper _quoteHelper;
 
         public override string Command => "quote";
 
-        public QuoteCommand(IServiceProvider serviceProvider, TumblrClient client, IOptions<TumblrOptions> options) : base(serviceProvider)
+        public QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHelper) : base(serviceProvider)
         {
-            _client = client;
-            _options = options.Value;
+            _quoteHelper = quoteHelper;
         }
 
         public override async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
@@ -52,73 +44,42 @@ namespace Abyss.Web.Commands.Discord
                 return;
             }
             var clientUser = await GetClientUser(e);
-            if (clientUser == null) {
+            if (clientUser == null)
+            {
                 await e.Message.RespondAsync("You are not registered");
                 return;
             };
-            if (!_userHelper.HasPermission(clientUser, Permissions.QuoteManager)) {
+            if (!_userHelper.HasPermission(clientUser, Permissions.QuoteManager))
+            {
                 await e.Message.RespondAsync("You are not authorized");
                 return;
             }
             var quote = args[0];
             var source = args[1];
-            await UpdateQuotes();
-            var existing = _posts.Any(x => x.Summary == quote) || _localPosts.Any(x => x.Summary == quote);
-            if (existing)
+            var result = await _quoteHelper.AddQuote(quote, source);
+            if (!result.Success)
             {
-                await e.Message.RespondAsync("That quote already exists");
-                return;
+                if (string.IsNullOrEmpty(result.ErrorMessage))
+                {
+                    await e.Message.RespondAsync("Failed to add quote");
+                }
+                else
+                {
+                    await e.Message.RespondAsync(result.ErrorMessage);
+                }
             }
-            var post = await _client.CreatePostAsync(_options.BlogName, PostData.CreateQuote(quote, source));
-            var newQuote = new QuotePost
-            {
-                Id = post.PostId,
-                Summary = quote,
-                Source = source,
-                Timestamp = DateTime.Now
-            };
-            _localPosts.Add(newQuote);
-            await WriteQuote(e, newQuote);
+            await WriteQuote(e, result.Quote);
         }
 
         private async Task GetQuote(MessageCreateEventArgs e)
         {
-            var quotes = await GetAllQuotes();
-            var quote = quotes.OrderBy(x => Guid.NewGuid()).First();
+            var quote = await _quoteHelper.GetQuote();
             await WriteQuote(e, quote);
         }
 
-        private static async Task WriteQuote(MessageCreateEventArgs e, QuotePost quote)
+        private async Task WriteQuote(MessageCreateEventArgs e, QuotePost quote)
         {
-            await e.Message.RespondAsync($"_‟{quote.Summary}“_ – {quote.Source}, {quote.Timestamp.ToString("yyyy")}");
-        }
-
-        private async Task<List<QuotePost>> GetAllQuotes()
-        {
-            if (!_posts.Any() || DateTime.UtcNow >= _cacheExpiry)
-            {
-                await UpdateQuotes();
-            }
-            return _posts;
-        }
-
-        private async Task UpdateQuotes()
-        {
-            var count = 20;
-            var startIndex = 0;
-            var allPosts = new List<BasePost>();
-
-            int lastCount;
-            do
-            {
-                var posts = await _client.GetPostsAsync(_options.BlogName, startIndex: startIndex, count: count, type: PostType.Quote);
-                allPosts.AddRange(posts.Result);
-                lastCount = posts.Result.Count();
-                startIndex += count;
-            }
-            while (lastCount >= count);
-            _cacheExpiry = DateTime.UtcNow.AddMinutes(_options.CacheMinutes);
-            _posts = allPosts.Select(x => (QuotePost)x).ToList();
+            await e.Message.RespondAsync(_quoteHelper.FormatQuote(quote));
         }
     }
 }
