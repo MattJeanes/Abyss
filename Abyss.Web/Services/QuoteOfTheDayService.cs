@@ -39,13 +39,20 @@ namespace Abyss.Web.Services
 
         public override async Task DoWork(CancellationToken cancellationToken)
         {
-            using var scope = _serviceProvider.CreateScope();
-            var discordClient = scope.ServiceProvider.GetService<DiscordClient>();
-            _logger.LogInformation("Sending quote of the day");
-            var quote = await _quoteHelper.GetQuote();
-            var message = $"**Quote of the day:** {_quoteHelper.FormatQuote(quote)}";
-            var channel = await discordClient.GetChannelAsync(_options.DiscordChannelId);
-            await discordClient.SendMessageAsync(channel, message.ToString());
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var discordClient = scope.ServiceProvider.GetService<DiscordClient>();
+                _logger.LogInformation("Sending quote of the day");
+                var quote = await _quoteHelper.GetQuote();
+                var message = $"**Quote of the day:** {_quoteHelper.FormatQuote(quote)}";
+                var channel = await discordClient.GetChannelAsync(_options.DiscordChannelId);
+                await discordClient.SendMessageAsync(channel, message.ToString());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send quote of the day");
+            }
         }
 
         public override Task StopAsync(CancellationToken cancellationToken)
