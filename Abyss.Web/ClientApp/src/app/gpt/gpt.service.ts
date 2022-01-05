@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 import { IGPTRequest, IGPTResponse, IGPTModel } from '../app.data';
 
@@ -9,10 +9,10 @@ export class GPTService {
     constructor(private httpClient: HttpClient) { }
 
     public generate(message: IGPTRequest): Promise<IGPTResponse> {
-        return this.httpClient.post<IGPTResponse>('/api/gpt', message).pipe(first()).toPromise();
+        return firstValueFrom(this.httpClient.post<IGPTResponse>('/api/gpt', message));
     }
 
     public getModels(): Promise<IGPTModel[]> {
-        return this.httpClient.get<IGPTModel[]>('/api/gpt/models').pipe(first()).toPromise();
+        return firstValueFrom(this.httpClient.get<IGPTModel[]>('/api/gpt/models'));
     }
 }

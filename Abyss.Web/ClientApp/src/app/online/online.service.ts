@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 import { ITeamSpeakChannel, ITeamSpeakClient } from '../app.data';
 
@@ -8,9 +8,9 @@ import { ITeamSpeakChannel, ITeamSpeakClient } from '../app.data';
 export class OnlineService {
     constructor(private httpClient: HttpClient) { }
     public getClients(): Promise<ITeamSpeakClient[]> {
-        return this.httpClient.get<ITeamSpeakClient[]>('/api/online/client').pipe(first()).toPromise();
+        return firstValueFrom(this.httpClient.get<ITeamSpeakClient[]>('/api/online/client'));
     }
     public getChannels(): Promise<ITeamSpeakChannel[]> {
-        return this.httpClient.get<ITeamSpeakChannel[]>('/api/online/channel').pipe(first()).toPromise();
+        return firstValueFrom(this.httpClient.get<ITeamSpeakChannel[]>('/api/online/channel'));
     }
 }

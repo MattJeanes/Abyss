@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 import { IUser } from '../app.data';
 
@@ -8,6 +8,6 @@ import { IUser } from '../app.data';
 export class UserManagerService {
     constructor(private httpClient: HttpClient) { }
     public getUsers(): Promise<IUser[]> {
-        return this.httpClient.get<IUser[]>('/api/user').pipe(first()).toPromise();
+        return firstValueFrom(this.httpClient.get<IUser[]>('/api/user'));
     }
 }

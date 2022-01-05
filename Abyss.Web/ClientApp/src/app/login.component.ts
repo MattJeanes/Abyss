@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { first } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthService, DialogService } from './services';
 
@@ -12,7 +12,7 @@ export class LoginComponent implements OnInit {
 
     public async ngOnInit(): Promise<void> {
         try {
-            const params = await this.activatedRoute.params.pipe(first()).toPromise();
+            const params = await firstValueFrom(this.activatedRoute.params);
             await this.authService.getNewToken(params.scheme);
             this.router.navigate(['/']);
         } catch (e: any) {
