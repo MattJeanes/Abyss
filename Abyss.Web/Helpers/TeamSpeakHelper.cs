@@ -77,7 +77,7 @@ public class TeamSpeakHelper : ITeamSpeakHelper, IDisposable
                         await _teamspeak.Connect();
                     }
                     await _teamspeak.UseServer(_options.ServerId);
-                    await _teamspeak.ChangeNickName(_options.ClientName);
+                    //await _teamspeak.ChangeNickName(_options.ClientName);
                 }
                 var rawChannels = await _teamspeak.GetChannels();
                 var channels = new List<Channel>();

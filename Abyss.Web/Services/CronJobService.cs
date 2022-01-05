@@ -10,7 +10,7 @@ public abstract class CronJobService : IHostedService, IDisposable
 
     protected CronJobService(string? cronExpression, TimeZoneInfo? timeZoneInfo)
     {
-        if (_expression == null)
+        if (cronExpression == null)
         {
             throw new ArgumentNullException(nameof(cronExpression));
         }
