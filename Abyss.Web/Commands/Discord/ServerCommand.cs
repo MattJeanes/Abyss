@@ -37,6 +37,9 @@ namespace Abyss.Web.Commands.Discord
                 case "stop":
                     await StopServer(e, args.Skip(1).FirstOrDefault());
                     break;
+                case "status":
+                    await GetServerStatus(e, args.Skip(1).FirstOrDefault());
+                    break;
                 default:
                     await e.Message.RespondAsync("Unknown sub-command, try: (none), start, stop");
                     break;
@@ -94,6 +97,35 @@ namespace Abyss.Web.Commands.Discord
                     await thread.SendMessageAsync(logItem.ToString());
                 }
             });
+        }
+
+        private async Task GetServerStatus(MessageCreateEventArgs e, string name)
+        {
+            var servers = await _serverManager.GetServers();
+            var server = servers.FirstOrDefault(x => x.Name == name);
+            if (server == null)
+            {
+                await e.Message.RespondAsync("Server not found");
+                return;
+            }
+            switch (server.StatusId)
+            {
+                case ServerStatus.Activating:
+                    await e.Message.RespondAsync($"{server.Name} is starting up");
+                    break;
+                case ServerStatus.Active:
+                    await e.Message.RespondAsync($"{server.Name} is running");
+                    break;
+                case ServerStatus.Deactivating:
+                    await e.Message.RespondAsync($"{server.Name} is stopping");
+                    break;
+                case ServerStatus.Inactive:
+                    await e.Message.RespondAsync($"{server.Name} is stopped");
+                    break;
+                default:
+                    await e.Message.RespondAsync($"{server.Name} is in unknown state '{server.StatusId}'");
+                    break;
+            }
         }
 
         private async Task<DiscordThreadChannel> TryCreateThread(MessageCreateEventArgs e, string name)

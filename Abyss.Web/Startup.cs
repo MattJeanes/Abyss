@@ -75,7 +75,6 @@ namespace Abyss.Web
                 options.EnableEndpointRouting = true;
                 options.InputFormatters.Add(new TextPlainInputFormatter());
             })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddJsonOptions(o => ConfigureJsonOptions(o.JsonSerializerOptions));
             services.AddHttpsRedirection(options =>
             {
