@@ -25,7 +25,7 @@ export class WhoSaidComponent {
             this.log = [...this.log, whoSaid];
             this.name = whoSaid.Name;
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to get who said it',
                 message: e.toString(),
             });

@@ -35,7 +35,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             await this.hub.start();
             this.hubReady = true;
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to load online',
                 message: e.toString(),
             });
@@ -59,7 +59,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             this.channels = await this.onlineService.getChannels();
             this.clients = await this.onlineService.getClients();
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to refresh',
                 message: e.toString(),
             });

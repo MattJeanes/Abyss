@@ -1,30 +1,24 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
 
 import { IDialogAlert, IDialogConfirm, IDialogPrompt } from '../app.data';
 
 @Injectable()
 export class DialogService {
-    public openAlert(alert: IDialogAlert): OpenDialog<undefined> {
+    public async alert(alert: IDialogAlert): Promise<void> {
         // todo
-        return new OpenDialog();
     }
 
-    public openConfirm(confirm: IDialogConfirm): OpenDialog<boolean> {
+    public confirm(confirm: IDialogConfirm): Promise<boolean> {
         // todo
-        return new OpenDialog();
+        return new Promise<boolean>((resolve, reject) => {
+            resolve(false);
+        });
     }
 
-    public openPrompt(prompt: IDialogPrompt): OpenDialog<string> {
+    public prompt(prompt: IDialogPrompt): Promise<string> {
         // todo
-        return new OpenDialog();
-    }
-}
-
-
-class OpenDialog<T> {
-    public afterClosed(): Subject<T> {
-        // todo
-        return new Subject<T>();
+        return new Promise<string>((resolve, reject) => {
+            resolve('');
+        });
     }
 }

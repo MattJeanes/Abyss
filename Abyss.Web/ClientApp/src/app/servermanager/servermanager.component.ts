@@ -23,7 +23,7 @@ export class ServerManagerComponent implements OnInit {
             this.loading = true;
             await this.refresh();
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to load server manager',
                 message: e.toString(),
             });
@@ -38,7 +38,7 @@ export class ServerManagerComponent implements OnInit {
             this.loading = true;
             await this.serverManagerService.start(this.selected.Id);
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to start server',
                 message: e.toString(),
             });
@@ -54,7 +54,7 @@ export class ServerManagerComponent implements OnInit {
             this.loading = true;
             await this.serverManagerService.stop(this.selected.Id);
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to stop server',
                 message: e.toString(),
             });
@@ -72,7 +72,7 @@ export class ServerManagerComponent implements OnInit {
         try {
             this.servers = await this.serverManagerService.getServers();
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to refresh servers',
                 message: e.toString(),
             });

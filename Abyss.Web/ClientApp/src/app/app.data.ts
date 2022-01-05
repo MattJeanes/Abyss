@@ -14,7 +14,6 @@ export interface IClientUser {
 }
 
 export interface IUser {
-    // todo
     Name: string;
 }
 

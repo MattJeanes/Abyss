@@ -46,14 +46,14 @@ export class AppComponent implements OnInit {
                 await this.authService.getNewToken();
             }
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to get new auth token, forcing logout',
                 message: e.toString(),
             });
             try {
                 await this.authService.logout();
             } catch (e: any) {
-                this.dialogService.openAlert({
+                this.dialogService.alert({
                     title: 'Failed to log out',
                     message: e.toString(),
                 });

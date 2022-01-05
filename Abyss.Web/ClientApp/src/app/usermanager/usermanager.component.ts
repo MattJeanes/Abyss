@@ -17,7 +17,7 @@ export class UserManagerComponent implements OnInit {
         try {
             this.users = await this.userManagerService.getUsers();
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to load user manager',
                 message: e.toString(),
             });

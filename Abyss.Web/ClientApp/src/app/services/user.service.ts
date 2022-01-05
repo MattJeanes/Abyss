@@ -13,11 +13,11 @@ export class UserService {
         const user = this.authService.getUser();
         const currentUsername = user ? user.Name : undefined;
         if (!username) {
-            username = await this.dialogService.openPrompt({
+            username = await this.dialogService.prompt({
                 message: 'Enter new username',
                 title: 'Change username',
                 value: currentUsername,
-            }).afterClosed().toPromise();
+            });
             if (username) {
                 username = username.trim();
             }

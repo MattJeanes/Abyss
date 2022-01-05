@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
             await this.authService.getNewToken(params.scheme);
             this.router.navigate(['/']);
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to login',
                 message: e.toString(),
             });

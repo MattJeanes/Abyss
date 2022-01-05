@@ -38,7 +38,7 @@ export class GPTComponent implements OnInit {
             this.models = await this.gptService.getModels()
 
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to load GPT models',
                 message: e.toString(),
             });
@@ -58,7 +58,7 @@ export class GPTComponent implements OnInit {
             }
             this.log = [...this.log, response];
         } catch (e: any) {
-            this.dialogService.openAlert({
+            this.dialogService.alert({
                 title: 'Failed to generate GPT text',
                 message: e.toString(),
             });
