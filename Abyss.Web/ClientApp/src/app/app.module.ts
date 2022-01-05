@@ -38,49 +38,48 @@ export function JwtTokenGetter(): string {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    AccountDialogComponent,
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    FormsModule,
-    AppRoutingModule,
-    HttpClientModule,
-    MatButtonModule,
-    MatListModule,
-    MatTooltipModule,
-    MatIconModule,
-    MatDialogModule,
-    MatButtonModule,
-  ],
-  providers: [
-    AuthService,
-    UserService,
-    ErrorService,
-    AuthGuard,
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: JwtInterceptor,
-      multi: true,
-    },
-    {
-      provide: JWT_OPTIONS,
-      useValue: {
-        tokenGetter: JwtTokenGetter,
-      },
-    },
-    JwtHelperService,
-    TdDialogService,
-    TitleService,
-  ],
-  entryComponents: [AccountDialogComponent],
-  bootstrap: [AppComponent],
+    declarations: [
+        AppComponent,
+        AccountDialogComponent,
+    ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        FormsModule,
+        AppRoutingModule,
+        HttpClientModule,
+        MatButtonModule,
+        MatListModule,
+        MatTooltipModule,
+        MatIconModule,
+        MatDialogModule,
+        MatButtonModule,
+    ],
+    providers: [
+        AuthService,
+        UserService,
+        ErrorService,
+        AuthGuard,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: JwtInterceptor,
+            multi: true,
+        },
+        {
+            provide: JWT_OPTIONS,
+            useValue: {
+                tokenGetter: JwtTokenGetter,
+            },
+        },
+        JwtHelperService,
+        TdDialogService,
+        TitleService,
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }
