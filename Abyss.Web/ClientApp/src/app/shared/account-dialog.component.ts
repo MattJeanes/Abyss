@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { TdDialogService } from '@covalent/core/dialogs';
 
 import { IAuthScheme, IClientUserAuthentication, IClientUser } from '../app.data';
-import { AuthService } from '../services/auth.service';
-import { UserService } from '../services/user.service';
+import { AuthService, UserService, DialogService } from '../services';
 
 @Component({
     templateUrl: './account-dialog.component.html',
@@ -27,14 +25,14 @@ export class AccountDialogComponent implements OnInit {
         public dialogRef: MatDialogRef<AccountDialogComponent>,
         public authService: AuthService,
         public userService: UserService,
-        private dialogService: TdDialogService
+        private dialogService: DialogService
     ) { }
 
     public async ngOnInit(): Promise<void> {
         try {
             this.loading = true;
             this.schemes = await this.authService.getAuthSchemes();
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to load auth schemes',
                 message: e.toString(),
@@ -69,7 +67,7 @@ export class AccountDialogComponent implements OnInit {
                 title: 'Logout',
                 message: allDevices ? 'Logout successful, note that other devices may take up to 15 minutes to log out.' : 'Logout successful.',
             });
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to logout',
                 message: e.toString(),
@@ -83,7 +81,7 @@ export class AccountDialogComponent implements OnInit {
         try {
             this.loading = true;
             await this.userService.deleteAuthScheme(scheme);
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: `Failed to delete auth scheme ${scheme}`,
                 message: e.toString(),

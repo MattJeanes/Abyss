@@ -93,3 +93,21 @@ export interface IGPTModel {
     Name: string;
     Identifier: string;
 }
+
+export interface IDialogAlert {
+    title: string;
+    message: string;
+}
+
+export interface IDialogConfirm {
+    title: string;
+    message: string;
+    acceptButton: string;
+    cancelButton: string;
+}
+
+export interface IDialogPrompt {
+    title: string;
+    message: string;
+    value: string | undefined;
+}

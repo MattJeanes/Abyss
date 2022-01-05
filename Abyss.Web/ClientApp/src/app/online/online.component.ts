@@ -1,9 +1,10 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
-import { HttpTransportType, HubConnectionBuilder } from '@aspnet/signalr';
-import { TdDialogService } from '@covalent/core/dialogs';
+import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 
 import { ITeamSpeakChannel, ITeamSpeakClient } from '../app.data';
 import { OnlineService } from './online.service';
+
+import { DialogService } from '../services';
 
 @Component({
     templateUrl: './online.component.html',
@@ -17,7 +18,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
         .withUrl('hub/online', { transport: HttpTransportType.WebSockets })
         .build();
     private hubReady = false;
-    constructor(public onlineService: OnlineService, public dialogService: TdDialogService, private ngZone: NgZone) {
+    constructor(public onlineService: OnlineService, public dialogService: DialogService, private ngZone: NgZone) {
         this.hub.on('update', (clients: ITeamSpeakClient[], channels: ITeamSpeakChannel[]) => {
             // Because this is a call from the server, Angular change detection won't detect it so we must force ngZone to run
             this.ngZone.run(() => {
@@ -33,7 +34,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
             await this.refresh();
             await this.hub.start();
             this.hubReady = true;
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to load online',
                 message: e.toString(),
@@ -57,7 +58,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
         try {
             this.channels = await this.onlineService.getChannels();
             this.clients = await this.onlineService.getClients();
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to refresh',
                 message: e.toString(),
@@ -78,7 +79,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
                 channelName = `${this.getChannelName(channel.ParentId)} / ${channelName}`;
             }
             return channelName;
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
             return 'Error';
         }

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { TdDialogService } from '@covalent/core/dialogs';
 
 import { IServer, ServerStatus } from '../app.data';
 import { ServerManagerService } from './servermanager.service';
+
+import { DialogService } from '../services';
 
 @Component({
     templateUrl: './servermanager.component.html',
@@ -15,13 +16,13 @@ export class ServerManagerComponent implements OnInit {
 
     public get selected(): IServer | undefined { return this.servers ? this.servers.find(x => x.Id === this.selectedId) : undefined; }
 
-    constructor(public serverManagerService: ServerManagerService, public dialogService: TdDialogService) { }
+    constructor(public serverManagerService: ServerManagerService, public dialogService: DialogService) { }
 
     public async ngOnInit(): Promise<void> {
         try {
             this.loading = true;
             await this.refresh();
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to load server manager',
                 message: e.toString(),
@@ -36,7 +37,7 @@ export class ServerManagerComponent implements OnInit {
         try {
             this.loading = true;
             await this.serverManagerService.start(this.selected.Id);
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to start server',
                 message: e.toString(),
@@ -52,7 +53,7 @@ export class ServerManagerComponent implements OnInit {
         try {
             this.loading = true;
             await this.serverManagerService.stop(this.selected.Id);
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to stop server',
                 message: e.toString(),
@@ -70,7 +71,7 @@ export class ServerManagerComponent implements OnInit {
         }
         try {
             this.servers = await this.serverManagerService.getServers();
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to refresh servers',
                 message: e.toString(),

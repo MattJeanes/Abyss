@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { TdDialogService } from '@covalent/core/dialogs';
 
 import { GPTService } from './gpt.service';
 import { IGPTMessage, IGPTModel } from '../app.data';
+
+import { DialogService } from '../services';
 
 @Component({
     templateUrl: './gpt.component.html',
@@ -29,14 +30,14 @@ export class GPTComponent implements OnInit {
     public message = '';
     public models: IGPTModel[] = [];
 
-    constructor(private gptService: GPTService, private dialogService: TdDialogService) { }
+    constructor(private gptService: GPTService, private dialogService: DialogService) { }
 
     public async ngOnInit(): Promise<void> {
         try {
             this.loading = true;
             this.models = await this.gptService.getModels()
 
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to load GPT models',
                 message: e.toString(),
@@ -53,10 +54,10 @@ export class GPTComponent implements OnInit {
             this.loading = true;
             const response = await this.gptService.generate({ Text: currentText, ModelId: this.model });
             if (this.removeIncompleteLine) {
-                response.Text = this.removeLastLine(response.Text).trimRight();
+                response.Text = this.removeLastLine(response.Text).trimEnd();
             }
             this.log = [...this.log, response];
-        } catch (e) {
+        } catch (e: any) {
             this.dialogService.openAlert({
                 title: 'Failed to generate GPT text',
                 message: e.toString(),

@@ -5,6 +5,7 @@
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -17,9 +18,9 @@
     "target": "es2015",
     "module": "es2020",
     "lib": [
-      "es2018",
+      "es2019",
       "dom"
-    ]
+    ],
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

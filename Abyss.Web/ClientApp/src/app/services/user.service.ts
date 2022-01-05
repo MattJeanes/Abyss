@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { TdDialogService } from '@covalent/core/dialogs';
 import { first } from 'rxjs/operators';
 
 import { IAuthResult, IUser } from '../app.data';
 import { AuthService } from './auth.service';
 
+import { DialogService } from './dialog.service';
 @Injectable()
 export class UserService {
-    constructor(private httpClient: HttpClient, private authService: AuthService, private dialogService: TdDialogService) { }
+    constructor(private httpClient: HttpClient, private authService: AuthService, private dialogService: DialogService) { }
     public async changeUsername(username?: string): Promise<void> {
         const user = this.authService.getUser();
         const currentUsername = user ? user.Name : undefined;

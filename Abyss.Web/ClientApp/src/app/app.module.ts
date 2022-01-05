@@ -12,8 +12,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 
-import { TdDialogService } from '@covalent/core/dialogs';
-
 import {
   JWT_OPTIONS,
   JwtHelperService,
@@ -31,6 +29,7 @@ import {
   ErrorService,
   AuthInterceptor,
   TitleService,
+  DialogService,
 } from './services';
 
 export function JwtTokenGetter(): string {
@@ -59,6 +58,7 @@ export function JwtTokenGetter(): string {
         AuthService,
         UserService,
         ErrorService,
+        DialogService,
         AuthGuard,
         {
             provide: HTTP_INTERCEPTORS,
@@ -77,7 +77,6 @@ export function JwtTokenGetter(): string {
             },
         },
         JwtHelperService,
-        TdDialogService,
         TitleService,
     ],
     bootstrap: [AppComponent]
