@@ -16,7 +16,6 @@ namespace Abyss.Web.Commands.Discord
         private readonly ILogger<ServerCommand> _logger;
 
         public override string Command => "server";
-        public override string Permission => Permissions.ServerManager;
 
         public ServerCommand(IServiceProvider serviceProvider, IServerManager serverManager, ILogger<ServerCommand> logger) : base(serviceProvider)
         {
@@ -55,6 +54,11 @@ namespace Abyss.Web.Commands.Discord
 
         private async Task StartServer(MessageCreateEventArgs e, string name)
         {
+            if (!await HasPermission(e, Permissions.ServerManager))
+            {
+                await e.Message.RespondAsync($"You do not have permission to start servers");
+                return;
+            };
             var servers = await _serverManager.GetServers();
             var server = servers.FirstOrDefault(x => x.Name == name);
             if (server == null)
@@ -78,6 +82,11 @@ namespace Abyss.Web.Commands.Discord
 
         private async Task StopServer(MessageCreateEventArgs e, string name)
         {
+            if (!await HasPermission(e, Permissions.ServerManager))
+            {
+                await e.Message.RespondAsync($"You do not have permission to stop servers");
+                return;
+            };
             var servers = await _serverManager.GetServers();
             var server = servers.FirstOrDefault(x => x.Name == name);
             if (server == null)

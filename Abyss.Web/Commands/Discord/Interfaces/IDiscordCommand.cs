@@ -15,5 +15,6 @@ namespace Abyss.Web.Commands.Discord.Interfaces
         Task<ClientUser> GetClientUser(MessageCreateEventArgs e);
         Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e);
         Task<ClientUser> GetClientUser(DiscordUser discordUser);
+        Task<bool> HasPermission(MessageCreateEventArgs e, string permission);
     }
 }

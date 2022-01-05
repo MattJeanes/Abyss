@@ -40,14 +40,20 @@ namespace Abyss.Web.Commands.Discord
             return Task.CompletedTask;
         }
 
-        public Task<ClientUser> GetClientUser(MessageCreateEventArgs e)
+        public async Task<ClientUser> GetClientUser(MessageCreateEventArgs e)
         {
-            return GetClientUser(e.Author);
+            return await GetClientUser(e.Author);
         }
 
-        public Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e)
+        public async Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e)
         {
-            return GetClientUser(e.Member);
+            return await GetClientUser(e.Member);
+        }
+
+        public async Task<bool> HasPermission(MessageCreateEventArgs e, string permission)
+        {
+            var user = await GetClientUser(e.Author);
+            return _userHelper.HasPermission(user, permission);
         }
 
         public async Task<ClientUser> GetClientUser(DiscordUser discordUser)
