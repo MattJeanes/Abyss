@@ -35,7 +35,7 @@ public class ServerCommand : BaseCommand
                 await GetServerStatus(e, args.Skip(1).FirstOrDefault());
                 break;
             default:
-                await e.Message.RespondAsync("Unknown sub-command, try: (none), start, stop");
+                await e.Message.RespondAsync("Unknown sub-command, try: (none), start, stop, status");
                 break;
         }
     }
