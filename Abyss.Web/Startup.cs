@@ -255,6 +255,7 @@ public class Startup
         o.PropertyNamingPolicy = null;
         o.DictionaryKeyPolicy = null;
         o.Converters.Add(new ObjectIdConverter());
+        o.IncludeFields = true;
         return o;
     }
 

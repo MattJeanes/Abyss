@@ -11,11 +11,12 @@ import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import {
-  JWT_OPTIONS,
-  JwtHelperService,
-  JwtInterceptor,
+    JWT_OPTIONS,
+    JwtHelperService,
+    JwtInterceptor,
 } from '@auth0/angular-jwt';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,23 +24,30 @@ import { AppRoutingModule } from './app-routing.module';
 import { AccountDialogComponent } from './shared';
 
 import {
-  AuthService,
-  AuthGuard,
-  UserService,
-  ErrorService,
-  AuthInterceptor,
-  TitleService,
-  DialogService,
+    AuthService,
+    AuthGuard,
+    UserService,
+    ErrorService,
+    AuthInterceptor,
+    TitleService,
+    DialogService,
+    DialogAlertComponent,
+    DialogConfirmComponent,
+    DialogPromptComponent,
 } from './services';
+import { MatInputModule } from '@angular/material/input';
 
 export function JwtTokenGetter(): string {
-  return localStorage.token;
+    return localStorage.token;
 }
 
 @NgModule({
     declarations: [
         AppComponent,
         AccountDialogComponent,
+        DialogAlertComponent,
+        DialogConfirmComponent,
+        DialogPromptComponent,
     ],
     imports: [
         BrowserModule,
@@ -53,6 +61,8 @@ export function JwtTokenGetter(): string {
         MatIconModule,
         MatDialogModule,
         MatButtonModule,
+        MatFormFieldModule,
+        MatInputModule,
     ],
     providers: [
         AuthService,

@@ -93,20 +93,23 @@ export interface IGPTModel {
     Identifier: string;
 }
 
-export interface IDialogAlert {
+export interface ICommonDialog {
     title: string;
     message: string;
+    width?: string;
 }
 
-export interface IDialogConfirm {
-    title: string;
-    message: string;
-    acceptButton: string;
-    cancelButton: string;
+export interface IDialogAlert extends ICommonDialog {
+    closeButtonText?: string;
 }
 
-export interface IDialogPrompt {
-    title: string;
-    message: string;
-    value: string | undefined;
+export interface IDialogConfirm extends ICommonDialog {
+    confirmButtonText?: string;
+    cancelButtonText?: string;
+}
+
+export interface IDialogPrompt extends ICommonDialog {
+    acceptButtonText?: string;
+    cancelButtonText?: string;
+    value?: string;
 }

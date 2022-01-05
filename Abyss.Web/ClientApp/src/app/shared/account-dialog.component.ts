@@ -56,8 +56,8 @@ export class AccountDialogComponent implements OnInit {
         try {
             this.loading = true;
             const allDevices = await this.dialogService.confirm({
-                acceptButton: 'All devices',
-                cancelButton: 'Just this one',
+                confirmButtonText: 'All devices',
+                cancelButtonText: 'Just this one',
                 message: 'Do you want to log out of all devices or just this one?',
                 title: 'Logout',
             });

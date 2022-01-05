@@ -35,9 +35,9 @@ public static class AuthSchemes
     };
 
     public static List<AuthScheme> ExternalSchemes = new List<AuthScheme>
-        {
-            Steam,
-            Google,
-            Discord
-        };
+    {
+        Steam,
+        Google,
+        Discord
+    };
 }

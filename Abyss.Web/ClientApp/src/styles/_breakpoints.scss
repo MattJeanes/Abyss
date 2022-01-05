@@ -1,11 +1,11 @@
 @mixin medium() {
-    @media (min-width: 576px) {
-        @content;
-    }
+  @media (min-width: 576px) {
+    @content;
+  }
 }
 
 @mixin large() {
-    @media (min-width: 992px) {
-        @content;
-    }
+  @media (min-width: 992px) {
+    @content;
+  }
 }
