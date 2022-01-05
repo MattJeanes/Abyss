@@ -1,8 +1,7 @@
-﻿namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data;
+
+public struct WhoSaid
 {
-    public class WhoSaid
-    {
-        public string Name { get; set; }
-        public string Message { get; set; }
-    }
+    public string Name { get; set; }
+    public string Message { get; set; }
 }

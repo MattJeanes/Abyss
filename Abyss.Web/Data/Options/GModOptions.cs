@@ -1,7 +1,6 @@
-﻿namespace Abyss.Web.Data.Options
+﻿namespace Abyss.Web.Data.Options;
+
+public class GModOptions
 {
-    public class GModOptions
-    {
-        public bool Active { get; set; }
-    }
+    public bool Active { get; set; }
 }

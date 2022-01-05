@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿namespace Abyss.Web.Data;
 
-namespace Abyss.Web.Data
+public enum LoggerType
 {
-    public enum LoggerType
-    {
-        Exceptional,
-        MongoDB
-    }
+    Exceptional,
+    MongoDB
 }

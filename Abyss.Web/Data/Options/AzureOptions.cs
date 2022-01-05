@@ -1,7 +1,6 @@
-﻿namespace Abyss.Web.Data.Options
+﻿namespace Abyss.Web.Data.Options;
+
+public class AzureOptions
 {
-    public class AzureOptions
-    {
-        public int OperationTimeoutSeconds { get; set; }
-    }
+    public int OperationTimeoutSeconds { get; set; }
 }

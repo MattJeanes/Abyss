@@ -1,25 +1,20 @@
 ﻿using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Controllers
+namespace Abyss.Web.Controllers;
+
+public class BaseController : Controller
 {
-    public class BaseController : Controller
+    public readonly IUserHelper _userHelper;
+
+    public BaseController(IUserHelper userHelper)
     {
-        public readonly IUserHelper _userHelper;
+        _userHelper = userHelper;
+    }
 
-        public BaseController(IUserHelper userHelper)
-        {
-            _userHelper = userHelper;
-        }
-
-        public async Task<User> GetUser()
-        {
-            return await _userHelper.GetUser();
-        }
+    public async Task<User?> GetUser()
+    {
+        return await _userHelper.GetUser();
     }
 }

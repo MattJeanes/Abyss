@@ -1,9 +1,8 @@
-﻿namespace Abyss.Web.Logging
+﻿namespace Abyss.Web.Logging;
+
+public enum LogItemLevel
 {
-    public enum LogItemLevel
-    {
-        Info,
-        Warn,
-        Error,
-    }
+    Info,
+    Warn,
+    Error,
 }

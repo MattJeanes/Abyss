@@ -1,8 +1,12 @@
-﻿namespace Abyss.Web.Data.Options
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Abyss.Web.Data.Options;
+
+public class JwtOptions
 {
-    public class JwtOptions
-    {
-        public string Key { get; set; }
-        public string Issuer { get; set; }
-    }
+    [NotNull]
+    public string? Key { get; set; }
+
+    [NotNull]
+    public string? Issuer { get; set; }
 }

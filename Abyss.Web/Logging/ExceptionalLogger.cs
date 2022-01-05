@@ -1,91 +1,94 @@
 ﻿using Abyss.Web.Data;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using StackExchange.Exceptional;
-using System;
-using System.Collections.Generic;
 
-namespace Abyss.Web.Logging
+namespace Abyss.Web.Logging;
+
+public class ExceptionalLoggerProvider : ILoggerProvider
 {
-    public class ExceptionalLoggerProvider : ILoggerProvider
+    public readonly IHttpContextAccessor _httpContextAccessor;
+    public ExceptionalLoggerProvider(IHttpContextAccessor httpContextAccessor)
     {
-        public readonly IHttpContextAccessor _httpContextAccessor;
-        public ExceptionalLoggerProvider(IHttpContextAccessor httpContextAccessor)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
-        public ILogger CreateLogger(string categoryName)
-        {
-            return new ExceptionalLogger(_httpContextAccessor, categoryName);
-        }
-
-        public void Dispose()
-        {
-            // nothing to dispose
-        }
+        _httpContextAccessor = httpContextAccessor;
     }
 
-
-    public class ExceptionalLogger : ILogger
+    public ILogger CreateLogger(string categoryName)
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly string _categoryName;
-        public ExceptionalLogger(IHttpContextAccessor httpContextAccessor, string categoryName)
-        {
-            _httpContextAccessor = httpContextAccessor;
-            _categoryName = categoryName;
-        }
-        public IDisposable BeginScope<TState>(TState state)
-        {
-            return null;
-        }
+        return new ExceptionalLogger(_httpContextAccessor, categoryName);
+    }
 
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return true;
-        }
+    public void Dispose()
+    {
+        // nothing to dispose
+    }
+}
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+
+public class ExceptionalLogger : ILogger
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly string _categoryName;
+    public ExceptionalLogger(IHttpContextAccessor httpContextAccessor, string categoryName)
+    {
+        _httpContextAccessor = httpContextAccessor;
+        _categoryName = categoryName;
+    }
+    public IDisposable BeginScope<TState>(TState state)
+    {
+#pragma warning disable CS8603 // Possible null reference return.
+        return null;
+#pragma warning restore CS8603 // Possible null reference return.
+    }
+
+    public bool IsEnabled(LogLevel logLevel)
+    {
+        return true;
+    }
+
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception, string> formatter)
+    {
+        try
         {
-            try
+            if (exception != null && !exception.IsLogged(LoggerType.Exceptional))
             {
-                if (exception != null && !exception.IsLogged(LoggerType.Exceptional))
+                var context = _httpContextAccessor.HttpContext;
+                var customData = new Dictionary<string, string>
                 {
-                    var context = _httpContextAccessor.HttpContext;
-                    var customData = new Dictionary<string, string>
-                    {
-                        ["Message"] = formatter(state, exception)
-                    };
-                    if (context != null)
-                    {
-                        exception.Log(context, _categoryName, customData: customData);
-                    }
-                    else
-                    {
-                        exception.LogNoContext(_categoryName, customData: customData);
-                    }
+                    ["Message"] = formatter(state, exception)
+                };
+                if (context != null)
+                {
+                    exception.Log(context, _categoryName, customData: customData);
+                }
+                else
+                {
+                    exception.LogNoContext(_categoryName, customData: customData);
                 }
             }
-            catch (Exception e)
+        }
+        catch (Exception e)
+        {
+            // Failed to log exception, we don't want to blow up here too!
+            Console.WriteLine("Failed to log exception to Exceptional:");
+            Console.WriteLine(e.ToString());
+            if (exception != null)
             {
-                // Failed to log exception, we don't want to blow up here too!
-                Console.WriteLine("Failed to log exception to Exceptional:");
-                Console.WriteLine(e.ToString());
                 Console.WriteLine("Original exception:");
                 Console.WriteLine(exception.ToString());
             }
+            else
+            {
+                Console.WriteLine("No original exception found");
+            }
         }
     }
+}
 
-    public static class ExceptionalLoggerExtensions
+public static class ExceptionalLoggerExtensions
+{
+    public static ILoggingBuilder AddExceptional(this ILoggingBuilder loggingBuilder)
     {
-        public static ILoggingBuilder AddExceptional(this ILoggingBuilder loggingBuilder)
-        {
-            loggingBuilder.Services.AddSingleton<ILoggerProvider, ExceptionalLoggerProvider>();
-            loggingBuilder.AddFilter<ExceptionalLoggerProvider>(level => true);
-            return loggingBuilder;
-        }
+        loggingBuilder.Services.AddSingleton<ILoggerProvider, ExceptionalLoggerProvider>();
+        loggingBuilder.AddFilter<ExceptionalLoggerProvider>(level => true);
+        return loggingBuilder;
     }
 }

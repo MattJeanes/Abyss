@@ -1,11 +1,10 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Abyss.Web.Entities
+namespace Abyss.Web.Entities;
+
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        [BsonId]
-        public ObjectId Id { get; set; }
-    }
+    [BsonId]
+    public ObjectId Id { get; set; }
 }

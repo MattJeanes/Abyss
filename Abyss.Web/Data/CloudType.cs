@@ -1,8 +1,7 @@
-﻿namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data;
+
+public enum CloudType
 {
-    public enum CloudType
-    {
-        DigitalOcean = 0,
-        Azure = 1
-    }
+    DigitalOcean = 0,
+    Azure = 1
 }

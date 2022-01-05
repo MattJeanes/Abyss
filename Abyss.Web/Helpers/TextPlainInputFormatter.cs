@@ -1,33 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc.Formatters;
-using System;
-using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Helpers
+namespace Abyss.Web.Helpers;
+
+public class TextPlainInputFormatter : TextInputFormatter
 {
-    public class TextPlainInputFormatter : TextInputFormatter
+    public TextPlainInputFormatter()
     {
-        public TextPlainInputFormatter()
-        {
-            SupportedMediaTypes.Add("text/plain");
-            SupportedEncodings.Add(UTF8EncodingWithoutBOM);
-            SupportedEncodings.Add(UTF16EncodingLittleEndian);
-        }
+        SupportedMediaTypes.Add("text/plain");
+        SupportedEncodings.Add(UTF8EncodingWithoutBOM);
+        SupportedEncodings.Add(UTF16EncodingLittleEndian);
+    }
 
-        protected override bool CanReadType(Type type)
-        {
-            return type == typeof(string);
-        }
+    protected override bool CanReadType(Type type)
+    {
+        return type == typeof(string);
+    }
 
-        public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
+    public override async Task<InputFormatterResult> ReadRequestBodyAsync(InputFormatterContext context, Encoding encoding)
+    {
+        string data;
+        using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
         {
-            string data;
-            using (var reader = new StreamReader(context.HttpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
-            {
-                data = await reader.ReadToEndAsync();
-            }
-            return InputFormatterResult.Success(data);
+            data = await reader.ReadToEndAsync();
         }
+        return InputFormatterResult.Success(data);
     }
 }

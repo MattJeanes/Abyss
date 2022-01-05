@@ -1,9 +1,8 @@
-﻿namespace Abyss.Web.Data.TeamSpeak
+﻿namespace Abyss.Web.Data.TeamSpeak;
+
+public struct Channel
 {
-    public class Channel
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int? ParentId { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int? ParentId { get; set; }
 }

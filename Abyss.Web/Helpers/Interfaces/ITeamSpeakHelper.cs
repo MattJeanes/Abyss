@@ -1,13 +1,10 @@
 ﻿using Abyss.Web.Data.TeamSpeak;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Helpers
+namespace Abyss.Web.Helpers;
+
+public interface ITeamSpeakHelper
 {
-    public interface ITeamSpeakHelper
-    {
-        Task Update();
-        Task<List<Client>> GetClients();
-        Task<List<Channel>> GetChannels();
-    }
+    Task Update();
+    Task<List<Client>> GetClients();
+    Task<List<Channel>> GetChannels();
 }

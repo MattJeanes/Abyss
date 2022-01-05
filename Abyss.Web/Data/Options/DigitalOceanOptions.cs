@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Abyss.Web.Data.Options
+namespace Abyss.Web.Data.Options;
+
+public class DigitalOceanOptions
 {
-    public class DigitalOceanOptions
-    {
-        public string ApiKey { get; set; }
-        public int ActionTimeout { get; set; }
-        public int TimeBetweenChecks { get; set; }
-        public int TimeBetweenActions { get; set; }
-        public int SshId { get; set; }
-    }
+    [NotNull]
+    public string? ApiKey { get; set; }
+
+    public int ActionTimeout { get; set; }
+
+    public int TimeBetweenChecks { get; set; }
+
+    public int TimeBetweenActions { get; set; }
+
+    public int SshId { get; set; }
 }

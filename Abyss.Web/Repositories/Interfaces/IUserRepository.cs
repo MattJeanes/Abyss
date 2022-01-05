@@ -1,13 +1,8 @@
 ﻿using Abyss.Web.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Repositories.Interfaces
+namespace Abyss.Web.Repositories.Interfaces;
+
+public interface IUserRepository : IRepository<User>
 {
-    public interface IUserRepository : IRepository<User>
-    {
-        Task<User> GetByExternalIdentifier(string schemeId, string identifier);
-    }
+    Task<User> GetByExternalIdentifier(string schemeId, string identifier);
 }

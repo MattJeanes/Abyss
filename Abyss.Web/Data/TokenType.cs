@@ -1,8 +1,7 @@
-﻿namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data;
+
+public enum TokenType
 {
-    public enum TokenType
-    {
-        Access,
-        Refresh
-    }
+    Access,
+    Refresh
 }

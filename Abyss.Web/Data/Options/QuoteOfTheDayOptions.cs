@@ -1,7 +1,6 @@
-﻿namespace Abyss.Web.Data.Options
+﻿namespace Abyss.Web.Data.Options;
+
+public class QuoteOfTheDayOptions
 {
-    public class QuoteOfTheDayOptions
-    {
-        public ulong DiscordChannelId { get; set; }
-    }
+    public ulong DiscordChannelId { get; set; }
 }

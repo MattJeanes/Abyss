@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿namespace Abyss.Web.Data;
 
-namespace Abyss.Web.Data
+public struct AuthResult
 {
-    public class AuthResult
-    {
-        public string Token { get; set; }
-    }
+    public string Token { get; set; }
 }

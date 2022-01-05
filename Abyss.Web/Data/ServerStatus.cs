@@ -1,10 +1,9 @@
-﻿namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data;
+
+public enum ServerStatus
 {
-    public enum ServerStatus
-    {
-        Active = 0,
-        Inactive = 1,
-        Activating = 2,
-        Deactivating = 3,
-    }
+    Active = 0,
+    Inactive = 1,
+    Activating = 2,
+    Deactivating = 3,
 }

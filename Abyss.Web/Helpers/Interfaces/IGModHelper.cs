@@ -1,11 +1,9 @@
 ﻿using Abyss.Web.Data.GMod;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Helpers.Interfaces
+namespace Abyss.Web.Helpers.Interfaces;
+
+public interface IGModHelper
 {
-    public interface IGModHelper
-    {
-        Task<string> ChangeRank(ChangeRankDTO request);
-        bool IsActive();
-    }
+    Task<string> ChangeRank(ChangeRankDTO request);
+    bool IsActive();
 }

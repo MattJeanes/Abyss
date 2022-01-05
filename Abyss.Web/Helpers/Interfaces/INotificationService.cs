@@ -1,10 +1,8 @@
 ﻿using Abyss.Web.Data;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Helpers.Interfaces
+namespace Abyss.Web.Helpers.Interfaces;
+
+public interface INotificationHelper
 {
-    public interface INotificationHelper
-    {
-        Task SendMessage(string message, MessagePriority messagePriority = MessagePriority.Normal);
-    }
+    Task SendMessage(string message, MessagePriority messagePriority = MessagePriority.Normal);
 }

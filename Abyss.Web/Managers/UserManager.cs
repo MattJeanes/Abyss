@@ -5,142 +5,146 @@ using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
-namespace Abyss.Web.Managers
+namespace Abyss.Web.Managers;
+
+public class UserManager : IUserManager
 {
-    public class UserManager : IUserManager
+    private readonly IUserHelper _userHelper;
+    private readonly IUserRepository _userRepository;
+    private readonly IGModHelper _gmodHelper;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly DiscordOptions _discordOptions;
+
+    public UserManager(
+        IUserHelper userHelper,
+        IUserRepository userRepository,
+        IGModHelper gmodHelper,
+        IHttpContextAccessor httpContextAccessor,
+        IOptions<DiscordOptions> discordOptions
+        )
     {
-        private readonly IUserHelper _userHelper;
-        private readonly IUserRepository _userRepository;
-        private readonly IGModHelper _gmodHelper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly DiscordOptions _discordOptions;
+        _userHelper = userHelper;
+        _userRepository = userRepository;
+        _gmodHelper = gmodHelper;
+        _httpContextAccessor = httpContextAccessor;
+        _discordOptions = discordOptions.Value;
+    }
 
-        public UserManager(
-            IUserHelper userHelper,
-            IUserRepository userRepository,
-            IGModHelper gmodHelper,
-            IHttpContextAccessor httpContextAccessor,
-            IOptions<DiscordOptions> discordOptions
-            )
+    public async Task<string> Login(string schemeId)
+    {
+        var user = await _userHelper.GetUser();
+        var (username, identifier) = GetUsernameAndIdentifier(schemeId);
+        var externalUser = await _userRepository.GetByExternalIdentifier(schemeId, identifier);
+        if (externalUser != null)
         {
-            _userHelper = userHelper;
-            _userRepository = userRepository;
-            _gmodHelper = gmodHelper;
-            _httpContextAccessor = httpContextAccessor;
-            _discordOptions = discordOptions.Value;
-        }
-
-        public async Task<string> Login(string schemeId)
-        {
-            var user = await _userHelper.GetUser();
-            var (username, identifier) = GetUsernameAndIdentifier(schemeId);
-            var externalUser = await _userRepository.GetByExternalIdentifier(schemeId, identifier);
-            if (externalUser != null)
-            {
-                if (user == null)
-                {
-                    user = externalUser;
-                }
-                else if (user.Id != externalUser.Id)
-                {
-                    user = await MergeUsers(user, externalUser);
-                }
-            }
             if (user == null)
             {
-                user = new User
+                user = externalUser;
+            }
+            else if (user.Id != externalUser.Id)
+            {
+                user = await MergeUsers(user, externalUser);
+            }
+        }
+        if (user == null)
+        {
+            user = new User
+            {
+                Name = username,
+                Authentication = new Dictionary<string, string>
                 {
-                    Name = username,
-                    Authentication = new Dictionary<string, string>
-                    {
-                        [schemeId] = identifier
-                    }
-                };
-                await _userRepository.Add(user);
-            }
-            else if (!user.Authentication.ContainsKey(schemeId) || user.Authentication[schemeId] != identifier)
-            {
-                user.Authentication[schemeId] = identifier;
-                await _userRepository.Update(user);
-            }
-            return await _userHelper.GetAccessToken(user);
+                    [schemeId] = identifier
+                }
+            };
+            await _userRepository.Add(user);
         }
-
-        private (string username, string identifier) GetUsernameAndIdentifier(string schemeId)
+        else if (user.Authentication != null && (!user.Authentication.ContainsKey(schemeId) || user.Authentication[schemeId] != identifier))
         {
-            var user = _httpContextAccessor.HttpContext.User;
-            var username = user.Claims.First(x => x.Type == ClaimTypes.Name).Value;
-            var identifier = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-            if (schemeId == AuthSchemes.Steam.Id)
-            {
-                identifier = identifier.Split('/').Last();
-            }
-
-            return (username, identifier);
-        }
-
-        public async Task<string> ChangeUsername(User user, string username)
-        {
-            user.Name = username;
+            user.Authentication[schemeId] = identifier;
             await _userRepository.Update(user);
-            return await _userHelper.GetAccessToken(user);
+        }
+        return await _userHelper.GetAccessToken(user);
+    }
+
+    private (string username, string identifier) GetUsernameAndIdentifier(string schemeId)
+    {
+        if (_httpContextAccessor.HttpContext == null) { throw new Exception("HttpContext is invalid"); }
+        var user = _httpContextAccessor.HttpContext.User;
+        var username = user.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+        var identifier = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+        if (schemeId == AuthSchemes.Steam.Id)
+        {
+            identifier = identifier.Split('/').Last();
         }
 
-        public async Task<string> DeleteAuthScheme(User user, string schemeId)
+        return (username, identifier);
+    }
+
+    public async Task<string> ChangeUsername(User user, string username)
+    {
+        user.Name = username;
+        await _userRepository.Update(user);
+        return await _userHelper.GetAccessToken(user);
+    }
+
+    public async Task<string> DeleteAuthScheme(User user, string schemeId)
+    {
+        if (user.Authentication == null) { throw new ArgumentNullException(nameof(user.Authentication)); }
+        if (user.Authentication.Count <= 1)
         {
-            if (user.Authentication.Count <= 1)
+            throw new Exception("Cannot remove only auth provider");
+        }
+        else if (!user.Authentication.ContainsKey(schemeId))
+        {
+            throw new Exception($"User does not have {schemeId} auth provider");
+        }
+
+        var steamAndDiscord = new[] { AuthSchemes.Discord.Id, AuthSchemes.Steam.Id };
+        if (_gmodHelper.IsActive() && steamAndDiscord.Contains(schemeId) && steamAndDiscord.All(x => user.Authentication.ContainsKey(x)))
+        {
+            await _gmodHelper.ChangeRank(new ChangeRankDTO
             {
-                throw new Exception("Cannot remove only auth provider");
-            }
-            else if (!user.Authentication.ContainsKey(schemeId))
-            {
-                throw new Exception($"User does not have {schemeId} auth provider");
-            }
-
-            var steamAndDiscord = new[] { AuthSchemes.Discord.Id, AuthSchemes.Steam.Id };
-            if (_gmodHelper.IsActive() && steamAndDiscord.Contains(schemeId) && steamAndDiscord.All(x => user.Authentication.ContainsKey(x)))
-            {
-                await _gmodHelper.ChangeRank(new ChangeRankDTO
-                {
-                    Rank = _discordOptions.GuestRankId,
-                    MaxRankForDemote = _discordOptions.MemberRankId,
-                    CanDemote = true,
-                    SteamId64 = user.Authentication[AuthSchemes.Steam.Id]
-                });
-            }
-
-            user.Authentication.Remove(schemeId);
-            await _userRepository.Update(user);
-            return await _userHelper.GetAccessToken(user);
+                Rank = _discordOptions.GuestRankId,
+                MaxRankForDemote = _discordOptions.MemberRankId,
+                CanDemote = true,
+                SteamId64 = user.Authentication[AuthSchemes.Steam.Id]
+            });
         }
 
-        private async Task<User> MergeUsers(User userFrom, User userTo)
+        user.Authentication.Remove(schemeId);
+        await _userRepository.Update(user);
+        return await _userHelper.GetAccessToken(user);
+    }
+
+    private async Task<User> MergeUsers(User userFrom, User userTo)
+    {
+        if (userTo.Authentication == null)
         {
-            userFrom.Authentication.ToList().ForEach(x => userTo.Authentication[x.Key] = x.Value);
-            await _userRepository.Update(userTo);
-            await _userRepository.Remove(userFrom);
-            return userTo;
+            userTo.Authentication = new Dictionary<string, string>();
         }
-
-        public async Task<string> RefreshAccessToken()
+        userFrom.Authentication?.ToList().ForEach(x =>
         {
-            var refreshTokenCookie = _httpContextAccessor.HttpContext.Request.Cookies.FirstOrDefault(x => x.Key == AuthSchemes.RefreshToken);
-            var user = await _userHelper.VerifyRefreshToken(refreshTokenCookie.Value);
-            return await _userHelper.GetAccessToken(user);
-        }
+            userTo.Authentication[x.Key] = x.Value;
+        });
+        await _userRepository.Update(userTo);
+        await _userRepository.Remove(userFrom);
+        return userTo;
+    }
 
-        public async Task Logout(bool allSessions)
-        {
-            await _userHelper.Logout(allSessions);
-        }
+    public async Task<string> RefreshAccessToken()
+    {
+        if (_httpContextAccessor.HttpContext == null) { throw new Exception("HttpContext is invalid"); }
+        var refreshTokenCookie = _httpContextAccessor.HttpContext.Request.Cookies.FirstOrDefault(x => x.Key == AuthSchemes.RefreshToken);
+        var user = await _userHelper.VerifyRefreshToken(refreshTokenCookie.Value);
+        return await _userHelper.GetAccessToken(user);
+    }
+
+    public async Task Logout(bool allSessions)
+    {
+        await _userHelper.Logout(allSessions);
     }
 }

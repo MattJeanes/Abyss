@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Abyss.Web.Data.Options
+namespace Abyss.Web.Data.Options;
+
+public class CloudflareOptions
 {
-    public class CloudflareOptions
-    {
-        public string BaseUrl { get; set; }
-        public string Email { get; set; }
-        public string ApiKey { get; set; }
-        public string Zone { get; set; }
-    }
+    [NotNull]
+    public string? BaseUrl { get; set; }
+
+    [NotNull]
+    public string? Email { get; set; }
+
+    [NotNull]
+    public string? ApiKey { get; set; }
+
+    [NotNull]
+    public string? Zone { get; set; }
 }

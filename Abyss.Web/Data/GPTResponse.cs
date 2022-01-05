@@ -1,7 +1,6 @@
-﻿namespace Abyss.Web.Data
+﻿namespace Abyss.Web.Data;
+
+public struct GPTResponse
 {
-    public class GPTResponse
-    {
-        public string Text { get; set; }
-    }
+    public string Text { get; set; }
 }

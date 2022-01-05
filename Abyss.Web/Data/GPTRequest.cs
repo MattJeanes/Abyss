@@ -1,11 +1,10 @@
 ﻿using MongoDB.Bson;
 
-namespace Abyss.Web.Data
-{
-    public class GPTRequest
-    {
-        public string Text { get; set; }
+namespace Abyss.Web.Data;
 
-        public ObjectId ModelId { get; set; }
-    }
+public struct GPTRequest
+{
+    public string Text { get; set; }
+
+    public ObjectId ModelId { get; set; }
 }

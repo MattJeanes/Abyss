@@ -1,11 +1,10 @@
 ﻿using MongoDB.Bson;
 
-namespace Abyss.Web.Entities
+namespace Abyss.Web.Entities;
+
+public class GPTModel : BaseEntity
 {
-    public class GPTModel : BaseEntity
-    {
-        public string Name { get; set; }
-        public string Identifier { get; set; }
-        public ObjectId? Permission { get; set; }
-    }
+    public string? Name { get; set; }
+    public string? Identifier { get; set; }
+    public ObjectId? Permission { get; set; }
 }

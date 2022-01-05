@@ -1,10 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿namespace Abyss.Web.Helpers.Interfaces;
 
-namespace Abyss.Web.Helpers.Interfaces
+public interface ICloudflareHelper
 {
-    public interface ICloudflareHelper
-    {
-        Task<CloudflareDNSRecord> GetDNSRecord( string name);
-        Task<CloudflareDNSRecord> UpdateDNSRecord(CloudflareDNSRecord record);
-    }
+    Task<CloudflareDNSRecord?> GetDNSRecord(string name);
+    Task<CloudflareDNSRecord?> UpdateDNSRecord(CloudflareDNSRecord record);
 }

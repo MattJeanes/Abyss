@@ -1,10 +1,8 @@
-﻿using Abyss.Web.Entities;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
-namespace Abyss.Web.Contexts.Interfaces
+namespace Abyss.Web.Contexts.Interfaces;
+
+public interface IAbyssContext
 {
-    public interface IAbyssContext
-    {
-        IMongoCollection<T> GetCollection<T>();
-    }
+    IMongoCollection<T> GetCollection<T>();
 }

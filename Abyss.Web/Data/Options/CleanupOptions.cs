@@ -1,7 +1,6 @@
-﻿namespace Abyss.Web.Data.Options
+﻿namespace Abyss.Web.Data.Options;
+
+public class CleanupOptions
 {
-    public class CleanupOptions
-    {
-        public int IntervalSeconds { get; set; }
-    }
+    public int IntervalSeconds { get; set; }
 }
