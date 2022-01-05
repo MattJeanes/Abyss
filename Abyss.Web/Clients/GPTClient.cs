@@ -18,6 +18,7 @@ public class GPTClient : IGPTClient
     {
         var serializerOptions = new JsonSerializerOptions();
         serializerOptions.PropertyNameCaseInsensitive = true;
+        serializerOptions.IncludeFields = true;
         var json = JsonSerializer.Serialize(new { text = message, model }, serializerOptions);
         var httpContent = new StringContent(json);
         httpContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
