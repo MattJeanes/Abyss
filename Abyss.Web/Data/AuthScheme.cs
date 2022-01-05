@@ -2,8 +2,8 @@
 
 public struct AuthScheme
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
-    public string ProfileUrl { get; set; }
-    public string IconUrl { get; set; }
+    public string Id;
+    public string Name;
+    public string ProfileUrl;
+    public string IconUrl;
 }

@@ -2,5 +2,5 @@
 
 public struct AuthResult
 {
-    public string Token { get; set; }
+    public string Token;
 }

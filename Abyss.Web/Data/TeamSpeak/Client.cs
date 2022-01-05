@@ -2,8 +2,8 @@
 
 public struct Client
 {
-    public string Name { get; set; }
-    public int ChannelId { get; set; }
-    public int ConnectedSeconds { get; set; }
-    public int IdleSeconds { get; set; }
+    public string Name;
+    public int ChannelId;
+    public int ConnectedSeconds;
+    public int IdleSeconds;
 }

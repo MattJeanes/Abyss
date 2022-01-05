@@ -39,7 +39,7 @@ public class GModHelper : IGModHelper
         GModResponse<T> resp;
         try
         {
-            resp = (await JsonSerializer.DeserializeAsync<GModResponse<T>>(await message.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions));
+            resp = await JsonSerializer.DeserializeAsync<GModResponse<T>>(await message.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
         }
         catch (Exception e)
         {
@@ -52,10 +52,10 @@ public class GModHelper : IGModHelper
         return resp.Result;
     }
 
-    private struct GModResponse<T>
+    public struct GModResponse<T>
     {
-        public bool Success { get; set; }
-        public string Error { get; set; }
-        public T Result { get; set; }
+        public bool Success;
+        public string Error;
+        public T Result;
     }
 }

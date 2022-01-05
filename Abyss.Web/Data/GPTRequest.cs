@@ -4,7 +4,7 @@ namespace Abyss.Web.Data;
 
 public struct GPTRequest
 {
-    public string Text { get; set; }
+    public string Text;
 
-    public ObjectId ModelId { get; set; }
+    public ObjectId ModelId;
 }

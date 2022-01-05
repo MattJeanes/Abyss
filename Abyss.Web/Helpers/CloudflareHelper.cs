@@ -61,16 +61,16 @@ public class CloudflareHelper : ICloudflareHelper
 
 public struct CloudflareResponse<T>
 {
-    public bool Success { get; set; }
-    public List<CloudflareError> Errors { get; set; }
-    public List<string> Messages { get; set; }
-    public T Result { get; set; }
+    public bool Success;
+    public List<CloudflareError> Errors;
+    public List<string> Messages;
+    public T Result;
 }
 
 public struct CloudflareError
 {
-    public int Code { get; set; }
-    public string Message { get; set; }
+    public int Code;
+    public string Message;
 }
 
 public class CloudflareZone
