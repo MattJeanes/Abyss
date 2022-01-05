@@ -60,8 +60,8 @@
     <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn install" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run lint" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build --prod" />
-    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build:ssr --prod" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build --configuration production" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="yarn run build:ssr --configuration production" Condition=" '$(BuildServerSideRenderer)' == 'true' " />
 
     <!-- Include the newly-built files in the publish output -->
     <ItemGroup>
