@@ -1,7 +1,9 @@
 ﻿using Abyss.Web.Data;
 using Abyss.Web.Helpers.Interfaces;
 using DontPanic.TumblrSharp.Client;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.SlashCommands;
 
 namespace Abyss.Web.Commands.Discord;
 
@@ -30,6 +32,14 @@ public class QuoteCommand : BaseCommand
                 await e.Message.RespondAsync("Unknown sub-command, try: (none), add");
                 break;
         }
+    }
+
+    [SlashCommand("quote", "Get a random Abyss quote")]
+    public async Task RunCommand(InteractionContext ctx)
+    {
+        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+        var quote = await _quoteHelper.GetQuote();
+        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(_quoteHelper.FormatQuote(quote)));
     }
 
     private async Task AddQuote(MessageCreateEventArgs e, List<string> args)

@@ -21,4 +21,6 @@ public class DiscordOptions
 
     [NotNull]
     public string? AddonsMessage { get; set; }
+
+    public ulong GuildId { get; set; }
 }

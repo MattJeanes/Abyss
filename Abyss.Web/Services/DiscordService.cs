@@ -3,7 +3,9 @@ using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers.Interfaces;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Options;
+using System.Reflection;
 
 namespace Abyss.Web.Services;
 
@@ -11,6 +13,7 @@ public class DiscordService : IHostedService
 {
     private readonly ILogger _logger;
     private readonly DiscordClient _client;
+    private readonly SlashCommandsExtension _slash;
     private readonly DiscordOptions _options;
     private readonly IServiceProvider _serviceProvider;
     private readonly IEnumerable<IDiscordCommand> _commands;
@@ -25,7 +28,12 @@ public class DiscordService : IHostedService
     {
         _logger = logger;
         _client = client;
+        _slash = _client.UseSlashCommands(new SlashCommandsConfiguration
+        {
+            Services = serviceProvider
+        });
         _options = options.Value;
+        _slash.RegisterCommands(Assembly.GetExecutingAssembly(), _options.GuildId);
         _serviceProvider = serviceProvider;
         _commands = _serviceProvider.GetServices<IDiscordCommand>();
         _userHelper = userHelper;

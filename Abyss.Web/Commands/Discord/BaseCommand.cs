@@ -5,11 +5,12 @@ using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Commands.Discord;
 
-public class BaseCommand : IDiscordCommand
+public class BaseCommand : ApplicationCommandModule, IDiscordCommand
 {
     protected readonly IServiceProvider _serviceProvider;
     protected readonly IUserHelper _userHelper;
