@@ -19,4 +19,5 @@ public class Server : BaseEntity
     public DateTime? NextReminder { get; set; }
     public CloudType CloudType { get; set; }
     public string? ResourceId { get; set; }
+    public string? Alias { get; set; }
 }

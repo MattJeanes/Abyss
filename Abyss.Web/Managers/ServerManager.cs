@@ -5,6 +5,7 @@ using Abyss.Web.Logging;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 
 namespace Abyss.Web.Managers;
 
@@ -37,6 +38,13 @@ public class ServerManager : IServerManager
     public async Task<List<Server>> GetServers()
     {
         return await _serverRepository.GetAll().ToListAsync();
+    }
+
+    public async Task<Server> GetServerByAlias(string alias)
+    {
+        return await _serverRepository.GetAll()
+            .Where(x => !string.IsNullOrEmpty(x.Alias) && x.Alias.ToLower() == alias.ToLower())
+            .FirstOrDefaultAsync();
     }
 
     public async Task Start(string serverId, Func<LogItem, Task>? logHandler = null)

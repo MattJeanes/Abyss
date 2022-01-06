@@ -20,22 +20,24 @@ public class ServerCommand : BaseCommand
 
     public override async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
     {
-        switch (args.FirstOrDefault())
+        var subcommand = args.FirstOrDefault();
+        var alias = args.Skip(1).FirstOrDefault();
+        switch (subcommand)
         {
-            case null:
+            case "list":
                 await GetServers(e);
                 break;
             case "start":
-                await StartServer(e, args.Skip(1).FirstOrDefault());
+                await StartServer(e, alias);
                 break;
             case "stop":
-                await StopServer(e, args.Skip(1).FirstOrDefault());
+                await StopServer(e, alias);
                 break;
             case "status":
-                await GetServerStatus(e, args.Skip(1).FirstOrDefault());
+                await GetServerStatus(e, alias);
                 break;
             default:
-                await e.Message.RespondAsync("Unknown sub-command, try: (none), start, stop, status");
+                await e.Message.RespondAsync($"Unknown sub-command '{subcommand}', try: list, start, stop, status");
                 break;
         }
     }
@@ -43,15 +45,15 @@ public class ServerCommand : BaseCommand
     private async Task GetServers(MessageCreateEventArgs e)
     {
         var servers = await _serverManager.GetServers();
-        var serverList = string.Join("\n", servers.Select(x => $"{x.Name}"));
+        var serverList = string.Join("\n", servers.Select(x => $"{x.Name} ({x.Alias}): {x.StatusId}"));
         await e.Message.RespondAsync($"Server list:\n{serverList}");
     }
 
-    private async Task StartServer(MessageCreateEventArgs e, string? name)
+    private async Task StartServer(MessageCreateEventArgs e, string? alias)
     {
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(alias))
         {
-            await e.Message.RespondAsync($"Server name required");
+            await e.Message.RespondAsync($"Server alias required");
             return;
         }
         if (!await HasPermission(e, Permissions.ServerManager))
@@ -59,8 +61,7 @@ public class ServerCommand : BaseCommand
             await e.Message.RespondAsync($"You do not have permission to start servers");
             return;
         };
-        var servers = await _serverManager.GetServers();
-        var server = servers.FirstOrDefault(x => x.Name == name);
+        var server = await _serverManager.GetServerByAlias(alias);
         if (server == null)
         {
             await e.Message.RespondAsync("Server not found");
@@ -80,11 +81,11 @@ public class ServerCommand : BaseCommand
         });
     }
 
-    private async Task StopServer(MessageCreateEventArgs e, string? name)
+    private async Task StopServer(MessageCreateEventArgs e, string? alias)
     {
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(alias))
         {
-            await e.Message.RespondAsync($"Server name required");
+            await e.Message.RespondAsync($"Server alias required");
             return;
         }
         if (!await HasPermission(e, Permissions.ServerManager))
@@ -92,8 +93,7 @@ public class ServerCommand : BaseCommand
             await e.Message.RespondAsync($"You do not have permission to stop servers");
             return;
         };
-        var servers = await _serverManager.GetServers();
-        var server = servers.FirstOrDefault(x => x.Name == name);
+        var server = await _serverManager.GetServerByAlias(alias);
         if (server == null)
         {
             await e.Message.RespondAsync("Server not found");
@@ -113,15 +113,14 @@ public class ServerCommand : BaseCommand
         });
     }
 
-    private async Task GetServerStatus(MessageCreateEventArgs e, string? name)
+    private async Task GetServerStatus(MessageCreateEventArgs e, string? alias)
     {
-        if (string.IsNullOrEmpty(name))
+        if (string.IsNullOrEmpty(alias))
         {
-            await e.Message.RespondAsync($"Server name required");
+            await e.Message.RespondAsync($"Server alias required");
             return;
         }
-        var servers = await _serverManager.GetServers();
-        var server = servers.FirstOrDefault(x => x.Name == name);
+        var server = await _serverManager.GetServerByAlias(alias);
         if (server == null)
         {
             await e.Message.RespondAsync("Server not found");
