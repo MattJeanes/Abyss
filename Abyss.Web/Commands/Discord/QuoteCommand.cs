@@ -1,6 +1,6 @@
-﻿using Abyss.Web.Data;
-using Abyss.Web.Helpers.Interfaces;
+﻿using Abyss.Web.Helpers.Interfaces;
 using DontPanic.TumblrSharp.Client;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
@@ -42,6 +42,32 @@ public class QuoteCommand : BaseCommand
         await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(_quoteHelper.FormatQuote(quote)));
     }
 
+    [ContextMenu(ApplicationCommandType.MessageContextMenu, "Add Quote")]
+    public async Task AddQuoteFromMessage(ContextMenuContext ctx)
+    {
+        await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+        var clientUser = await GetClientUser(ctx.User);
+        if (!_userHelper.HasPermission(clientUser, Data.Permissions.QuoteManager))
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not authorized"));
+            return;
+        }
+
+        var quote = ctx.TargetMessage.Content;
+        var author = ctx.TargetMessage.Author.Username;
+
+        var result = await _quoteHelper.AddQuote(quote, author);
+        if (result.Success)
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(_quoteHelper.FormatQuote(result.Quote)));
+        }
+        else
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(result.ErrorMessage));
+        }
+    }
+
     private async Task AddQuote(MessageCreateEventArgs e, List<string> args)
     {
         if (args.Count() != 2)
@@ -55,7 +81,7 @@ public class QuoteCommand : BaseCommand
             await e.Message.RespondAsync("You are not registered");
             return;
         };
-        if (!_userHelper.HasPermission(clientUser, Permissions.QuoteManager))
+        if (!_userHelper.HasPermission(clientUser, Data.Permissions.QuoteManager))
         {
             await e.Message.RespondAsync("You are not authorized");
             return;

@@ -3,7 +3,9 @@ using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Managers.Interfaces;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Commands.Discord;
@@ -30,22 +32,18 @@ public class RegisterCommand : BaseCommand
 
     public override async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
     {
-        var user = await _userRepository.GetByExternalIdentifier(AuthSchemes.Discord.Id, e.Author.Id.ToString());
-        if (user == null)
-        {
-            user = new User
-            {
-                Name = e.Author.Username,
-                Authentication = new Dictionary<string, string>
-                {
-                    [AuthSchemes.Discord.Id] = e.Author.Id.ToString()
-                }
-            };
-            await _userRepository.Add(user);
-            await e.Message.RespondAsync("User account created");
-            return;
-        }
-        await e.Message.RespondAsync($"You are already registered as {user.Name}");
+        var response = await RegisterUser(e.Author);
+        await e.Message.RespondAsync(response);
+    }
+
+    [SlashCommand("register", "Register your account")]
+    public async Task RunCommand(InteractionContext ctx)
+    {
+        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+        var response = await RegisterUser(ctx.User);
+
+        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(response));
     }
 
     public override async Task MemberRemoved(GuildMemberRemoveEventArgs e)
@@ -62,5 +60,24 @@ public class RegisterCommand : BaseCommand
         {
             _logger.LogError(ex, $"Failed to handle removed Discord member: {e.Member.Id}");
         }
+    }
+
+    private async Task<string> RegisterUser(DiscordUser discordUser)
+    {
+        var user = await _userRepository.GetByExternalIdentifier(AuthSchemes.Discord.Id, discordUser.Id.ToString());
+        if (user == null)
+        {
+            user = new User
+            {
+                Name = discordUser.Username,
+                Authentication = new Dictionary<string, string>
+                {
+                    [AuthSchemes.Discord.Id] = discordUser.Id.ToString()
+                }
+            };
+            await _userRepository.Add(user);
+            return "User account created";
+        }
+        return $"You are already registered as {user.Name}";
     }
 }
