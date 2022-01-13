@@ -1,10 +1,13 @@
 ﻿using Abyss.Web.Data;
 using Abyss.Web.Managers.Interfaces;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.SlashCommands;
 
 namespace Abyss.Web.Commands.Discord;
 
+[SlashCommandGroup("server", "View or manage servers")]
 public class ServerCommand : BaseCommand
 {
     private readonly IServerManager _serverManager;
@@ -16,6 +19,88 @@ public class ServerCommand : BaseCommand
     {
         _serverManager = serverManager;
         _logger = logger;
+    }
+
+    [SlashCommand("status", "Get server status")]
+    public async Task RunGetStatus(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    {
+        await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+        var server = await _serverManager.GetServerByAlias(alias);
+        if (server != null)
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(GetServerStatus(server)));
+        }
+        else
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Server not found"));
+        }
+    }
+
+    [SlashCommand("start", "Start server")]
+    public async Task RunStartServer(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    {
+        await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+        var clientUser = await GetClientUser(ctx.User);
+        if (!_userHelper.HasPermission(clientUser, Data.Permissions.ServerManager))
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not authorized"));
+            return;
+        }
+
+        var server = await _serverManager.GetServerByAlias(alias);
+        if (server != null)
+        {
+            try
+            {
+                await _serverManager.Start(server.Id.ToString(), async (logItem) =>
+                {
+                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(logItem.ToString()));
+                });
+            }
+            catch (Exception ex)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Failed to start server: {ex.Message}"));
+            }
+        }
+        else
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Server not found"));
+        }
+    }
+
+    [SlashCommand("stop", "Stop server")]
+    public async Task RunStopServer(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    {
+        await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+        var clientUser = await GetClientUser(ctx.User);
+        if (!_userHelper.HasPermission(clientUser, Data.Permissions.ServerManager))
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not authorized"));
+            return;
+        }
+
+        var server = await _serverManager.GetServerByAlias(alias);
+        if (server != null)
+        {
+            try
+            {
+                await _serverManager.Stop(server.Id.ToString(), async (logItem) =>
+                {
+                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(logItem.ToString()));
+                });
+            }
+            catch (Exception ex)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Failed to stop server: {ex.Message}"));
+            }
+        }
+        else
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Server not found"));
+        }
     }
 
     public override async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
@@ -56,7 +141,7 @@ public class ServerCommand : BaseCommand
             await e.Message.RespondAsync($"Server alias required");
             return;
         }
-        if (!await HasPermission(e, Permissions.ServerManager))
+        if (!await HasPermission(e, Data.Permissions.ServerManager))
         {
             await e.Message.RespondAsync($"You do not have permission to start servers");
             return;
@@ -88,7 +173,7 @@ public class ServerCommand : BaseCommand
             await e.Message.RespondAsync($"Server alias required");
             return;
         }
-        if (!await HasPermission(e, Permissions.ServerManager))
+        if (!await HasPermission(e, Data.Permissions.ServerManager))
         {
             await e.Message.RespondAsync($"You do not have permission to stop servers");
             return;
@@ -126,24 +211,19 @@ public class ServerCommand : BaseCommand
             await e.Message.RespondAsync("Server not found");
             return;
         }
-        switch (server.StatusId)
+        await e.Message.RespondAsync(GetServerStatus(server));
+    }
+
+    private static string GetServerStatus(Entities.Server server)
+    {
+        return server.StatusId switch
         {
-            case ServerStatus.Activating:
-                await e.Message.RespondAsync($"{server.Name} is starting up");
-                break;
-            case ServerStatus.Active:
-                await e.Message.RespondAsync($"{server.Name} is running");
-                break;
-            case ServerStatus.Deactivating:
-                await e.Message.RespondAsync($"{server.Name} is stopping");
-                break;
-            case ServerStatus.Inactive:
-                await e.Message.RespondAsync($"{server.Name} is stopped");
-                break;
-            default:
-                await e.Message.RespondAsync($"{server.Name} is in unknown state '{server.StatusId}'");
-                break;
-        }
+            ServerStatus.Activating => $"{server.Name} is starting up",
+            ServerStatus.Active => $"{server.Name} is running",
+            ServerStatus.Deactivating => $"{server.Name} is stopping",
+            ServerStatus.Inactive => $"{server.Name} is stopped",
+            _ => $"{server.Name} is in unknown state '{server.StatusId}'",
+        };
     }
 
     private async Task<DiscordThreadChannel?> TryCreateThread(MessageCreateEventArgs e, string name)
@@ -161,5 +241,17 @@ public class ServerCommand : BaseCommand
             }
         }
         return thread;
+    }
+}
+
+public class ServerChoiceProvider : ChoiceProvider
+{
+    public override async Task<IEnumerable<DiscordApplicationCommandOptionChoice>> Provider()
+    {
+        using var scope = Services.CreateScope();
+        var serverManager = scope.ServiceProvider.GetRequiredService<IServerManager>();
+        var servers = await serverManager.GetServers();
+
+        return servers.OrderBy(x => x.Name).Select(x => new DiscordApplicationCommandOptionChoice(x.Name, x.Alias));
     }
 }

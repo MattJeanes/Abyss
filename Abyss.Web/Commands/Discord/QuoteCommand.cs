@@ -7,6 +7,7 @@ using DSharpPlus.SlashCommands;
 
 namespace Abyss.Web.Commands.Discord;
 
+[SlashCommandGroup("quote", "Add or view quotes")]
 public class QuoteCommand : BaseCommand
 {
     private readonly IQuoteHelper _quoteHelper;
@@ -34,12 +35,35 @@ public class QuoteCommand : BaseCommand
         }
     }
 
-    [SlashCommand("quote", "Get a random Abyss quote")]
-    public async Task RunCommand(InteractionContext ctx)
+    [SlashCommand("get", "Get a random Abyss quote")]
+    public async Task RunGetQuote(InteractionContext ctx)
     {
         await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
         var quote = await _quoteHelper.GetQuote();
         await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(_quoteHelper.FormatQuote(quote)));
+    }
+
+    [SlashCommand("add", "Add a quote")]
+    public async Task RunAddQuote(InteractionContext ctx, [Option("quote", "Quote text")] string quote, [Option("author", "Quote author")] string author)
+    {
+        await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+        var clientUser = await GetClientUser(ctx.User);
+        if (!_userHelper.HasPermission(clientUser, Data.Permissions.QuoteManager))
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("You are not authorized"));
+            return;
+        }
+
+        var result = await _quoteHelper.AddQuote(quote, author);
+        if (result.Success)
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(_quoteHelper.FormatQuote(result.Quote)));
+        }
+        else
+        {
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(result.ErrorMessage));
+        }
     }
 
     [ContextMenu(ApplicationCommandType.MessageContextMenu, "Add Quote")]
