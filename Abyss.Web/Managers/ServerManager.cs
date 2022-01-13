@@ -61,7 +61,7 @@ public class ServerManager : IServerManager
             if (server == null) { throw new Exception($"Server id {server} not found"); }
             if (string.IsNullOrEmpty(server.DNSRecord)) { throw new ArgumentNullException(nameof(server.DNSRecord)); }
             if (server.StatusId != ServerStatus.Inactive) { throw new Exception("Cannot start server that is active"); }
-            logger.LogInformation($"Starting server {server.Id}");
+            logger.LogInformation($"Starting server {server.Name}");
             await _notificationHelper.SendMessage($"Starting server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Activating;
             await _serverRepository.Update(server);
@@ -109,12 +109,12 @@ public class ServerManager : IServerManager
                 server.NextReminder = DateTime.UtcNow.AddMinutes(server.RemindAfterMinutes.Value);
             }
             await _serverRepository.Update(server);
-            logger.LogInformation($"Successfully started server {server.Id}");
+            logger.LogInformation($"Successfully started server {server.Name}");
             await _notificationHelper.SendMessage($"Started server {server.Name}", MessagePriority.HighPriority);
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Failed to start server {server?.Id.ToString() ?? "N/A"}");
+            logger.LogError(e, $"Failed to start server {server?.Name ?? "N/A"}");
             await _notificationHelper.SendMessage($"Failed to start server {server?.Name ?? "(Unknown)"}", MessagePriority.HighPriority);
             throw;
         }
@@ -142,7 +142,7 @@ public class ServerManager : IServerManager
             server = await _serverRepository.GetById(serverId);
             if (server == null) { throw new Exception($"Server id {server} not found"); }
             if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot stop server that is not active"); }
-            logger.LogInformation($"Stopping server {server.Id}");
+            logger.LogInformation($"Stopping server {server.Name}");
             await _notificationHelper.SendMessage($"Stopping server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Deactivating;
             await _serverRepository.Update(server);
@@ -200,12 +200,12 @@ public class ServerManager : IServerManager
             server.NextReminder = null;
             server.StatusId = ServerStatus.Inactive;
             await _serverRepository.Update(server);
-            logger.LogInformation($"Successfully stopped server {server.Id}");
+            logger.LogInformation($"Successfully stopped server {server.Name}");
             await _notificationHelper.SendMessage($"Stopped server {server.Name}", MessagePriority.HighPriority);
         }
         catch (Exception e)
         {
-            logger.LogError(e, $"Failed to stop server {server?.Id.ToString() ?? "N/A"}");
+            logger.LogError(e, $"Failed to stop server {server?.Name ?? "N/A"}");
             await _notificationHelper.SendMessage($"Failed to stop server {server?.Name ?? "(Unknown)"}", MessagePriority.HighPriority);
             throw;
         }
