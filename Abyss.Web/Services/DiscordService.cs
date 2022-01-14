@@ -63,45 +63,7 @@ public class DiscordService : IHostedService
     private async Task MessageCreated(MessageCreateEventArgs e)
     {
         if (!e.Message.Content.ToLower().StartsWith(_options.CommandPrefix)) { return; }
-        var argString = e.Message.Content.Trim().Substring(_options.CommandPrefix.Length).Trim();
-        var args = argString.Split('"')
-                 .Select((element, index) => index % 2 == 0  // If even index
-                                       ? element.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)  // Split the item
-                                       : new string[] { element })  // Keep the entire item
-                 .SelectMany(element => element).ToList();
-        var cmd = args.FirstOrDefault();
-        if (string.IsNullOrEmpty(cmd) || cmd == "help")
-        {
-            await e.Message.RespondAsync($"Commands: {string.Join(", ", _commands.Where(x => !string.IsNullOrEmpty(x.Command)).Select(x => x.Command))}");
-            return;
-        }
-        args = args.Skip(1).ToList();
-        var command = _commands.FirstOrDefault(x => x.Command == cmd.ToLower());
-        if (command == null)
-        {
-            await e.Message.RespondAsync($"Unknown command, type `{_options.CommandPrefix} help` for all commands");
-            return;
-        }
-
-        if (!string.IsNullOrEmpty(command.Permission))
-        {
-            var user = await command.GetClientUser(e);
-            if (!_userHelper.HasPermission(user, command.Permission))
-            {
-                await e.Message.RespondAsync($"You do not have permission to use this command");
-                return;
-            };
-        }
-        _logger.LogInformation($"Command {command} with args {string.Join(" ", args)} run by {e.Author.Username}");
-        try
-        {
-            await command.ProcessMessage(e, args);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogInformation(ex, $"Failed to run {command} with args {string.Join(" ", args)} run by {e.Author.Username}");
-            await e.Message.RespondAsync($"Failed to run command: {ex.Message}");
-        }
+        await e.Message.RespondAsync($"AbyssBot commands have been migrated to Discord Slash Commands, type / to view commands");
     }
 
     private async Task GuildMemberRemovedAsync(DiscordClient client, GuildMemberRemoveEventArgs e)

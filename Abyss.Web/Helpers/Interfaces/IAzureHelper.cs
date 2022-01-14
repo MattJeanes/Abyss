@@ -8,4 +8,5 @@ public interface IAzureHelper
 {
     Task<IVirtualMachine> StartServer(Server server, TaskLogger logger);
     Task<IVirtualMachine> StopServer(Server server, TaskLogger logger);
+    Task<IVirtualMachine> RestartServer(Server server, TaskLogger logger);
 }

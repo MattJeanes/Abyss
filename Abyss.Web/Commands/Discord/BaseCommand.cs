@@ -1,6 +1,7 @@
 ﻿using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
+using Abyss.Web.Helpers;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using DSharpPlus.Entities;
@@ -17,20 +18,12 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand
     protected readonly IUserRepository _userRepository;
     protected readonly DiscordOptions _baseOptions;
 
-    public virtual string? Command => null;
-    public virtual string? Permission => null;
-
     public BaseCommand(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
         _userHelper = _serviceProvider.GetRequiredService<IUserHelper>();
         _userRepository = _serviceProvider.GetRequiredService<IUserRepository>();
         _baseOptions = _serviceProvider.GetRequiredService<IOptions<DiscordOptions>>().Value;
-    }
-
-    public virtual Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
-    {
-        return Task.CompletedTask;
     }
 
     public virtual Task MemberRemoved(GuildMemberRemoveEventArgs e)
@@ -63,5 +56,16 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand
     {
         var user = await GetClientUser(e.Author);
         return _userHelper.HasPermission(user, permission);
+    }
+
+    public async Task<bool> CheckPermission(BaseContext ctx, string permission)
+    {
+        var clientUser = await GetClientUser(ctx.User);
+        if (!_userHelper.HasPermission(clientUser, permission))
+        {
+            await ctx.EditResponseAsync("You are not authorized");
+            return false;
+        }
+        return true;
     }
 }

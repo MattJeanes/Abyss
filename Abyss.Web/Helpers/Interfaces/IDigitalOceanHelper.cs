@@ -12,4 +12,5 @@ public interface IDigitalOceanHelper
     Task<Image?> Snapshot(long dropletId, string snapshotName);
     Task DeleteSnapshot(long id);
     Task DeleteDroplet(long id);
+    Task Restart(long dropletId);
 }

@@ -2,6 +2,7 @@
 using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
+using Abyss.Web.Helpers;
 using Abyss.Web.Managers.Interfaces;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -12,8 +13,6 @@ namespace Abyss.Web.Commands.Discord;
 
 public class RegisterCommand : BaseCommand
 {
-    public override string Command => "register";
-
     private readonly IUserManager _userManager;
     private readonly ILogger<RegisterCommand> _logger;
     private readonly DiscordOptions _discordOptions;
@@ -30,20 +29,15 @@ public class RegisterCommand : BaseCommand
         _discordOptions = discordOptions.Value;
     }
 
-    public override async Task ProcessMessage(MessageCreateEventArgs e, List<string> args)
-    {
-        var response = await RegisterUser(e.Author);
-        await e.Message.RespondAsync(response);
-    }
 
     [SlashCommand("register", "Register your account")]
-    public async Task RunCommand(InteractionContext ctx)
+    public async Task Register(InteractionContext ctx)
     {
-        await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+        await ctx.CreateDeferredResponseAsync();
 
         var response = await RegisterUser(ctx.User);
 
-        await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(response));
+        await ctx.EditResponseAsync(response);
     }
 
     public override async Task MemberRemoved(GuildMemberRemoveEventArgs e)

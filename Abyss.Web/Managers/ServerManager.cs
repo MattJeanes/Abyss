@@ -218,4 +218,53 @@ public class ServerManager : IServerManager
             }
         }
     }
+
+    public async Task Restart(string serverId, Func<LogItem, Task>? logHandler = null)
+    {
+        var logger = new TaskLogger(_baseLogger);
+        if (logHandler != null)
+        {
+            logger.AddLogHandler("server-restart", logHandler);
+        }
+        Server? server = null;
+        try
+        {
+            server = await _serverRepository.GetById(serverId);
+            if (server == null) { throw new Exception($"Server id {server} not found"); }
+            if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot restart server that is not active"); }
+            logger.LogInformation($"Restarting server {server.Name}");
+            await _notificationHelper.SendMessage($"Restarting server {server.Name}", MessagePriority.HighPriority);
+            if (server.CloudType == CloudType.DigitalOcean)
+            {
+                if (!server.DropletId.HasValue) { throw new Exception("Server has no droplet id"); }
+                var droplet = await _digitalOceanHelper.GetDroplet(server.DropletId.Value);
+                if (droplet == null) { throw new Exception($"Droplet id {server.DropletId} not valid"); }
+                var dropletName = $"{droplet.Name} (id {droplet.Id})";
+                if (droplet.Status != DigitalOceanEnums.DropletStatus.Active)
+                {
+                    throw new Exception($"{dropletName} is not in expected state active, is currently: {droplet.Status}");
+                }
+                logger.LogInformation($"Restarting server {dropletName}");
+                await _digitalOceanHelper.Restart(droplet.Id);
+                logger.LogInformation($"Restarted server {dropletName}");
+            }
+
+            else if (server.CloudType == CloudType.Azure)
+            {
+                await _azureHelper.RestartServer(server, logger);
+            }
+            else
+            {
+                throw new Exception($"Unsupported cloud type {server.CloudType}");
+            }
+            logger.LogInformation($"Successfully restarted server {server.Name}");
+            await _notificationHelper.SendMessage($"Restarted server {server.Name}", MessagePriority.HighPriority);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, $"Failed to restart server {server?.Name ?? "N/A"}");
+            await _notificationHelper.SendMessage($"Failed to restart server {server?.Name ?? "(Unknown)"}", MessagePriority.HighPriority);
+            throw;
+        }
+    }
 }

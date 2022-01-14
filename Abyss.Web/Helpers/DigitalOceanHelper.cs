@@ -6,7 +6,6 @@ using Abyss.Web.Logging;
 using DigitalOcean.API;
 using DigitalOcean.API.Models.Responses;
 using Microsoft.Extensions.Options;
-using System.Timers;
 using Requests = DigitalOcean.API.Models.Requests;
 using Responses = DigitalOcean.API.Models.Responses;
 
@@ -27,7 +26,7 @@ public class DigitalOceanHelper : IDigitalOceanHelper
     public async Task<Droplet> CreateDropletFromServer(Server server, TaskLogger logger)
     {
         if (!server.SnapshotId.HasValue) { throw new ArgumentNullException(nameof(server.SnapshotId)); }
-        if(string.IsNullOrEmpty(server.Tag)) { throw new ArgumentNullException(nameof(server.Tag)); }
+        if (string.IsNullOrEmpty(server.Tag)) { throw new ArgumentNullException(nameof(server.Tag)); }
         var servers = await _client.Droplets.GetAllByTag(server.Tag);
         if (servers.Any()) { throw new Exception($"Droplet {server.Tag} already exists"); }
         var newDroplet = new Requests.Droplet
@@ -63,6 +62,11 @@ public class DigitalOceanHelper : IDigitalOceanHelper
     public async Task Shutdown(long dropletId)
     {
         await WaitForAction(await _client.DropletActions.Shutdown(dropletId));
+    }
+
+    public async Task Restart(long dropletId)
+    {
+        await WaitForAction(await _client.DropletActions.Reboot(dropletId));
     }
 
     public async Task<Image?> Snapshot(long dropletId, string snapshotName)

@@ -24,7 +24,7 @@ public class AzureHelper : IAzureHelper
         var vm = await _azure.VirtualMachines.GetByIdAsync(server.ResourceId);
         logger.LogInformation($"Starting Azure virtual machine {vm.Name} in resource group {vm.ResourceGroupName}");
         await vm.StartAsync(GetCancellationToken());
-        logger.LogInformation($"Virtual machine started");
+        logger.LogInformation($"Virtual machine {vm.Name} started");
         return vm;
     }
 
@@ -33,7 +33,16 @@ public class AzureHelper : IAzureHelper
         var vm = await _azure.VirtualMachines.GetByIdAsync(server.ResourceId);
         logger.LogInformation($"Shutting down Azure virtual machine {vm.Name} in resource group {vm.ResourceGroupName}");
         await vm.DeallocateAsync(GetCancellationToken());
-        logger.LogInformation($"Virtual machine stopped");
+        logger.LogInformation($"Virtual machine {vm.Name} stopped");
+        return vm;
+    }
+
+    public async Task<IVirtualMachine> RestartServer(Server server, TaskLogger logger)
+    {
+        var vm = await _azure.VirtualMachines.GetByIdAsync(server.ResourceId);
+        logger.LogInformation($"Restarting Azure virtual machine {vm.Name} in resource group {vm.ResourceGroupName}");
+        await vm.RestartAsync(GetCancellationToken());
+        logger.LogInformation($"Virtual machine {vm.Name} restarted");
         return vm;
     }
 
