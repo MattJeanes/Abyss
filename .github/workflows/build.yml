@@ -22,12 +22,12 @@ jobs:
         
     - name: Push Docker images
       run: |
-        echo $GITHUB_TOKEN | docker login docker.pkg.github.com --username MattJeanes --password-stdin
+        echo $GITHUB_TOKEN | docker login ghcr.io --username MattJeanes --password-stdin
         for appname in Abyss.Web; do
           app=`echo $appname | tr '[:upper:]' '[:lower:]'`
           echo "Deploying $appname"
-          docker tag $app docker.pkg.github.com/mattjeanes/abyss/$app:latest
-          docker push docker.pkg.github.com/mattjeanes/abyss/$app:latest
+          docker tag $app ghcr.io/mattjeanes/abyss/$app:latest
+          docker push ghcr.io/mattjeanes/abyss/$app:latest
         done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
