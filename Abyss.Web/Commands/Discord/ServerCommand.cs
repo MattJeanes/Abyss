@@ -58,6 +58,7 @@ public class ServerCommand : BaseCommand
             return;
         }
         var thread = await TryCreateThread(ctx, $"Starting {server.Name}");
+        string response = string.Empty;
         try
         {
             await _serverManager.Start(server.Id.ToString(), async (logItem) =>
@@ -71,21 +72,22 @@ public class ServerCommand : BaseCommand
                     await thread.SendMessageAsync(logItem.ToString());
                 }
             });
-            await ctx.EditResponseAsync($"Started server {server.Name}");
+            response = $"Started server {server.Name}";
         }
         catch (Exception ex)
         {
-            await ctx.EditResponseAsync($"Failed to start server {server.Name}: {ex.Message}");
+            response = $"Failed to start server {server.Name}: {ex.Message}";
         }
         finally
         {
+            await ctx.EditResponseAsync(response);
             if (thread == null)
             {
-                await ctx.CreateFollowupMessageAsync(ctx.User.Mention);
+                await ctx.CreateFollowupMessageAsync($"{response} {ctx.User.Mention}");
             }
             else
             {
-                await thread.SendMessageAsync(ctx.User.Mention);
+                await thread.SendMessageAsync($"{response} {ctx.User.Mention}");
             }
         }
     }
@@ -112,6 +114,7 @@ public class ServerCommand : BaseCommand
             return;
         }
         var thread = await TryCreateThread(ctx, $"Stopping {server.Name}");
+        string response = string.Empty;
         try
         {
             await _serverManager.Stop(server.Id.ToString(), async (logItem) =>
@@ -125,21 +128,22 @@ public class ServerCommand : BaseCommand
                     await thread.SendMessageAsync(logItem.ToString());
                 }
             });
-            await ctx.EditResponseAsync($"Stopped server {server.Name}");
+            response = $"Stopped server {server.Name}";
         }
         catch (Exception ex)
         {
-            await ctx.EditResponseAsync($"Failed to stop server {server.Name}: {ex.Message}");
+            response = $"Failed to stop server {server.Name}: {ex.Message}";
         }
         finally
         {
+            await ctx.EditResponseAsync(response);
             if (thread == null)
             {
-                await ctx.CreateFollowupMessageAsync(ctx.User.Mention);
+                await ctx.CreateFollowupMessageAsync($"{response} {ctx.User.Mention}");
             }
             else
             {
-                await thread.SendMessageAsync(ctx.User.Mention);
+                await thread.SendMessageAsync($"{response} {ctx.User.Mention}");
             }
         }
     }
@@ -166,6 +170,7 @@ public class ServerCommand : BaseCommand
             return;
         }
         var thread = await TryCreateThread(ctx, $"Restarting {server.Name}");
+        string response = string.Empty;
         try
         {
             await _serverManager.Restart(server.Id.ToString(), async (logItem) =>
@@ -179,21 +184,22 @@ public class ServerCommand : BaseCommand
                     await thread.SendMessageAsync(logItem.ToString());
                 }
             });
-            await ctx.EditResponseAsync($"Restarted server {server.Name}");
+            response = $"Restarted server {server.Name}";
         }
         catch (Exception ex)
         {
-            await ctx.EditResponseAsync($"Failed to restart server {server.Name}: {ex.Message}");
+            response = $"Failed to restart server {server.Name}: {ex.Message}";
         }
         finally
         {
+            await ctx.EditResponseAsync(response);
             if (thread == null)
             {
-                await ctx.CreateFollowupMessageAsync(ctx.User.Mention);
+                await ctx.CreateFollowupMessageAsync($"{response} {ctx.User.Mention}");
             }
             else
             {
-                await thread.SendMessageAsync(ctx.User.Mention);
+                await thread.SendMessageAsync($"{response} {ctx.User.Mention}");
             }
         }
     }
