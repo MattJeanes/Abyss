@@ -19,8 +19,5 @@ public class DiscordOptions
     [NotNull]
     public string? GuestRankId { get; set; }
 
-    [NotNull]
-    public string? AddonsMessage { get; set; }
-
     public ulong? GuildId { get; set; }
 }

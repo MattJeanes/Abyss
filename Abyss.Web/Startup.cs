@@ -23,6 +23,7 @@ using DSharpPlus;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Azure.Management.Fluent;
+using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization.Conventions;
@@ -45,14 +46,11 @@ public class Startup
     {
         var builder = new ConfigurationBuilder()
             .SetBasePath(env.ContentRootPath)
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
+            .AddUserSecrets<Program>(true);
 
-        if (!env.IsDevelopment())
-        {
-            builder.AddJsonFile($"appsettings.Release.json", optional: false, reloadOnChange: true);
-        }
-
-        builder.AddEnvironmentVariables();
 
         _config = builder.Build();
         _env = env;
@@ -146,7 +144,7 @@ public class Startup
             client.BaseAddress = new Uri(_config["GPTClient:BaseUrl"]);
         });
 
-        services.AddPredictionEnginePool<InputData, Prediction>().FromFile("Models/whosaidit.zip");
+        services.AddPredictionEnginePool<InputData, Prediction>().FromFile(_config["WhoSaidIt:ModelPath"]);
 
         services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
         {
@@ -157,8 +155,15 @@ public class Startup
         services.AddTransient(serviceProvider =>
             serviceProvider.GetRequiredService<TumblrClientFactory>().Create<TumblrClient>(
                 _config["Tumblr:ConsumerKey"], _config["Tumblr:ConsumerSecret"], new DontPanic.TumblrSharp.OAuth.Token(_config["Tumblr:Token"], _config["Tumblr:TokenSecret"])));
-        services.AddTransient(serviceProvider => Azure.Authenticate("azure.json").WithSubscription(_config["Azure:SubscriptionId"]));
-        //services.AddTransient<IDiscordCommand, AddonsCommand>();
+
+        var azureCredentials = SdkContext.AzureCredentialsFactory.FromServicePrincipal(
+            _config["Azure:ClientId"],
+            _config["Azure:ClientSecret"],
+            _config["Azure:TenantId"],
+            AzureEnvironment.AzureGlobalCloud
+        );
+
+        services.AddTransient(serviceProvider => Azure.Authenticate(azureCredentials).WithSubscription(_config["Azure:SubscriptionId"]));
         services.AddTransient<IDiscordCommand, RegisterCommand>();
         services.AddTransient<IDiscordCommand, PingCommand>();
         services.AddTransient<IDiscordCommand, QuoteCommand>();
