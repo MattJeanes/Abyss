@@ -17,22 +17,22 @@ jobs:
       contents: read
       security-events: write
 
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'csharp', 'javascript' ]
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+    
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.9.0
+      with:
+        dotnet-version: 6.x
       
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
       with:
-        languages: ${{ matrix.language }}
+        languages: csharp, javascript
         
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+    - name: Build solution
+      run: dotnet build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
