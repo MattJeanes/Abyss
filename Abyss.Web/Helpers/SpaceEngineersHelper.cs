@@ -25,9 +25,29 @@ public class SpaceEngineersHelper : ISpaceEngineersHelper
     public async Task<List<SpaceEngineersCharacters.Character>> GetCharacters()
     {
         var request = CreateRequest("v1/session/characters", Method.Get);
-        var response = await _client.ExecuteAsync<SpaceEngineersResponse<SpaceEngineersCharacters>>(request);
-        if (!response.IsSuccessful) { return null; }
-        return response.Data.Data.Characters;
+        var response = await HandleResponse<SpaceEngineersCharacters>(request);
+        return response.Characters;
+    }
+
+    private async Task<T> HandleResponse<T>(RestRequest request)
+    {
+        var response = await _client.ExecuteAsync<SpaceEngineersResponse<T>>(request);
+        if (!response.IsSuccessful)
+        {
+            if (response.ErrorException != null)
+            {
+                throw response.ErrorException;
+            }
+            if (!string.IsNullOrEmpty(response.ErrorMessage))
+            {
+                throw new Exception(response.ErrorMessage);
+            }
+            else
+            {
+                throw new Exception($"Failed to process request {request.Resource}");
+            }
+        }
+        return response.Data.Data;
     }
 
     private RestRequest CreateRequest(string resourceLink, Method method, params Tuple<string, string>[] queryParams)

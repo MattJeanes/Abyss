@@ -204,23 +204,25 @@ public class ServerManager : IServerManager
 
     public async Task<ServerRichStatus> GetServerRichStatus(Server server)
     {
+        if (server.StatusId != ServerStatus.Active) { return null; }
         try
         {
             if (server.Type == ServerType.SpaceEngineers)
             {
                 var characters = await _spaceEngineersHelper.GetCharacters();
-                if (characters != null)
+                return new ServerRichStatus
                 {
-                    return new ServerRichStatus
-                    {
-                        Players = characters.Select(x => x.DisplayName).ToList(),
-                    };
-                }
+                    Players = characters.Select(x => x.DisplayName).ToList(),
+                };
             }
         }
         catch (Exception e)
         {
             _baseLogger.LogError(e, $"Failed to get rich status for server: {server.Name}");
+            return new ServerRichStatus
+            {
+                Error = e.Message
+            };
         }
         return null;
     }
