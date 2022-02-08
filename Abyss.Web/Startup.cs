@@ -140,10 +140,7 @@ public class Startup
         {
             client.BaseAddress = new Uri(_config["GPTClient:BaseUrl"]);
         });
-        services.AddHttpClient<ISpaceEngineersHelper, SpaceEngineersHelper>(client =>
-        {
-            client.BaseAddress = new Uri(_config["SpaceEngineers:BaseUrl"]);
-        });
+        services.AddHttpClient<ISpaceEngineersHelper, SpaceEngineersHelper>();
 
         services.AddPredictionEnginePool<InputData, Prediction>().FromFile(_config["WhoSaidIt:ModelPath"]);
 
@@ -180,7 +177,6 @@ public class Startup
         services.Configure<QuoteOfTheDayOptions>(_config.GetSection("QuoteOfTheDay"));
         services.Configure<AzureOptions>(_config.GetSection("Azure"));
         services.Configure<GModOptions>(_config.GetSection("GMod"));
-        services.Configure<SpaceEngineersOptions>(_config.GetSection("SpaceEngineers"));
         services.Configure<PushoverOptions>(_config.GetSection("Pushover"));
         services.AddHttpContextAccessor();
         services.AddHttpClient("cloudflare", options =>

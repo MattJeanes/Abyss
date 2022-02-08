@@ -21,4 +21,6 @@ public class Server : BaseEntity
     public string ResourceId { get; set; }
     public string Alias { get; set; }
     public ServerType Type { get; set; }
+    public string ApiBaseUrl { get; set; }
+    public string ApiKey { get; set; }
 }

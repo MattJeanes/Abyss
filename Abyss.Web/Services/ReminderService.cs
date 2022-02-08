@@ -63,27 +63,7 @@ public class ReminderService : IHostedService, IDisposable
                     {
                         var message = new StringBuilder($"Psst! As a reminder the {server.Name} server is still running. ");
                         var richStatus = await serverManager.GetServerRichStatus(server);
-                        if (richStatus != null)
-                        {
-                            if (!string.IsNullOrEmpty(richStatus.Error))
-                            {
-                                message.Append($"Failed to retrieve server rich status: {richStatus.Error}. ");
-                            }
-                            else
-                            {
-                                if (richStatus.Players != null)
-                                {
-                                    if (richStatus.Players.Count > 0)
-                                    {
-                                        message.Append($"Players online: {string.Join(", ", richStatus.Players)}. ");
-                                    }
-                                    else
-                                    {
-                                        message.Append("No players online. ");
-                                    }
-                                }
-                            }
-                        }
+                        AppendRichStatusData(message, richStatus);
                         if (server.ReminderIntervalMinutes.HasValue)
                         {
                             message.Append($"I'll remind you again in {TimeSpan.FromMinutes(server.ReminderIntervalMinutes.Value).ToReadableString()} if it's not been stopped by then.");
@@ -112,6 +92,30 @@ public class ReminderService : IHostedService, IDisposable
                         _logger.LogError(e, $"Failed to send reminder for server id {server.Id}");
                     }
                 }
+            }
+        }
+    }
+
+    private static void AppendRichStatusData(StringBuilder message, Data.ServerRichStatus richStatus)
+    {
+        if (richStatus == null)
+        {
+            return;
+        }
+        if (!string.IsNullOrEmpty(richStatus.Error))
+        {
+            message.Append($"Failed to retrieve server rich status: {richStatus.Error}. ");
+            return;
+        }
+        if (richStatus.Players != null)
+        {
+            if (richStatus.Players.Count > 0)
+            {
+                message.Append($"Players online: {string.Join(", ", richStatus.Players)}. ");
+            }
+            else
+            {
+                message.Append("No players online. ");
             }
         }
     }

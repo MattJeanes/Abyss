@@ -209,7 +209,7 @@ public class ServerManager : IServerManager
         {
             if (server.Type == ServerType.SpaceEngineers)
             {
-                var characters = await _spaceEngineersHelper.GetCharacters();
+                var characters = await _spaceEngineersHelper.GetCharacters(server);
                 return new ServerRichStatus
                 {
                     Players = characters.Select(x => x.DisplayName).ToList(),

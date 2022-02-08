@@ -1,7 +1,7 @@
-﻿using Abyss.Web.Data.Options;
+﻿using Abyss.Web.Data;
 using Abyss.Web.Data.SpaceEngineers;
+using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
-using Microsoft.Extensions.Options;
 using RestSharp;
 using System.Globalization;
 using System.Security.Cryptography;
@@ -11,20 +11,22 @@ namespace Abyss.Web.Helpers;
 
 public class SpaceEngineersHelper : ISpaceEngineersHelper
 {
-    private readonly SpaceEngineersOptions _options;
     private readonly Random _random;
     private readonly RestClient _client;
 
-    public SpaceEngineersHelper(IOptions<SpaceEngineersOptions> options, HttpClient httpClient)
+    public SpaceEngineersHelper(HttpClient httpClient)
     {
-        _options = options.Value;
         _random = new Random();
         _client = new RestClient(httpClient);
     }
 
-    public async Task<List<SpaceEngineersCharacters.Character>> GetCharacters()
+    public async Task<List<SpaceEngineersCharacters.Character>> GetCharacters(Server server)
     {
-        var request = CreateRequest("v1/session/characters", Method.Get);
+        if (server.Type != ServerType.SpaceEngineers)
+        {
+            throw new InvalidOperationException(nameof(server.Type));
+        }
+        var request = CreateRequest(server, "v1/session/characters", Method.Get);
         var response = await HandleResponse<SpaceEngineersCharacters>(request);
         return response.Characters;
     }
@@ -50,10 +52,11 @@ public class SpaceEngineersHelper : ISpaceEngineersHelper
         return response.Data.Data;
     }
 
-    private RestRequest CreateRequest(string resourceLink, Method method, params Tuple<string, string>[] queryParams)
+    private RestRequest CreateRequest(Server server, string resourceLink, Method method, params Tuple<string, string>[] queryParams)
     {
         var methodUrl = $"/vrageremote/{resourceLink}";
-        var request = new RestRequest(methodUrl, method);
+        var baseUri = new Uri(server.ApiBaseUrl);
+        var request = new RestRequest(new Uri(baseUri, methodUrl), method);
         var date = DateTime.UtcNow.ToString("r", CultureInfo.InvariantCulture);
         request.AddHeader("Date", date);
         var nonce = _random.Next(0, int.MaxValue).ToString();
@@ -61,7 +64,7 @@ public class SpaceEngineersHelper : ISpaceEngineersHelper
         message.Append(methodUrl);
         if (queryParams.Length > 0)
         {
-            message.Append("?");
+            message.Append('?');
         }
 
         for (var i = 0; i < queryParams.Length; i++)
@@ -71,7 +74,7 @@ public class SpaceEngineersHelper : ISpaceEngineersHelper
             message.AppendFormat("{0}={1}", param.Item1, param.Item2);
             if (i != queryParams.Length - 1)
             {
-                message.Append("&");
+                message.Append('&');
             }
         }
 
@@ -80,7 +83,7 @@ public class SpaceEngineersHelper : ISpaceEngineersHelper
         message.AppendLine(date);
         var messageBuffer = Encoding.UTF8.GetBytes(message.ToString());
 
-        var key = Convert.FromBase64String(_options.ApiKey);
+        var key = Convert.FromBase64String(server.ApiKey);
         byte[] computedHash;
         using (var hmac = new HMACSHA1(key))
         {

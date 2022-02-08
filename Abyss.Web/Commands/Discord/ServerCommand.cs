@@ -216,18 +216,24 @@ public class ServerCommand : BaseCommand
             _ => $"{server.Name} is in unknown state '{server.StatusId}'",
         };
 
-        if (richStatus != null)
+        if (richStatus == null)
         {
-            if (richStatus.Players != null)
+            return status;
+        }
+        if (!string.IsNullOrEmpty(richStatus.Error))
+        {
+            status += $". Failed to retrieve server rich status: {richStatus.Error}";
+            return status;
+        }
+        if (richStatus.Players != null)
+        {
+            if (richStatus.Players.Count > 0)
             {
-                if (richStatus.Players.Count > 0)
-                {
-                    status += $". Players online: {string.Join(", ", richStatus.Players)}";
-                }
-                else
-                {
-                    status += ". No players online";
-                }
+                status += $". Players online: {string.Join(", ", richStatus.Players)}";
+            }
+            else
+            {
+                status += ". No players online";
             }
         }
 
