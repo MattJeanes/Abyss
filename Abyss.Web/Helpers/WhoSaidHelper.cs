@@ -2,7 +2,6 @@
 using Abyss.Web.Helpers.Interfaces;
 using Microsoft.Extensions.ML;
 using Microsoft.ML.Data;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Abyss.Web.Helpers;
 
@@ -32,7 +31,7 @@ public class WhoSaidHelper : IWhoSaidHelper
 public class InputData
 {
     [ColumnName("sender_name"), LoadColumn(0)]
-    public string? SenderName { get; set; }
+    public string SenderName { get; set; }
 
 
     [ColumnName("timestamp_ms"), LoadColumn(1)]
@@ -40,16 +39,16 @@ public class InputData
 
 
     [ColumnName("content"), LoadColumn(2)]
-    public string? Text { get; set; }
+    public string Text { get; set; }
 
 
     [ColumnName("type"), LoadColumn(3)]
-    public string? Type { get; set; }
+    public string Type { get; set; }
 }
 
 public class Prediction
 {
-    [ColumnName("PredictedLabel"), NotNull]
-    public string? PredictedLabel { get; set; }
-    public float[]? Score { get; set; }
+    [ColumnName("PredictedLabel")]
+    public string PredictedLabel { get; set; }
+    public float[] Score { get; set; }
 }

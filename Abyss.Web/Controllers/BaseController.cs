@@ -13,7 +13,7 @@ public class BaseController : Controller
         _userHelper = userHelper;
     }
 
-    public async Task<User?> GetUser()
+    public async Task<User> GetUser()
     {
         return await _userHelper.GetUser();
     }

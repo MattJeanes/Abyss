@@ -57,7 +57,7 @@ public class TaskLogger : ITaskLogger
         Log(LogItemLevel.Error, message, ex);
     }
 
-    public void Log(LogItemLevel logLevel, string message, Exception? ex = null)
+    public void Log(LogItemLevel logLevel, string message, Exception ex = null)
     {
         switch (logLevel)
         {

@@ -75,7 +75,7 @@ public class UserHelper : IUserHelper
         return user;
     }
 
-    public async Task<User?> GetUser()
+    public async Task<User> GetUser()
     {
         var clientUser = GetClientUser();
         if (clientUser != null)
@@ -86,7 +86,7 @@ public class UserHelper : IUserHelper
         return null;
     }
 
-    public static ClientUser? GetClientUser(ClaimsPrincipal? user)
+    public static ClientUser GetClientUser(ClaimsPrincipal user)
     {
         var encodedUser = user?.Claims.FirstOrDefault(x => x.Type == UserClaimField) ?? null;
         if (encodedUser != null)
@@ -96,24 +96,24 @@ public class UserHelper : IUserHelper
         return null;
     }
 
-    public static ClientUser? GetClientUser(HttpContext? httpContext)
+    public static ClientUser GetClientUser(HttpContext httpContext)
     {
         if (httpContext == null) { return null; }
         return GetClientUser(httpContext.User);
     }
 
-    public ClientUser? GetClientUser()
+    public ClientUser GetClientUser()
     {
         return GetClientUser(_httpContextAccessor.HttpContext);
     }
 
-    public ClientUser? GetClientUser(string token)
+    public ClientUser GetClientUser(string token)
     {
         var jwt = VerifyToken(token, TokenType.Access);
         return GetClientUser(jwt);
     }
 
-    public async Task<RefreshToken> AddRefreshToken(User user, RefreshToken? currentToken)
+    public async Task<RefreshToken> AddRefreshToken(User user, RefreshToken currentToken)
     {
         var (refreshToken, entity) = await GetRefreshToken(user);
         if (currentToken != null)
@@ -152,7 +152,7 @@ public class UserHelper : IUserHelper
         return GetToken(claims, DateTime.UtcNow.AddMinutes(_authenticationOptions.AccessToken.ValidMinutes), TokenType.Access);
     }
 
-    private bool NeedsNewRefreshToken(RefreshToken? token)
+    private bool NeedsNewRefreshToken(RefreshToken token)
     {
         if (token == null) { return true; }
         var renewAfter = token.FromDate.AddMinutes(token.Expiry.Subtract(token.FromDate).TotalMinutes / 2);
@@ -198,7 +198,7 @@ public class UserHelper : IUserHelper
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public ClaimsPrincipal? VerifyToken(string token, TokenType type)
+    public ClaimsPrincipal VerifyToken(string token, TokenType type)
     {
         try
         {
@@ -269,7 +269,7 @@ public class UserHelper : IUserHelper
         _httpContextAccessor.HttpContext.Response.Cookies.Delete(AuthSchemes.RefreshToken);
     }
 
-    public async Task<RefreshToken?> GetCurrentRefreshToken()
+    public async Task<RefreshToken> GetCurrentRefreshToken()
     {
         if (_httpContextAccessor.HttpContext == null) { throw new Exception("HttpContext is invalid"); }
         var refreshTokenId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == RefreshTokenIdField);
@@ -281,7 +281,7 @@ public class UserHelper : IUserHelper
         return null;
     }
 
-    public bool HasPermission(ClientUser? user, string permission)
+    public bool HasPermission(ClientUser user, string permission)
     {
         return user?.Permissions?.Contains(permission) ?? false;
     }
@@ -298,7 +298,7 @@ public class UserHelper : IUserHelper
         return await GetPermissions(user);
     }
 
-    public async Task<IList<Permission>> GetPermissions(ClientUser? user)
+    public async Task<IList<Permission>> GetPermissions(ClientUser user)
     {
         if (string.IsNullOrEmpty(user?.RoleId)) { return new List<Permission>(); }
         var role = await _roleRepository.GetById(user.RoleId);

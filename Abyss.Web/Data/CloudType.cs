@@ -2,6 +2,5 @@
 
 public enum CloudType
 {
-    DigitalOcean = 0,
     Azure = 1
 }

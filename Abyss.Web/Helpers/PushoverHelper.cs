@@ -3,10 +3,9 @@ using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers.Interfaces;
 using Microsoft.Extensions.Options;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Abyss.Web.Services;
+namespace Abyss.Web.Helpers;
 
 public class PushoverHelper : INotificationHelper
 {
@@ -58,13 +57,13 @@ public class PushoverHelper : INotificationHelper
     private class PushRequest
     {
         [JsonPropertyName("token")]
-        public string? Token { get; set; }
+        public string Token { get; set; }
 
         [JsonPropertyName("user")]
-        public string? User { get; set; }
+        public string User { get; set; }
 
         [JsonPropertyName("message")]
-        public string? Message { get; set; }
+        public string Message { get; set; }
 
         [JsonPropertyName("priority")]
         public PushoverPriority Priority { get; set; }
@@ -87,8 +86,8 @@ public class PushoverHelper : INotificationHelper
 
     private class PushoverResponse
     {
-        [JsonPropertyName("errors"), NotNull]
-        public List<string>? Errors { get; set; }
+        [JsonPropertyName("errors")]
+        public List<string> Errors { get; set; }
 
         [JsonPropertyName("status")]
         public PushoverResponseStatus Status { get; set; }

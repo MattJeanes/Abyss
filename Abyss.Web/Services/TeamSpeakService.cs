@@ -1,5 +1,5 @@
 ﻿using Abyss.Web.Data.Options;
-using Abyss.Web.Helpers;
+using Abyss.Web.Helpers.Interfaces;
 using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Services;
@@ -9,7 +9,7 @@ public class TeamSpeakService : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly TeamSpeakOptions _options;
     private readonly IServiceProvider _serviceProvider;
-    private Timer? _timer;
+    private Timer _timer;
 
     public TeamSpeakService(ILogger<TeamSpeakService> logger, IOptions<TeamSpeakOptions> options, IServiceProvider serviceProvider)
     {

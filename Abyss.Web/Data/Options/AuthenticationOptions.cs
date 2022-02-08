@@ -1,17 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Abyss.Web.Data.Options;
+﻿namespace Abyss.Web.Data.Options;
 
 public class AuthenticationOptions
 {
-    [NotNull]
-    public InternalAuthenticationProviderOptions? ExternalLogin { get; set; }
+    public InternalAuthenticationProviderOptions ExternalLogin { get; set; }
 
-    [NotNull]
-    public InternalAuthenticationProviderOptions? RefreshToken { get; set; }
+    public InternalAuthenticationProviderOptions RefreshToken { get; set; }
 
-    [NotNull]
-    public InternalAuthenticationProviderOptions? AccessToken { get; set; }
+    public InternalAuthenticationProviderOptions AccessToken { get; set; }
 }
 
 public class InternalAuthenticationProviderOptions

@@ -1,12 +1,8 @@
 ﻿namespace Abyss.Web.Data.Options;
 
-public class CloudflareOptions
+public class SpaceEngineersOptions
 {
     public string BaseUrl { get; set; }
 
-    public string Email { get; set; }
-
     public string ApiKey { get; set; }
-
-    public string Zone { get; set; }
 }

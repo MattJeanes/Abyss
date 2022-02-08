@@ -1,33 +1,34 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
+using StackExchange.Exceptional;
 using StackExchange.Exceptional.Internal;
 
-namespace StackExchange.Exceptional.Stores;
+namespace Abyss.Web.Logging;
 
 public class MongoDBErrorStoreSettings : ErrorStoreSettings
 {
-    public string? DatabaseName { get; set; }
+    public string DatabaseName { get; set; }
 }
 
 public class MongoDBError
 {
     [BsonId]
     public Guid GUID { get; set; }
-    public string? ApplicationName { get; set; }
-    public string? Category { get; set; }
-    public string? MachineName { get; set; }
+    public string ApplicationName { get; set; }
+    public string Category { get; set; }
+    public string MachineName { get; set; }
     public DateTime CreationDate { get; set; }
-    public string? Type { get; set; }
+    public string Type { get; set; }
     public bool IsProtected { get; set; }
-    public string? Host { get; set; }
-    public string? Url { get; set; }
-    public string? HTTPMethod { get; set; }
-    public string? IPAddress { get; set; }
-    public string? Source { get; set; }
-    public string? Message { get; set; }
-    public string? Detail { get; set; }
+    public string Host { get; set; }
+    public string Url { get; set; }
+    public string HTTPMethod { get; set; }
+    public string IPAddress { get; set; }
+    public string Source { get; set; }
+    public string Message { get; set; }
+    public string Detail { get; set; }
     public int? StatusCode { get; set; }
-    public string? FullJson { get; set; }
+    public string FullJson { get; set; }
     public int? ErrorHash { get; set; }
     public int? DuplicateCount { get; set; }
     public DateTime? LastLogDate { get; set; }
@@ -167,7 +168,7 @@ public sealed class MongoDBErrorStore : ErrorStore
     /// </summary>
     /// <param name="applicationName">The name of the application to delete all errors for.</param>
     /// <returns><c>true</c> if any errors were deleted, <c>false</c> otherwise.</returns>
-    protected override async Task<bool> DeleteAllErrorsAsync(string? applicationName = null)
+    protected override async Task<bool> DeleteAllErrorsAsync(string applicationName = null)
     {
         var c = GetConnection();
         var builders = Builders<MongoDBError>.Filter;
@@ -305,7 +306,7 @@ public sealed class MongoDBErrorStore : ErrorStore
     /// </summary>
     /// <param name="guid">The GUID of the error to retrieve.</param>
     /// <returns>The error object if found, <c>null</c> otherwise.</returns>
-    protected override async Task<Error?> GetErrorAsync(Guid guid)
+    protected override async Task<Error> GetErrorAsync(Guid guid)
     {
         var c = GetConnection();
         var filter = Builders<MongoDBError>.Filter.Eq(x => x.GUID, guid);
@@ -326,7 +327,7 @@ public sealed class MongoDBErrorStore : ErrorStore
     /// Retrieves all non-deleted application errors in the database.
     /// </summary>
     /// <param name="applicationName">The name of the application to get all errors for.</param>
-    protected override async Task<List<Error>> GetAllErrorsAsync(string? applicationName = null)
+    protected override async Task<List<Error>> GetAllErrorsAsync(string applicationName = null)
     {
         var c = GetConnection();
         var filter = Builders<MongoDBError>.Filter.Eq(x => x.ApplicationName, applicationName ?? ApplicationName) & Builders<MongoDBError>.Filter.Eq(x => x.DeletionDate, null);
@@ -340,7 +341,7 @@ public sealed class MongoDBErrorStore : ErrorStore
     /// </summary>
     /// <param name="since">The date to get errors since.</param>
     /// <param name="applicationName">The application name to get an error count for.</param>
-    protected override async Task<int> GetErrorCountAsync(DateTime? since = null, string? applicationName = null)
+    protected override async Task<int> GetErrorCountAsync(DateTime? since = null, string applicationName = null)
     {
         var c = GetConnection();
         var filter = Builders<MongoDBError>.Filter.Eq(x => x.ApplicationName, applicationName ?? ApplicationName);

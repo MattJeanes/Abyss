@@ -1,23 +1,16 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace Abyss.Web.Data.Options;
+﻿namespace Abyss.Web.Data.Options;
 
 public class DiscordOptions
 {
-    [NotNull]
-    public string? Token { get; set; }
+    public string Token { get; set; }
 
-    [NotNull]
-    public string? CommandPrefix { get; set; }
+    public string CommandPrefix { get; set; }
 
-    [NotNull]
-    public string? MemberRankId { get; set; }
+    public string MemberRankId { get; set; }
 
-    [NotNull]
-    public string? MemberRankName { get; set; }
+    public string MemberRankName { get; set; }
 
-    [NotNull]
-    public string? GuestRankId { get; set; }
+    public string GuestRankId { get; set; }
 
     public ulong? GuildId { get; set; }
 }

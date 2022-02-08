@@ -28,7 +28,8 @@ public class ServerCommand : BaseCommand
         var server = await _serverManager.GetServerByAlias(alias);
         if (server != null)
         {
-            await ctx.EditResponseAsync(GetServerStatus(server));
+            var richStatus = await _serverManager.GetServerRichStatus(server);
+            await ctx.EditResponseAsync(FormatServerStatus(server, richStatus));
         }
         else
         {
@@ -54,11 +55,11 @@ public class ServerCommand : BaseCommand
         }
         if (server.StatusId != ServerStatus.Inactive)
         {
-            await ctx.EditResponseAsync($"Cannot start server: {GetServerStatus(server)}");
+            await ctx.EditResponseAsync($"Cannot start server: {FormatServerStatus(server)}");
             return;
         }
         var thread = await TryCreateThread(ctx, $"Starting {server.Name}");
-        string response = string.Empty;
+        var response = string.Empty;
         try
         {
             await _serverManager.Start(server.Id.ToString(), async (logItem) =>
@@ -110,11 +111,11 @@ public class ServerCommand : BaseCommand
         }
         if (server.StatusId != ServerStatus.Active)
         {
-            await ctx.EditResponseAsync($"Cannot stop server: {GetServerStatus(server)}");
+            await ctx.EditResponseAsync($"Cannot stop server: {FormatServerStatus(server)}");
             return;
         }
         var thread = await TryCreateThread(ctx, $"Stopping {server.Name}");
-        string response = string.Empty;
+        var response = string.Empty;
         try
         {
             await _serverManager.Stop(server.Id.ToString(), async (logItem) =>
@@ -166,11 +167,11 @@ public class ServerCommand : BaseCommand
         }
         if (server.StatusId != ServerStatus.Active)
         {
-            await ctx.EditResponseAsync($"Cannot restart server: {GetServerStatus(server)}");
+            await ctx.EditResponseAsync($"Cannot restart server: {FormatServerStatus(server)}");
             return;
         }
         var thread = await TryCreateThread(ctx, $"Restarting {server.Name}");
-        string response = string.Empty;
+        var response = string.Empty;
         try
         {
             await _serverManager.Restart(server.Id.ToString(), async (logItem) =>
@@ -204,9 +205,9 @@ public class ServerCommand : BaseCommand
         }
     }
 
-    private static string GetServerStatus(Entities.Server server)
+    private static string FormatServerStatus(Entities.Server server, ServerRichStatus richStatus = null)
     {
-        return server.StatusId switch
+        var status = server.StatusId switch
         {
             ServerStatus.Activating => $"{server.Name} is starting up",
             ServerStatus.Active => $"{server.Name} is running",
@@ -214,11 +215,28 @@ public class ServerCommand : BaseCommand
             ServerStatus.Inactive => $"{server.Name} is stopped",
             _ => $"{server.Name} is in unknown state '{server.StatusId}'",
         };
+
+        if (richStatus != null)
+        {
+            if (richStatus.Players != null)
+            {
+                if (richStatus.Players.Count > 0)
+                {
+                    status += $". Players online: {string.Join(", ", richStatus.Players)}";
+                }
+                else
+                {
+                    status += ". No players online";
+                }
+            }
+        }
+
+        return status;
     }
 
-    private async Task<DiscordThreadChannel?> TryCreateThread(InteractionContext ctx, string name)
+    private async Task<DiscordThreadChannel> TryCreateThread(InteractionContext ctx, string name)
     {
-        DiscordThreadChannel? thread = null;
+        DiscordThreadChannel thread = null;
         if (!ctx.Channel.IsPrivate)
         {
             try

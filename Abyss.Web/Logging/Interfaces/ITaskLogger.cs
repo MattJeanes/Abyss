@@ -5,7 +5,7 @@ public interface ITaskLogger
     void AddLogHandler(string name, Func<LogItem, Task> handler);
     void ClearLog();
     List<LogItem> GetLog();
-    void Log(LogItemLevel logLevel, string message, Exception? ex = null);
+    void Log(LogItemLevel logLevel, string message, Exception ex = null);
     void LogError(string message);
     void LogError(Exception ex, string message);
     void LogInformation(string message);

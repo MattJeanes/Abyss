@@ -4,11 +4,11 @@ namespace Abyss.Web.Services;
 
 public abstract class CronJobService : IHostedService, IDisposable
 {
-    private System.Timers.Timer? _timer;
+    private System.Timers.Timer _timer;
     private readonly CronExpression _expression;
     private readonly TimeZoneInfo _timeZoneInfo;
 
-    protected CronJobService(string? cronExpression, TimeZoneInfo? timeZoneInfo)
+    protected CronJobService(string cronExpression, TimeZoneInfo timeZoneInfo)
     {
         if (cronExpression == null)
         {
@@ -78,15 +78,15 @@ public abstract class CronJobService : IHostedService, IDisposable
 
 public interface IScheduleConfig<T>
 {
-    string? CronExpression { get; set; }
-    TimeZoneInfo? TimeZoneInfo { get; set; }
+    string CronExpression { get; set; }
+    TimeZoneInfo TimeZoneInfo { get; set; }
 }
 
 public class ScheduleConfig<T> : IScheduleConfig<T>
 {
-    public string? CronExpression { get; set; }
+    public string CronExpression { get; set; }
 
-    public TimeZoneInfo? TimeZoneInfo { get; set; }
+    public TimeZoneInfo TimeZoneInfo { get; set; }
 }
 
 public static class ScheduledServiceExtensions

@@ -16,7 +16,6 @@ using Abyss.Web.Middleware;
 using Abyss.Web.Repositories;
 using Abyss.Web.Repositories.Interfaces;
 using Abyss.Web.Services;
-using DigitalOcean.API;
 using DontPanic.TumblrSharp;
 using DontPanic.TumblrSharp.Client;
 using DSharpPlus;
@@ -129,8 +128,6 @@ public class Startup
         services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IUserHelper, UserHelper>();
-        services.AddTransient<IDigitalOceanHelper, DigitalOceanHelper>();
-        services.AddTransient(_ => new DigitalOceanClient(_config["DigitalOcean:ApiKey"]));
         services.AddTransient<IServerManager, ServerManager>();
         services.AddTransient<ICloudflareHelper, CloudflareHelper>();
         services.AddTransient<IAzureHelper, AzureHelper>();
@@ -142,6 +139,10 @@ public class Startup
         services.AddHttpClient<IGPTClient, GPTClient>(client =>
         {
             client.BaseAddress = new Uri(_config["GPTClient:BaseUrl"]);
+        });
+        services.AddHttpClient<ISpaceEngineersHelper, SpaceEngineersHelper>(client =>
+        {
+            client.BaseAddress = new Uri(_config["SpaceEngineers:BaseUrl"]);
         });
 
         services.AddPredictionEnginePool<InputData, Prediction>().FromFile(_config["WhoSaidIt:ModelPath"]);
@@ -171,7 +172,6 @@ public class Startup
         services.Configure<JwtOptions>(_config.GetSection("Jwt"));
         services.Configure<AuthenticationOptions>(_config.GetSection("Authentication"));
         services.Configure<CleanupOptions>(_config.GetSection("Services:Cleanup"));
-        services.Configure<DigitalOceanOptions>(_config.GetSection("DigitalOcean"));
         services.Configure<CloudflareOptions>(_config.GetSection("Cloudflare"));
         services.Configure<DiscordOptions>(_config.GetSection("Discord"));
         services.Configure<TeamSpeakOptions>(_config.GetSection("TeamSpeak"));
@@ -180,6 +180,7 @@ public class Startup
         services.Configure<QuoteOfTheDayOptions>(_config.GetSection("QuoteOfTheDay"));
         services.Configure<AzureOptions>(_config.GetSection("Azure"));
         services.Configure<GModOptions>(_config.GetSection("GMod"));
+        services.Configure<SpaceEngineersOptions>(_config.GetSection("SpaceEngineers"));
         services.Configure<PushoverOptions>(_config.GetSection("Pushover"));
         services.AddHttpContextAccessor();
         services.AddHttpClient("cloudflare", options =>

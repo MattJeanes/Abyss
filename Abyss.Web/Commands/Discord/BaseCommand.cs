@@ -31,17 +31,17 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand
         return Task.CompletedTask;
     }
 
-    public async Task<ClientUser?> GetClientUser(MessageCreateEventArgs e)
+    public async Task<ClientUser> GetClientUser(MessageCreateEventArgs e)
     {
         return await GetClientUser(e.Author);
     }
 
-    public async Task<ClientUser?> GetClientUser(GuildMemberRemoveEventArgs e)
+    public async Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e)
     {
         return await GetClientUser(e.Member);
     }
 
-    public async Task<ClientUser?> GetClientUser(DiscordUser discordUser)
+    public async Task<ClientUser> GetClientUser(DiscordUser discordUser)
     {
         var user = await _userRepository.GetByExternalIdentifier(AuthSchemes.Discord.Id, discordUser.Id.ToString());
         if (user == null)

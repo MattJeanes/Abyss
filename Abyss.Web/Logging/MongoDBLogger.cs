@@ -8,7 +8,7 @@ namespace Abyss.Web.Logging;
 
 public static class MongoDBLogger
 {
-    private static Logger? _logger;
+    private static Logger _logger;
 
     public static void AddMongoDB(this ILoggingBuilder loggingBuilder, string connectionString, string databaseName, string collectionName, int maxEntries, IConfiguration config)
     {

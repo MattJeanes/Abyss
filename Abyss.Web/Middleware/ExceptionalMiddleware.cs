@@ -50,7 +50,7 @@ public class ErrorViewerMiddleware
         }
     }
 
-    private bool CheckToken(string? token, out string errorMessage)
+    private bool CheckToken(string token, out string errorMessage)
     {
         errorMessage = "";
         if (string.IsNullOrEmpty(token))

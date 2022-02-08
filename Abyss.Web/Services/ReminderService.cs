@@ -15,7 +15,7 @@ public class ReminderService : IHostedService, IDisposable
     private readonly ReminderOptions _options;
     private readonly IServiceProvider _serviceProvider;
     private readonly DiscordClient _discordClient;
-    private Timer? _timer;
+    private Timer _timer;
 
     public ReminderService(
         ILogger<ReminderService> logger,

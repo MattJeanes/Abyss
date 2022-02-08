@@ -1,5 +1,6 @@
 ﻿using Abyss.Web.Data.Options;
 using Abyss.Web.Data.TeamSpeak;
+using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
@@ -13,10 +14,10 @@ public class TeamSpeakHelper : ITeamSpeakHelper, IDisposable
     private readonly TeamSpeakOptions _options;
     private readonly IHubContext<OnlineHub> _onlineHub;
     private readonly ILogger<TeamSpeakHelper> _logger;
-    private List<Client>? _clients;
-    private List<Channel>? _channels;
-    private Task? _updateTask;
-    private TeamSpeakClient? _teamspeak;
+    private List<Client> _clients;
+    private List<Channel> _channels;
+    private Task _updateTask;
+    private TeamSpeakClient _teamspeak;
 
     public TeamSpeakHelper(
         IOptions<TeamSpeakOptions> options,
@@ -127,6 +128,6 @@ public class TeamSpeakHelper : ITeamSpeakHelper, IDisposable
 
     public void Dispose()
     {
-        ((IDisposable?)_teamspeak)?.Dispose();
+        ((IDisposable)_teamspeak)?.Dispose();
     }
 }

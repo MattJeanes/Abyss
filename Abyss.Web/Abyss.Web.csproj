@@ -9,13 +9,11 @@
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
     <UserSecretsId>28f66483-b394-40b3-89e8-ba264be8a47c</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OpenId.Steam" Version="6.0.0" />
-    <PackageReference Include="DigitalOcean.API" Version="5.2.0" />
     <PackageReference Include="AspNet.Security.OAuth.Discord" Version="6.0.1" />
     <PackageReference Include="Cronos" Version="0.7.1" />
     <PackageReference Include="DSharpPlus.SlashCommands" Version="4.2.0-nightly-01056" />
@@ -35,6 +33,7 @@
     <PackageReference Include="Microsoft.ML" Version="1.7.0" />
     <PackageReference Include="Microsoft.Azure.Management.Compute.Fluent" Version="1.38.0" />
     <PackageReference Include="Microsoft.Azure.Management.Fluent" Version="1.38.0" />
+    <PackageReference Include="RestSharp" Version="107.2.1" />
   </ItemGroup>
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->

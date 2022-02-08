@@ -12,7 +12,7 @@ public class CleanupService : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly CleanupOptions _options;
     private readonly IServiceProvider _serviceProvider;
-    private Timer? _timer;
+    private Timer _timer;
 
     public CleanupService(ILogger<CleanupService> logger, IOptions<CleanupOptions> options, IServiceProvider serviceProvider)
     {

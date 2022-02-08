@@ -1,5 +1,5 @@
 ﻿using Abyss.Web.Data.TeamSpeak;
-using Abyss.Web.Helpers;
+using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 
 namespace Abyss.Web.Managers;
