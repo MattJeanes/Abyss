@@ -78,9 +78,9 @@ public class SpaceEngineersHelper : ISpaceEngineersHelper
             }
         }
 
-        message.AppendLine();
-        message.AppendLine(nonce);
-        message.AppendLine(date);
+        message.Append("\r\n");
+        message.Append($"{nonce}\r\n");
+        message.Append($"{date}\r\n");
         var messageBuffer = Encoding.UTF8.GetBytes(message.ToString());
 
         var key = Convert.FromBase64String(server.ApiKey);
