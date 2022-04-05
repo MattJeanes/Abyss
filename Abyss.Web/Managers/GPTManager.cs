@@ -47,7 +47,7 @@ public class GPTManager : IGPTManager
                 throw new Exception("User does not have permission to use this model");
             }
         }
-        var response = await _gptClient.Generate(model.Identifier, message.Text);
+        var response = await _gptClient.Generate(model.Identifier, message.Text, message.Temperature, message.TopP);
         _logger.LogInformation($"GPT: {response.Text}");
         return response;
     }
@@ -58,6 +58,7 @@ public class GPTManager : IGPTManager
         var models = await _gptModelRepository.GetAll().ToListAsync();
         return models
             .Where(x => !x.Permission.HasValue || permissions.Select(x => x.Id).Any(y => y.Equals(x.Permission.Value)))
+            .OrderBy(x => x.Name)
             .ToList();
     }
 }

@@ -1,16 +1,17 @@
 ﻿using Abyss.Web.Data;
 using Abyss.Web.Entities;
+using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Abyss.Web.Controllers;
 
 [Route("api/gpt")]
-public class GPTController
+public class GPTController : BaseController
 {
     private readonly IGPTManager _gptManager;
 
-    public GPTController(IGPTManager gptManager)
+    public GPTController(IGPTManager gptManager, IUserHelper userHelper) : base(userHelper)
     {
         _gptManager = gptManager;
     }

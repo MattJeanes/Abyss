@@ -9,6 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { GPTComponent } from './gpt.component';
 import { GPTService } from './gpt.service';
@@ -31,6 +33,8 @@ export const routes: Routes = [
         MatButtonModule,
         MatSelectModule,
         MatCheckboxModule,
+        MatSliderModule,
+        MatTooltipModule,
     ],
     declarations: [
         GPTComponent,

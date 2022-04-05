@@ -1,48 +1,55 @@
-
 .main {
-    display: flex;
-    flex-direction: row;
+  display: flex;
+  flex-direction: row;
 }
 
 .options {
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  & > * {
     margin-bottom: 5px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    & > * {
-        margin-bottom: 5px;
-        margin-right: 5px;
-    }
+    margin-right: 5px;
+  }
 }
 
-.buttons { 
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    & > * {
-        margin-bottom: 5px;
-        margin-right: 5px;
-    }
+.buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  & > * {
+    margin-bottom: 5px;
+    margin-right: 5px;
+  }
 }
 
 .field {
-    flex: 10;
+  flex: 10;
 }
 
 .button {
-    align-self: center;
+  align-self: center;
 }
 
 .log {
-    margin-top: 10px;
-    white-space: pre-wrap;
-    line-height: 1.5em;
+  margin-top: 10px;
+  white-space: pre-wrap;
+  line-height: 1.5em;
 }
 
 .human {
-    border-style: solid;
-    border-width: thin;
-    border-color: #808080;
+  border-style: solid;
+  border-width: thin;
+  border-color: #808080;
+}
+
+.slider {
+  mat-label {
+    align-self: center;
+    margin-right: 5px;
+  }
+  display: flex;
 }

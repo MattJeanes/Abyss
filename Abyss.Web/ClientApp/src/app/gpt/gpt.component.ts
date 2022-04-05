@@ -27,6 +27,20 @@ export class GPTComponent implements OnInit {
     public set removeIncompleteLine(value: boolean) {
         localStorage['GPT.RemoveIncompleteLine'] = JSON.stringify(value);
     }
+    public get temperature(): number {
+        const data = localStorage['GPT.Temperature'];
+        return data ? JSON.parse(data) : 0.9;
+    }
+    public set temperature(value: number) {
+        localStorage['GPT.Temperature'] = JSON.stringify(value);
+    }
+    public get top_p(): number {
+        const data = localStorage['GPT.TopP'];
+        return data ? JSON.parse(data) : 0.9;
+    }
+    public set top_p(value: number) {
+        localStorage['GPT.TopP'] = JSON.stringify(value);
+    }
     public message = '';
     public models: IGPTModel[] = [];
 
@@ -52,7 +66,12 @@ export class GPTComponent implements OnInit {
             const currentText = this.log.map(x => x.Text).join();
             if ((!this.model) || this.loading) { return; }
             this.loading = true;
-            const response = await this.gptService.generate({ Text: currentText, ModelId: this.model });
+            const response = await this.gptService.generate({
+                Text: currentText,
+                ModelId: this.model,
+                Temperature: this.temperature,
+                TopP: this.top_p,
+            });
             if (this.removeIncompleteLine) {
                 response.Text = this.removeLastLine(response.Text).trimEnd();
             }

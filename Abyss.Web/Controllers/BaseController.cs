@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Abyss.Web.Controllers;
 
+[ApiController]
 public class BaseController : Controller
 {
     public readonly IUserHelper _userHelper;
@@ -13,7 +14,7 @@ public class BaseController : Controller
         _userHelper = userHelper;
     }
 
-    public async Task<User> GetUser()
+    protected async Task<User> GetUser()
     {
         return await _userHelper.GetUser();
     }

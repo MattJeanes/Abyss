@@ -19,6 +19,7 @@ using Abyss.Web.Services;
 using DontPanic.TumblrSharp;
 using DontPanic.TumblrSharp.Client;
 using DSharpPlus;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Azure.Management.Fluent;
@@ -62,7 +63,8 @@ public class Startup
             options.EnableEndpointRouting = true;
             options.InputFormatters.Add(new TextPlainInputFormatter());
         })
-            .AddJsonOptions(o => ConfigureJsonOptions(o.JsonSerializerOptions));
+            .AddJsonOptions(o => ConfigureJsonOptions(o.JsonSerializerOptions))
+            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Program>());
         services.AddHttpsRedirection(options =>
         {
             options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;

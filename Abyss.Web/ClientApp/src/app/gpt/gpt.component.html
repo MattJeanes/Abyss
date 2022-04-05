@@ -6,6 +6,24 @@
             <mat-option [value]="model.Id" *ngFor="let model of models">{{ model.Name }}</mat-option>
         </mat-select>
     </mat-form-field>
+    <div class="slider" #tooltip="matTooltip"
+        matTooltip="Higher values result in more creative text but may be less coherent, recommend 0.9 for good balance"
+        matTooltipPosition="right">
+        <mat-label>Temperature</mat-label>
+        <mat-slider min="0.1" max="1" step="0.01" thumbLabel [(ngModel)]="temperature"></mat-slider>
+        <button mat-icon-button matSuffix aria-label="Reset" *ngIf="temperature !== 0.9" (click)="temperature = 0.9">
+            <mat-icon>settings_backup_restore</mat-icon>
+        </button>
+    </div>
+    <div class="slider" #tooltip="matTooltip"
+        matTooltip="Percentage of total vocabulary to use, recommend 0.9 for good balance"
+        matTooltipPosition="right">
+        <mat-label>Top P</mat-label>
+        <mat-slider min="0" max="1" step="0.01" thumbLabel [(ngModel)]="top_p"></mat-slider>
+        <button mat-icon-button matSuffix aria-label="Reset" *ngIf="top_p !== 0.9" (click)="top_p = 0.9">
+            <mat-icon>settings_backup_restore</mat-icon>
+        </button>
+    </div>
     <mat-checkbox name="removeIncompleteLine" [(ngModel)]="removeIncompleteLine">Remove Incomplete Lines</mat-checkbox>
 </div>
 <div class="main">
@@ -17,8 +35,10 @@
     </mat-form-field>
 </div>
 <div class="buttons">
-    <button [disabled]="loading || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate New</button>
-    <button [disabled]="loading || !log.length" mat-raised-button (click)="add('\n'+message); generate()">Add to existing</button>
+    <button [disabled]="loading || !model" mat-raised-button (click)="clear(); add(message); generate()">Generate
+        New</button>
+    <button [disabled]="loading || !log.length" mat-raised-button (click)="add('\n'+message); generate()">Add to
+        existing</button>
     <button mat-raised-button [disabled]="!log.length || loading" (click)="undo()">Undo</button>
     <button mat-raised-button [disabled]="!log.length || loading" (click)="generate()">Continue</button>
     <button mat-raised-button [disabled]="!log.length || loading" (click)="undo(); generate()">Retry Last</button>

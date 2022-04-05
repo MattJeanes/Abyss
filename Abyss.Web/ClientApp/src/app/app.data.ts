@@ -76,6 +76,8 @@ export interface IWhoSaid {
 export interface IGPTRequest {
     Text: string;
     ModelId: string;
+    Temperature: number;
+    TopP: number;
 }
 
 export interface IGPTResponse {
