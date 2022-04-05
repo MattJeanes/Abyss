@@ -8,7 +8,6 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
 WORKDIR /src
 COPY ["Abyss.Web/Abyss.Web.csproj", "Abyss.Web/"]
-COPY ["nuget.config", "nuget.config"]
 RUN dotnet restore "Abyss.Web/Abyss.Web.csproj"
 COPY . .
 WORKDIR "/src/Abyss.Web"
