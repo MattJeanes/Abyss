@@ -251,6 +251,8 @@ public class Startup
                 new IgnoreExtraElementsConvention(true)
             };
         ConventionRegistry.Register("Abyss Conventions", pack, t => true);
+
+        services.AddHealthChecks();
     }
 
     private static JsonSerializerOptions ConfigureJsonOptions(JsonSerializerOptions o)
@@ -297,6 +299,7 @@ public class Startup
 
         app.UseEndpoints(routes =>
         {
+            routes.MapHealthChecks("/healthz");
             routes.MapHub<OnlineHub>("/hub/online");
             routes.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
         });
