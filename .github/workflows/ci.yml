@@ -1,0 +1,93 @@
+name: CI
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        lfs: true
+
+    - name: Build Docker images
+      run: |
+        for appname in Abyss.Web; do
+          app=`echo $appname | tr '[:upper:]' '[:lower:]'`
+          echo "Building $appname docker"
+          docker build -t $app -f "$appname/Dockerfile" .
+        done
+        
+    - name: Push Docker images
+      run: |
+        echo $GITHUB_TOKEN | docker login ghcr.io --username MattJeanes --password-stdin
+        for appname in Abyss.Web; do
+          app=`echo $appname | tr '[:upper:]' '[:lower:]'`
+          echo "Deploying $appname"
+          docker tag $app ghcr.io/mattjeanes/abyss/$app:latest
+          docker push ghcr.io/mattjeanes/abyss/$app:latest
+        done
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: github.ref == 'refs/heads/main'
+  deploy:
+    name: Deploy
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Azure Login
+      uses: Azure/login@v1.4.3
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Login to Kubernetes
+      uses: Azure/aks-set-context@v2.1
+      with:
+        resource-group: abyss
+        cluster-name: abyss
+        
+    - name: Variable Substitution
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: charts/abyss/values.yaml
+      env:
+        env.secret.Authentication__Discord__ClientSecret: "${{ secrets.DiscordClientSecret }}"
+        env.secret.Authentication__Google__ClientSecret: "${{ secrets.GoogleClientSecret }}"
+        env.secret.Authentication__Steam__ApplicationKey: "${{ secrets.SteamAppKey }}"
+        env.secret.Azure__ClientSecret: "${{ secrets.AzureClientSecret }}"
+        env.secret.Cloudflare__ApiKey: "${{ secrets.CloudflareApiKey }}"
+        env.secret.ConnectionStrings__Abyss: "${{ secrets.DatabaseConnectionString }}"
+        env.secret.Discord__Token: "${{ secrets.DiscordToken }}"
+        env.secret.GMod__ApiKey: "${{ secrets.GModApiKey }}"
+        env.secret.Jwt__Key: "${{ secrets.JwtKey }}"
+        env.secret.Pushover__ApiKey: "${{ secrets.PushoverApiKey }}"
+        env.secret.Pushover__UserKey: "${{ secrets.PushoverUserKey }}"
+        env.secret.Tumblr__ConsumerKey: "${{ secrets.TumblrConsumerKey }}"
+        env.secret.Tumblr__ConsumerSecret: "${{ secrets.TumblrConsumerSecret }}"
+        env.secret.Tumblr__Token: "${{ secrets.TumblrToken }}"
+        env.secret.Tumblr__TokenSecret: "${{ secrets.TumblrTokenSecret }}"
+        
+        env.normal.Authentication__Discord__ClientId: "${{ secrets.DiscordClientId }}"
+        env.normal.Authentication__Google__ClientId: "${{ secrets.GoogleClientId }}"
+        env.normal.Azure__ClientId: "${{ secrets.AzureClientId }}"
+        env.normal.Azure__SubscriptionId: "${{ secrets.AzureSubscriptionId }}"
+        env.normal.Azure__TenantId: "${{ secrets.AzureTenantId }}"
+        env.normal.Cloudflare__Email: "${{ secrets.CloudflareEmail }}"
+        env.normal.Cloudflare__Zone: "${{ secrets.CloudflareZone }}"
+        env.normal.Discord__GuildId: "${{ secrets.DiscordGuildId }}"
+        env.normal.GMod__BaseUrl: "${{ secrets.GmodBaseUrl }}"
+        env.normal.QuoteOfTheDay__DiscordChannelId: "${{ secrets.QuoteOfTheDayDiscordChannelId }}"
+        env.normal.Reminder__DiscordChannelId: "${{ secrets.ReminderDiscordChannelId }}"
+        env.normal.TeamSpeak__Host: "${{ secrets.TeamSpeakHost }}"
+        env.normal.Tumblr__BlogName: "${{ secrets.TumblrBlogName }}"
+        env.normal.GPTClient__BaseUrl: "${{ secrets.GPTClientBaseUrl }}"
+        
+    - name: Install Abyss
+      run: |
+        helm upgrade --install --wait --atomic --debug \
+          abyss ./abyss \
+          --namespace default
+      working-directory: charts
