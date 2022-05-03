@@ -1,6 +1,7 @@
 replicaCount: 1
 image:
-  repository: ghcr.io/mattjeanes/abyss/abyss.web:latest
+  repository: ghcr.io/mattjeanes/abyss/abyss.web
+  tag: latest
   pullPolicy: IfNotPresent
 resources:
   requests:
