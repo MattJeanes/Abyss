@@ -57,6 +57,8 @@ jobs:
       with:
         files: charts/abyss/values.yaml
       env:
+        env.ingress.host: "${{ secrets.HOST }}"
+      
         env.secret.Authentication__Discord__ClientSecret: "${{ secrets.DISCORD_CLIENTSECRET }}"
         env.secret.Authentication__Google__ClientSecret: "${{ secrets.GOOGLE_CLIENTSECRET }}"
         env.secret.Authentication__Steam__ApplicationKey: "${{ secrets.STEAM_APPLICATIONKEY }}"
