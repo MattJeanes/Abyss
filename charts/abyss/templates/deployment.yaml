@@ -19,6 +19,9 @@ spec:
     metadata: 
       labels: 
         app: abyss
+        {{- if eq .Values.image.tag "latest" }}
+        date: "{{ now | unixEpoch }}"
+        {{- end }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec: 
