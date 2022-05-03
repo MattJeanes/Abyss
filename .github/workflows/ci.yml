@@ -110,7 +110,7 @@ jobs:
           --namespace default
       working-directory: charts
         
-    - name: Wait for Hello World certificate to be ready
+    - name: Wait for certificate to be ready
       run: |
         . "./Common/Helpers.ps1"
         Wait-KubeCertificate -CertificateName "abyss-tls"
