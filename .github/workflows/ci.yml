@@ -41,6 +41,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     
+    - name: Checkout Infrastructure repo
+      uses: actions/checkout@v2.4.2
+      with:
+        repository: MattJeanes/Abyss-Infrastructure
+        path: infrastructure
+    
     - name: Azure Login
       uses: Azure/login@v1.4.3
       with:
@@ -95,3 +101,10 @@ jobs:
           abyss ./abyss \
           --namespace default
       working-directory: charts
+        
+    - name: Wait for Hello World certificate to be ready
+      run: |
+        . "./Common/Helpers.ps1"
+        Wait-KubeCertificate -CertificateName "abyss-tls"
+      shell: pwsh
+      working-directory: infrastructure/scripts
