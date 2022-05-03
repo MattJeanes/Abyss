@@ -34,8 +34,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       if: github.ref == 'refs/heads/main'
   deploy:
-    name: Deploy
     if: github.ref == 'refs/heads/main'
+    name: Deploy
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
     - name: Azure Login
@@ -54,36 +55,35 @@ jobs:
       with:
         files: charts/abyss/values.yaml
       env:
-        env.secret.Authentication__Discord__ClientSecret: "${{ secrets.DiscordClientSecret }}"
-        env.secret.Authentication__Google__ClientSecret: "${{ secrets.GoogleClientSecret }}"
-        env.secret.Authentication__Steam__ApplicationKey: "${{ secrets.SteamAppKey }}"
-        env.secret.Azure__ClientSecret: "${{ secrets.AzureClientSecret }}"
-        env.secret.Cloudflare__ApiKey: "${{ secrets.CloudflareApiKey }}"
-        env.secret.ConnectionStrings__Abyss: "${{ secrets.DatabaseConnectionString }}"
-        env.secret.Discord__Token: "${{ secrets.DiscordToken }}"
-        env.secret.GMod__ApiKey: "${{ secrets.GModApiKey }}"
-        env.secret.Jwt__Key: "${{ secrets.JwtKey }}"
-        env.secret.Pushover__ApiKey: "${{ secrets.PushoverApiKey }}"
-        env.secret.Pushover__UserKey: "${{ secrets.PushoverUserKey }}"
-        env.secret.Tumblr__ConsumerKey: "${{ secrets.TumblrConsumerKey }}"
-        env.secret.Tumblr__ConsumerSecret: "${{ secrets.TumblrConsumerSecret }}"
-        env.secret.Tumblr__Token: "${{ secrets.TumblrToken }}"
-        env.secret.Tumblr__TokenSecret: "${{ secrets.TumblrTokenSecret }}"
-        
-        env.normal.Authentication__Discord__ClientId: "${{ secrets.DiscordClientId }}"
-        env.normal.Authentication__Google__ClientId: "${{ secrets.GoogleClientId }}"
-        env.normal.Azure__ClientId: "${{ secrets.AzureClientId }}"
-        env.normal.Azure__SubscriptionId: "${{ secrets.AzureSubscriptionId }}"
-        env.normal.Azure__TenantId: "${{ secrets.AzureTenantId }}"
-        env.normal.Cloudflare__Email: "${{ secrets.CloudflareEmail }}"
-        env.normal.Cloudflare__Zone: "${{ secrets.CloudflareZone }}"
-        env.normal.Discord__GuildId: "${{ secrets.DiscordGuildId }}"
-        env.normal.GMod__BaseUrl: "${{ secrets.GmodBaseUrl }}"
-        env.normal.QuoteOfTheDay__DiscordChannelId: "${{ secrets.QuoteOfTheDayDiscordChannelId }}"
-        env.normal.Reminder__DiscordChannelId: "${{ secrets.ReminderDiscordChannelId }}"
-        env.normal.TeamSpeak__Host: "${{ secrets.TeamSpeakHost }}"
-        env.normal.Tumblr__BlogName: "${{ secrets.TumblrBlogName }}"
-        env.normal.GPTClient__BaseUrl: "${{ secrets.GPTClientBaseUrl }}"
+        env.secret.Authentication__Discord__ClientSecret: "${{ secrets.DISCORD_CLIENTSECRET }}"
+        env.secret.Authentication__Google__ClientSecret: "${{ secrets.GOOGLE_CLIENTSECRET }}"
+        env.secret.Authentication__Steam__ApplicationKey: "${{ secrets.STEAM_APPLICATIONKEY }}"
+        env.secret.Azure__ClientSecret: "${{ secrets.AZURE_CLIENTSECRET }}"
+        env.secret.Cloudflare__ApiKey: "${{ secrets.CLOUDFLARE_APIKEY }}"
+        env.secret.ConnectionStrings__Abyss: "${{ secrets.DATABASECONNECTIONSTRING }}"
+        env.secret.Discord__Token: "${{ secrets.DISCORD_TOKEN }}"
+        env.secret.GMod__ApiKey: "${{ secrets.GMOD_APIKEY }}"
+        env.secret.Jwt__Key: "${{ secrets.JWT_KEY }}"
+        env.secret.Pushover__ApiKey: "${{ secrets.PUSHOVER_APIKEY }}"
+        env.secret.Pushover__UserKey: "${{ secrets.PUSHOVER_USERKEY }}"
+        env.secret.Tumblr__ConsumerKey: "${{ secrets.TUMBLR_CONSUMERKEY }}"
+        env.secret.Tumblr__ConsumerSecret: "${{ secrets.TUMBLR_CONSUMERSECRET }}"
+        env.secret.Tumblr__Token: "${{ secrets.TUMBLR_TOKEN }}"
+        env.secret.Tumblr__TokenSecret: "${{ secrets.TUMBLR_TOKENSECRET }}"
+
+        env.normal.Authentication__Discord__ClientId: "${{ secrets.DISCORD_CLIENTID }}"
+        env.normal.Authentication__Google__ClientId: "${{ secrets.GOOGLE_CLIENTID }}"
+        env.normal.Azure__ClientId: "${{ secrets.AZURE_CLIENTID }}"
+        env.normal.Azure__SubscriptionId: "${{ secrets.AZURE_SUBSCRIPTIONID }}"
+        env.normal.Azure__TenantId: "${{ secrets.AZURE_TENANTID }}"
+        env.normal.Cloudflare__Email: "${{ secrets.CLOUDFLARE_EMAIL }}"
+        env.normal.Cloudflare__Zone: "${{ secrets.CLOUDFLARE_ZONE }}"
+        env.normal.GMod__BaseUrl: "${{ secrets.GMOD_BASEURL }}"
+        env.normal.QuoteOfTheDay__DiscordChannelId: "${{ secrets.QUOTEOFTHEDAY_DISCORDCHANNELID }}"
+        env.normal.Reminder__DiscordChannelId: "${{ secrets.REMINDER_DISCORDCHANNELID }}"
+        env.normal.TeamSpeak__Host: "${{ secrets.TEAMSPEAK_HOST }}"
+        env.normal.Tumblr__BlogName: "${{ secrets.TUMBLR_BLOGNAME }}"
+        env.normal.GPTClient__BaseUrl: "${{ secrets.GPTCLIENT_BASEURL }}"
         
     - name: Install Abyss
       run: |
