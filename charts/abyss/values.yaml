@@ -3,6 +3,8 @@ image:
   repository: ghcr.io/mattjeanes/abyss/abyss.web
   tag: latest
   pullPolicy: IfNotPresent
+ingress:
+  host: ""
 resources:
   requests:
     memory: "256Mi"
