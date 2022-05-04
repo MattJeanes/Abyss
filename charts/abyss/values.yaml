@@ -44,5 +44,5 @@ env:
     Reminder__DiscordChannelId: ""
     TeamSpeak__Host: ""
     Tumblr__BlogName: ""
-    WhoSaidIt__ModelPath: "/gpt-models/whosaidit.zip"
+    WhoSaidIt__ModelPath: "/opt/models/whosaidit.zip"
     GPTClient__BaseUrl: ""

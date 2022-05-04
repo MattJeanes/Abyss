@@ -42,6 +42,9 @@ spec:
         - name: {{ $key }}
           value: {{ $val | quote }}
         {{- end }}
+        volumeMounts:
+        - name: models
+          mountPath: /opt/models
         ports:
         - containerPort: 80
         livenessProbe:
@@ -63,3 +66,10 @@ spec:
           timeoutSeconds: 2
           successThreshold: 1
           failureThreshold: 2
+      volumes:
+      - name: azure
+        csi:
+          driver: file.csi.azure.com
+          volumeAttributes:
+            secretName: azure-storage-account
+            shareName: models
