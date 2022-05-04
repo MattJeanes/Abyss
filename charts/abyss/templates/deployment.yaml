@@ -67,7 +67,7 @@ spec:
           successThreshold: 1
           failureThreshold: 2
       volumes:
-      - name: azure
+      - name: models
         csi:
           driver: file.csi.azure.com
           volumeAttributes:
