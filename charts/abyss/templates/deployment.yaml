@@ -8,7 +8,7 @@ spec:
   strategy: 
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
+      maxUnavailable: {{ ternary 1 0 (gt (int .Values.replicaCount) 1) }}
       maxSurge: 1
   replicas: {{ .Values.replicaCount }}
   revisionHistoryLimit: 3
