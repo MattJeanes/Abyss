@@ -111,8 +111,6 @@ jobs:
       working-directory: charts
         
     - name: Wait for certificate to be ready
-      run: |
-        . "./Common/Helpers.ps1"
-        Wait-KubeCertificate -Name "abyss-tls"
+      run: WaitKubeCertificate.ps1 -Name "abyss-tls"
       shell: pwsh
       working-directory: infrastructure/scripts
