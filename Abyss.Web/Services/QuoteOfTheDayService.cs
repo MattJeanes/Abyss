@@ -39,8 +39,17 @@ public class QuoteOfTheDayService : CronJobService
             using var scope = _serviceProvider.CreateScope();
             var discordClient = scope.ServiceProvider.GetRequiredService<DiscordClient>();
             _logger.LogInformation("Sending quote of the day");
-            var quote = await _quoteHelper.GetQuote();
-            var message = $"**Quote of the day:** {_quoteHelper.FormatQuote(quote)}";
+            string message;
+            try
+            {
+                var quote = await _quoteHelper.GetQuote();
+                message = $"**Quote of the day:** {_quoteHelper.FormatQuote(quote)}";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to retrieve quote of the day");
+                message = $"Failed to retrieve quote of the day: {ex.Message}";
+            }
             var channel = await discordClient.GetChannelAsync(_options.DiscordChannelId);
             await discordClient.SendMessageAsync(channel, message.ToString());
         }
