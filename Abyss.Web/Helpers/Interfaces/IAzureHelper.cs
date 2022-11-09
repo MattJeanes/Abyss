@@ -1,12 +1,13 @@
 ﻿using Abyss.Web.Entities;
 using Abyss.Web.Logging;
-using Microsoft.Azure.Management.Compute.Fluent;
+using Azure.ResourceManager.Compute;
 
 namespace Abyss.Web.Helpers.Interfaces;
 
 public interface IAzureHelper
 {
-    Task<IVirtualMachine> StartServer(Server server, TaskLogger logger);
-    Task<IVirtualMachine> StopServer(Server server, TaskLogger logger);
-    Task<IVirtualMachine> RestartServer(Server server, TaskLogger logger);
+    Task<VirtualMachineResource> StartServer(Server server, TaskLogger logger);
+    Task<VirtualMachineResource> StopServer(Server server, TaskLogger logger);
+    Task<VirtualMachineResource> RestartServer(Server server, TaskLogger logger);
+    Task<string> GetServerIpAddress(Server server);
 }

@@ -69,8 +69,8 @@ public class ServerManager : IServerManager
             string ipAddress;
             if (server.CloudType == CloudType.Azure)
             {
-                var vm = await _azureHelper.StartServer(server, logger);
-                ipAddress = vm.GetPrimaryPublicIPAddress().IPAddress;
+                await _azureHelper.StartServer(server, logger);
+                ipAddress = await _azureHelper.GetServerIpAddress(server);
             }
             else
             {

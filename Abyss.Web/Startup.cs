@@ -16,14 +16,15 @@ using Abyss.Web.Middleware;
 using Abyss.Web.Repositories;
 using Abyss.Web.Repositories.Interfaces;
 using Abyss.Web.Services;
+using Azure.Identity;
+using Azure.ResourceManager;
 using DontPanic.TumblrSharp;
 using DontPanic.TumblrSharp.Client;
 using DSharpPlus;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Azure.Management.Fluent;
-using Microsoft.Azure.Management.ResourceManager.Fluent;
 using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization.Conventions;
@@ -63,8 +64,9 @@ public class Startup
             options.EnableEndpointRouting = true;
             options.InputFormatters.Add(new TextPlainInputFormatter());
         })
-            .AddJsonOptions(o => ConfigureJsonOptions(o.JsonSerializerOptions))
-            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Program>());
+            .AddJsonOptions(o => ConfigureJsonOptions(o.JsonSerializerOptions));
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<Program>();
         services.AddHttpsRedirection(options =>
         {
             options.RedirectStatusCode = StatusCodes.Status301MovedPermanently;
@@ -156,14 +158,13 @@ public class Startup
             serviceProvider.GetRequiredService<TumblrClientFactory>().Create<TumblrClient>(
                 _config["Tumblr:ConsumerKey"], _config["Tumblr:ConsumerSecret"], new DontPanic.TumblrSharp.OAuth.Token(_config["Tumblr:Token"], _config["Tumblr:TokenSecret"])));
 
-        var azureCredentials = SdkContext.AzureCredentialsFactory.FromServicePrincipal(
-            _config["Azure:ClientId"],
-            _config["Azure:ClientSecret"],
+        var azureCredentials = new ClientSecretCredential(
             _config["Azure:TenantId"],
-            AzureEnvironment.AzureGlobalCloud
+            _config["Azure:ClientId"],
+            _config["Azure:ClientSecret"]
         );
 
-        services.AddTransient(serviceProvider => Azure.Authenticate(azureCredentials).WithSubscription(_config["Azure:SubscriptionId"]));
+        services.AddTransient(serviceProvider => new ArmClient(azureCredentials, _config["Azure:SubscriptionId"]));
         services.AddTransient<IDiscordCommand, RegisterCommand>();
         services.AddTransient<IDiscordCommand, PingCommand>();
         services.AddTransient<IDiscordCommand, QuoteCommand>();
