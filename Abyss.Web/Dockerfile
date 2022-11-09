@@ -14,8 +14,8 @@ WORKDIR "/src/Abyss.Web"
 RUN dotnet build "Abyss.Web.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN apt-get update -yq && apt-get upgrade -yq && apt-get install -yq curl git nano
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && apt-get install -yq nodejs build-essential
+RUN apt-get update -yq && apt-get upgrade -yq && apt-get install -yq curl
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -yq nodejs build-essential
 RUN npm install -g yarn
 RUN dotnet publish "Abyss.Web.csproj" -c Release -o /app/publish
 
