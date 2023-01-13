@@ -66,48 +66,43 @@ jobs:
         resource-group: abyss
         cluster-name: abyss
         
-    - name: Variable Substitution
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: charts/abyss/values.yaml
-      env:
-        ingress.host: "${{ vars.HOST }}"
-      
-        env.secret.Authentication__Discord__ClientSecret: "${{ secrets.DISCORD_CLIENTSECRET }}"
-        env.secret.Authentication__Google__ClientSecret: "${{ secrets.GOOGLE_CLIENTSECRET }}"
-        env.secret.Authentication__Steam__ApplicationKey: "${{ secrets.STEAM_APPLICATIONKEY }}"
-        env.secret.Azure__ClientSecret: "${{ secrets.AZURE_CLIENTSECRET }}"
-        env.secret.Cloudflare__ApiKey: "${{ secrets.CLOUDFLARE_APIKEY }}"
-        env.secret.ConnectionStrings__Abyss: "${{ secrets.DATABASECONNECTIONSTRING }}"
-        env.secret.Discord__Token: "${{ secrets.DISCORD_TOKEN }}"
-        env.secret.GMod__ApiKey: "${{ secrets.GMOD_APIKEY }}"
-        env.secret.Jwt__Key: "${{ secrets.JWT_KEY }}"
-        env.secret.Pushover__ApiKey: "${{ secrets.PUSHOVER_APIKEY }}"
-        env.secret.Pushover__UserKey: "${{ secrets.PUSHOVER_USERKEY }}"
-        env.secret.Tumblr__ConsumerKey: "${{ secrets.TUMBLR_CONSUMERKEY }}"
-        env.secret.Tumblr__ConsumerSecret: "${{ secrets.TUMBLR_CONSUMERSECRET }}"
-        env.secret.Tumblr__Token: "${{ secrets.TUMBLR_TOKEN }}"
-        env.secret.Tumblr__TokenSecret: "${{ secrets.TUMBLR_TOKENSECRET }}"
-
-        env.normal.Authentication__Discord__ClientId: "${{ vars.DISCORD_CLIENTID }}"
-        env.normal.Authentication__Google__ClientId: "${{ vars.GOOGLE_CLIENTID }}"
-        env.normal.Azure__ClientId: "${{ vars.AZURE_CLIENTID }}"
-        env.normal.Azure__SubscriptionId: "${{ vars.AZURE_SUBSCRIPTIONID }}"
-        env.normal.Azure__TenantId: "${{ vars.AZURE_TENANTID }}"
-        env.normal.Cloudflare__Email: "${{ vars.CLOUDFLARE_EMAIL }}"
-        env.normal.Cloudflare__Zone: "${{ vars.CLOUDFLARE_ZONE }}"
-        env.normal.GMod__BaseUrl: "${{ vars.GMOD_BASEURL }}"
-        env.normal.QuoteOfTheDay__DiscordChannelId: "${{ vars.QUOTEOFTHEDAY_DISCORDCHANNELID }}"
-        env.normal.Reminder__DiscordChannelId: "${{ vars.REMINDER_DISCORDCHANNELID }}"
-        env.normal.TeamSpeak__Host: "${{ vars.TEAMSPEAK_HOST }}"
-        env.normal.Tumblr__BlogName: "${{ vars.TUMBLR_BLOGNAME }}"
-        env.normal.GPTClient__BaseUrl: "${{ vars.GPTCLIENT_BASEURL }}"
-        
     - name: Install Abyss
       run: |
         helm upgrade --install --wait --atomic --debug \
           abyss ./abyss \
-          --namespace default
+          --namespace default \
+          
+          --set ingress.host="${{ vars.HOST }}" \
+
+          --set env.secret.Authentication__Discord__ClientSecret="${{ secrets.DISCORD_CLIENTSECRET }}" \
+          --set env.secret.Authentication__Google__ClientSecret="${{ secrets.GOOGLE_CLIENTSECRET }}" \
+          --set env.secret.Authentication__Steam__ApplicationKey="${{ secrets.STEAM_APPLICATIONKEY }}" \
+          --set env.secret.Azure__ClientSecret="${{ secrets.AZURE_CLIENTSECRET }}" \
+          --set env.secret.Cloudflare__ApiKey="${{ secrets.CLOUDFLARE_APIKEY }}" \
+          --set env.secret.ConnectionStrings__Abyss="${{ secrets.DATABASECONNECTIONSTRING }}" \
+          --set env.secret.Discord__Token="${{ secrets.DISCORD_TOKEN }}" \
+          --set env.secret.GMod__ApiKey="${{ secrets.GMOD_APIKEY }}" \
+          --set env.secret.Jwt__Key="${{ secrets.JWT_KEY }}" \
+          --set env.secret.Pushover__ApiKey="${{ secrets.PUSHOVER_APIKEY }}" \
+          --set env.secret.Pushover__UserKey="${{ secrets.PUSHOVER_USERKEY }}" \
+          --set env.secret.Tumblr__ConsumerKey="${{ secrets.TUMBLR_CONSUMERKEY }}" \
+          --set env.secret.Tumblr__ConsumerSecret="${{ secrets.TUMBLR_CONSUMERSECRET }}" \
+          --set env.secret.Tumblr__Token="${{ secrets.TUMBLR_TOKEN }}" \
+          --set env.secret.Tumblr__TokenSecret="${{ secrets.TUMBLR_TOKENSECRET }}" \
+          --set env.normal.Authentication__Discord__ClientId="${{ vars.DISCORD_CLIENTID }}" \
+          --set env.normal.Authentication__Google__ClientId="${{ vars.GOOGLE_CLIENTID }}" \
+
+          --set env.normal.Azure__ClientId="${{ vars.AZURE_CLIENTID }}" \
+          --set env.normal.Azure__SubscriptionId="${{ vars.AZURE_SUBSCRIPTIONID }}" \
+          --set env.normal.Azure__TenantId="${{ vars.AZURE_TENANTID }}" \
+          --set env.normal.Cloudflare__Email="${{ vars.CLOUDFLARE_EMAIL }}" \
+          --set env.normal.Cloudflare__Zone="${{ vars.CLOUDFLARE_ZONE }}" \
+          --set env.normal.GMod__BaseUrl="${{ vars.GMOD_BASEURL }}" \
+          --set env.normal.QuoteOfTheDay__DiscordChannelId="${{ vars.QUOTEOFTHEDAY_DISCORDCHANNELID }}" \
+          --set env.normal.Reminder__DiscordChannelId="${{ vars.REMINDER_DISCORDCHANNELID }}" \
+          --set env.normal.TeamSpeak__Host="${{ vars.TEAMSPEAK_HOST }}" \
+          --set env.normal.Tumblr__BlogName="${{ vars.TUMBLR_BLOGNAME }}" \
+          --set env.normal.GPTClient__BaseUrl="${{ vars.GPTCLIENT_BASEURL }}"
       working-directory: charts
         
     - name: Wait for certificate to be ready
