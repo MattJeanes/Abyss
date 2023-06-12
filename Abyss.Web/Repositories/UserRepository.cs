@@ -1,19 +1,28 @@
-﻿using Abyss.Web.Contexts.Interfaces;
+﻿using Abyss.Web.Contexts;
+using Abyss.Web.Data;
 using Abyss.Web.Entities;
 using Abyss.Web.Repositories.Interfaces;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Repositories;
 
 public class UserRepository : Repository<User>, IUserRepository
 {
-    public UserRepository(IAbyssContext context) : base(context) { }
+    public UserRepository(AbyssContext context) : base(context) { }
 
-    public async Task<User> GetByExternalIdentifier(string schemeId, string identifier)
+    public async override Task<User> GetById(int id)
     {
-        var builders = Builders<User>.Filter;
-        var filter = builders.Eq($"{nameof(User.Authentication)}.{schemeId}", identifier);
-        var user = await _repository.Find(filter).FirstOrDefaultAsync();
+        var user = await GetAll().Where(x => x.Id == id)
+            .Include(x => x.Authentications)
+            .Include(x => x.Role).ThenInclude(x => x.Permissions)
+            .FirstOrDefaultAsync();
+        return user;
+    }
+
+    public async Task<User> GetByExternalIdentifier(AuthSchemeType schemeType, string identifier)
+    {
+        var user = await _repository.Include(x => x.Authentications)
+            .FirstOrDefaultAsync(x => x.Authentications.Any(y => y.SchemeType == schemeType && y.Identifier == identifier));
 
         return user;
     }

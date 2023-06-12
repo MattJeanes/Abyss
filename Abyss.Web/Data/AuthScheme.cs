@@ -2,7 +2,7 @@
 
 public struct AuthScheme
 {
-    public string Id;
+    public AuthSchemeType Id;
     public string Name;
     public string ProfileUrl;
     public string IconUrl;

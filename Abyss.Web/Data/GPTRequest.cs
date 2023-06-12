@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using MongoDB.Bson;
 
 namespace Abyss.Web.Data;
 
@@ -7,7 +6,7 @@ public struct GPTRequest
 {
     public string Text;
 
-    public ObjectId ModelId;
+    public int ModelId;
 
     public decimal Temperature;
 

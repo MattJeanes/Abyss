@@ -62,7 +62,7 @@ public class ServerCommand : BaseCommand
         var response = string.Empty;
         try
         {
-            await _serverManager.Start(server.Id.ToString(), async (logItem) =>
+            await _serverManager.Start(server.Id, async (logItem) =>
             {
                 if (thread == null)
                 {
@@ -118,7 +118,7 @@ public class ServerCommand : BaseCommand
         var response = string.Empty;
         try
         {
-            await _serverManager.Stop(server.Id.ToString(), async (logItem) =>
+            await _serverManager.Stop(server.Id, async (logItem) =>
             {
                 if (thread == null)
                 {
@@ -174,7 +174,7 @@ public class ServerCommand : BaseCommand
         var response = string.Empty;
         try
         {
-            await _serverManager.Restart(server.Id.ToString(), async (logItem) =>
+            await _serverManager.Restart(server.Id, async (logItem) =>
             {
                 if (thread == null)
                 {

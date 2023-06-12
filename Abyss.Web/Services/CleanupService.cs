@@ -1,9 +1,8 @@
 ﻿using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 
 namespace Abyss.Web.Services;
 
@@ -46,15 +45,14 @@ public class CleanupService : IHostedService, IDisposable
 
         try
         {
-            using (var scope = _serviceProvider.CreateScope())
+            using var scope = _serviceProvider.CreateScope();
+            var refreshTokenRepository = scope.ServiceProvider.GetRequiredService<IRepository<RefreshToken>>();
+            var refreshTokens = await refreshTokenRepository.GetAll().Where(x => DateTime.UtcNow >= x.Expiry).ToListAsync();
+            foreach (var token in refreshTokens)
             {
-                var refreshTokenRepository = scope.ServiceProvider.GetRequiredService<IRepository<RefreshToken>>();
-                var refreshTokens = await refreshTokenRepository.GetAll().Where(x => DateTime.UtcNow >= x.Expiry).ToListAsync();
-                foreach (var token in refreshTokens)
-                {
-                    await refreshTokenRepository.Remove(token);
-                }
+                refreshTokenRepository.Remove(token);
             }
+            await refreshTokenRepository.SaveChanges();
         }
         catch (Exception e)
         {

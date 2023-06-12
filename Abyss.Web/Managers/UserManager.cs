@@ -6,7 +6,6 @@ using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using System.Security.Claims;
 
 namespace Abyss.Web.Managers;
@@ -34,11 +33,11 @@ public class UserManager : IUserManager
         _discordOptions = discordOptions.Value;
     }
 
-    public async Task<string> Login(string schemeId)
+    public async Task<string> Login(AuthSchemeType schemeType)
     {
         var user = await _userHelper.GetUser();
-        var (username, identifier) = GetUsernameAndIdentifier(schemeId);
-        var externalUser = await _userRepository.GetByExternalIdentifier(schemeId, identifier);
+        var (username, identifier) = GetUsernameAndIdentifier(schemeType);
+        var externalUser = await _userRepository.GetByExternalIdentifier(schemeType, identifier);
         if (externalUser != null)
         {
             if (user == null)
@@ -54,29 +53,36 @@ public class UserManager : IUserManager
         {
             user = new User
             {
-                Name = username,
-                Authentication = new Dictionary<string, string>
-                {
-                    [schemeId] = identifier
-                }
+                Name = username
             };
-            await _userRepository.Add(user);
+            user.Authentications.Add(new UserAuthentication { SchemeType = schemeType, Identifier = identifier });
+            _userRepository.Add(user);
+            await _userRepository.SaveChanges();
         }
-        else if (user.Authentication != null && (!user.Authentication.ContainsKey(schemeId) || user.Authentication[schemeId] != identifier))
+        else
         {
-            user.Authentication[schemeId] = identifier;
-            await _userRepository.Update(user);
+            var userAuth = user.Authentications.FirstOrDefault(x => x.SchemeType == schemeType);
+            if (userAuth != null && userAuth.Identifier != identifier)
+            {
+                userAuth.Identifier = identifier;
+                await _userRepository.SaveChanges();
+            }
+            else if (userAuth == null)
+            {
+                user.Authentications.Add(new UserAuthentication { SchemeType = schemeType, Identifier = identifier });
+                await _userRepository.SaveChanges();
+            }
         }
         return await _userHelper.GetAccessToken(user);
     }
 
-    private (string username, string identifier) GetUsernameAndIdentifier(string schemeId)
+    private (string username, string identifier) GetUsernameAndIdentifier(AuthSchemeType schemeType)
     {
         if (_httpContextAccessor.HttpContext == null) { throw new Exception("HttpContext is invalid"); }
         var user = _httpContextAccessor.HttpContext.User;
         var username = user.Claims.First(x => x.Type == ClaimTypes.Name).Value;
         var identifier = user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
-        if (schemeId == AuthSchemes.Steam.Id)
+        if (schemeType == AuthSchemeType.Steam)
         {
             identifier = identifier.Split('/').Last();
         }
@@ -87,51 +93,55 @@ public class UserManager : IUserManager
     public async Task<string> ChangeUsername(User user, string username)
     {
         user.Name = username;
-        await _userRepository.Update(user);
+        await _userRepository.SaveChanges();
         return await _userHelper.GetAccessToken(user);
     }
 
-    public async Task<string> DeleteAuthScheme(User user, string schemeId)
+    public async Task<string> DeleteAuthScheme(User user, AuthSchemeType schemeType)
     {
-        if (user.Authentication == null) { throw new ArgumentNullException(nameof(user.Authentication)); }
-        if (user.Authentication.Count <= 1)
+        var userAuth = user.Authentications.SingleOrDefault(x => x.SchemeType == schemeType);
+        if (user.Authentications.Count <= 1)
         {
             throw new Exception("Cannot remove only auth provider");
         }
-        else if (!user.Authentication.ContainsKey(schemeId))
+        else if (userAuth == null)
         {
-            throw new Exception($"User does not have {schemeId} auth provider");
+            throw new Exception($"User does not have {schemeType} auth provider");
         }
 
-        var steamAndDiscord = new[] { AuthSchemes.Discord.Id, AuthSchemes.Steam.Id };
-        if (_gmodHelper.IsActive() && steamAndDiscord.Contains(schemeId) && steamAndDiscord.All(x => user.Authentication.ContainsKey(x)))
+        var steamAndDiscord = new[] { AuthSchemeType.Steam, AuthSchemeType.Discord };
+        if (_gmodHelper.IsActive() && steamAndDiscord.Contains(schemeType) && steamAndDiscord.All(x => user.Authentications.Any(y => y.SchemeType == x)))
         {
             await _gmodHelper.ChangeRank(new ChangeRankDTO
             {
                 Rank = _discordOptions.GuestRankId,
                 MaxRankForDemote = _discordOptions.MemberRankId,
                 CanDemote = true,
-                SteamId64 = user.Authentication[AuthSchemes.Steam.Id]
+                SteamId64 = user.Authentications.Single(x => x.SchemeType == AuthSchemeType.Steam).Identifier
             });
         }
 
-        user.Authentication.Remove(schemeId);
-        await _userRepository.Update(user);
+        user.Authentications.Remove(userAuth);
+        await _userRepository.SaveChanges();
         return await _userHelper.GetAccessToken(user);
     }
 
     private async Task<User> MergeUsers(User userFrom, User userTo)
     {
-        if (userTo.Authentication == null)
+        foreach (var auth in userFrom.Authentications)
         {
-            userTo.Authentication = new Dictionary<string, string>();
+            var userAuth = userTo.Authentications.SingleOrDefault(x => x.SchemeType == auth.SchemeType);
+            if (userAuth != null)
+            {
+                userAuth.Identifier = auth.Identifier;
+            }
+            else
+            {
+                userTo.Authentications.Add(new UserAuthentication { SchemeType = auth.SchemeType, Identifier = auth.Identifier });
+            }
         }
-        userFrom.Authentication?.ToList().ForEach(x =>
-        {
-            userTo.Authentication[x.Key] = x.Value;
-        });
-        await _userRepository.Update(userTo);
-        await _userRepository.Remove(userFrom);
+        _userRepository.Remove(userFrom);
+        await _userRepository.SaveChanges();
         return userTo;
     }
 

@@ -1,6 +1,5 @@
 ﻿using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Data.Options;
-using Abyss.Web.Helpers.Interfaces;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.SlashCommands;
@@ -16,15 +15,12 @@ public class DiscordService : IHostedService
     private readonly SlashCommandsExtension _slash;
     private readonly DiscordOptions _options;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IEnumerable<IDiscordCommand> _commands;
-    private readonly IUserHelper _userHelper;
 
     public DiscordService(
         ILogger<DiscordService> logger,
         DiscordClient client,
         IOptions<DiscordOptions> options,
-        IServiceProvider serviceProvider,
-        IUserHelper userHelper)
+        IServiceProvider serviceProvider)
     {
         _logger = logger;
         _client = client;
@@ -35,8 +31,6 @@ public class DiscordService : IHostedService
         _options = options.Value;
         _slash.RegisterCommands(Assembly.GetExecutingAssembly(), _options.GuildId);
         _serviceProvider = serviceProvider;
-        _commands = _serviceProvider.GetServices<IDiscordCommand>();
-        _userHelper = userHelper;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -68,7 +62,9 @@ public class DiscordService : IHostedService
 
     private async Task GuildMemberRemovedAsync(DiscordClient client, GuildMemberRemoveEventArgs e)
     {
-        await Task.WhenAll(_commands.Select(x => x.MemberRemoved(e)).ToArray());
+        using var scope = _serviceProvider.CreateScope();
+        var commands = scope.ServiceProvider.GetServices<IDiscordCommand>();
+        await Task.WhenAll(commands.Select(x => x.MemberRemoved(e)).ToArray());
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

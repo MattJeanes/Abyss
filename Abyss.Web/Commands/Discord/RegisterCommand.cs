@@ -63,13 +63,15 @@ public class RegisterCommand : BaseCommand
         {
             user = new User
             {
-                Name = discordUser.Username,
-                Authentication = new Dictionary<string, string>
-                {
-                    [AuthSchemes.Discord.Id] = discordUser.Id.ToString()
-                }
+                Name = discordUser.Username
             };
-            await _userRepository.Add(user);
+            user.Authentications.Add(new UserAuthentication
+            {
+                SchemeType = AuthSchemeType.Discord,
+                Identifier = discordUser.Id.ToString()
+            });
+            _userRepository.Add(user);
+            await _userRepository.SaveChanges();
             return "User account created";
         }
         return $"You are already registered as {user.Name}";

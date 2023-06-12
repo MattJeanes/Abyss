@@ -1,18 +1,19 @@
-﻿using Abyss.Web.Contexts.Interfaces;
-using MongoDB.Driver;
+﻿using Abyss.Web.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Contexts;
 
-public class AbyssContext : IAbyssContext
+public class AbyssContext : DbContext
 {
-    private readonly IMongoDatabase _database;
-    public AbyssContext(IMongoDatabase database)
+    public AbyssContext(DbContextOptions<AbyssContext> options) : base(options)
     {
-        _database = database;
+
     }
 
-    public IMongoCollection<T> GetCollection<T>()
-    {
-        return _database.GetCollection<T>(typeof(T).Name);
-    }
+    public DbSet<GPTModel> GPTModels { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<Server> Servers { get; set; }
+    public DbSet<User> Users { get; set; }
 }

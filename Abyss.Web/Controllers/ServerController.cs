@@ -25,14 +25,14 @@ public class ServerController
 
     [Route("start/{serverId}")]
     [HttpPost]
-    public async Task Start(string serverId)
+    public async Task Start(int serverId)
     {
         await _serverManager.Start(serverId);
     }
 
     [Route("stop/{serverId}")]
     [HttpPost]
-    public async Task Stop(string serverId)
+    public async Task Stop(int serverId)
     {
         await _serverManager.Stop(serverId);
     }

@@ -3,7 +3,7 @@ export interface IAuthResult {
 }
 
 export interface IClientUserAuthentication {
-    [key: string]: string;
+    [key: number]: string;
 }
 
 export interface IClientUser {
@@ -24,7 +24,7 @@ export interface IToken {
 }
 
 export interface IAuthScheme {
-    Id: string;
+    Id: number;
     Name: string;
     ProfileUrl: string;
     IconUrl: string;
@@ -42,6 +42,12 @@ export enum ServerStatus {
     Inactive,
     Activating,
     Deactivating,
+}
+
+export enum AuthSchemeType {
+    Steam = 0,
+    Google = 1,
+    Discord = 2
 }
 
 export interface IServer {

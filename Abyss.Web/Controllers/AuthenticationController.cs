@@ -33,10 +33,10 @@ public class AuthenticationController : BaseController
 
     [Authorize(AuthenticationSchemes = AuthSchemes.ExternalLogin + "," + AuthSchemes.JsonWebToken)]
     [HttpPost]
-    [Route("token/{schemeId}")]
-    public async Task<AuthResult> GetToken(string schemeId)
+    [Route("token/{schemeType}")]
+    public async Task<AuthResult> GetToken(AuthSchemeType schemeType)
     {
-        var token = await _userManager.Login(schemeId);
+        var token = await _userManager.Login(schemeType);
 
         return new AuthResult
         {

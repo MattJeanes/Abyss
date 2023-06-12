@@ -4,8 +4,7 @@ using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Managers;
 
@@ -39,10 +38,9 @@ public class GPTManager : IGPTManager
         {
             throw new ArgumentException(nameof(message.ModelId), "Invalid model");
         }
-        if (model.Permission.HasValue)
+        if (model.Permission != null)
         {
-            var permission = await _permissionRepository.GetById(model.Permission.Value);
-            if (permission?.Identifier == null || !_userHelper.HasPermission(permission.Identifier))
+            if (model.Permission?.Identifier == null || !_userHelper.HasPermission(model.Permission.Identifier))
             {
                 throw new Exception("User does not have permission to use this model");
             }
@@ -57,7 +55,7 @@ public class GPTManager : IGPTManager
         var permissions = await _userHelper.GetPermissions();
         var models = await _gptModelRepository.GetAll().ToListAsync();
         return models
-            .Where(x => !x.Permission.HasValue || permissions.Select(x => x.Id).Any(y => y.Equals(x.Permission.Value)))
+            .Where(x => x.Permission == null || permissions.Any(y => y.Id.Equals(x.Permission.Id)))
             .OrderBy(x => x.Name)
             .ToList();
     }

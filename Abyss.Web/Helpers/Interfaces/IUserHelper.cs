@@ -9,7 +9,7 @@ public interface IUserHelper
     Task<User> GetUser();
     ClientUser GetClientUser(string token);
     Task<User> GetUser(ClientUser clientUser);
-    Task<ClientUser> GetClientUser(User user);
+    ClientUser GetClientUser(User user);
     ClientUser GetClientUser();
     Task<string> GetAccessToken(User user);
     Task<(string token, RefreshToken entity)> GetRefreshToken(User user);

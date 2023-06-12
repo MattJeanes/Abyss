@@ -85,7 +85,7 @@ public class ReminderService : IHostedService, IDisposable
                         {
                             server.NextReminder = null;
                         }
-                        await serverRepository.Update(server);
+                        await serverRepository.SaveChanges();
                     }
                     catch (Exception e)
                     {
