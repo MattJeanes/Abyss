@@ -1,5 +1,8 @@
-﻿namespace Abyss.Web.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace Abyss.Web.Entities;
+
+[Table("Roles")]
 public class Role : BaseEntity
 {
     public string Name { get; set; }

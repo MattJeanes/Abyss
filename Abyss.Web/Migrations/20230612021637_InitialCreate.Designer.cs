@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Abyss.Web.Migrations
 {
     [DbContext(typeof(AbyssContext))]
-    [Migration("20230612014435_InitialCreate")]
+    [Migration("20230612021637_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -126,7 +126,7 @@ namespace Abyss.Web.Migrations
 
                     b.HasIndex("PermissionId");
 
-                    b.ToTable("RolePermission");
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("Abyss.Web.Entities.Server", b =>
@@ -234,7 +234,7 @@ namespace Abyss.Web.Migrations
 
                     b.HasKey("UserId", "SchemeType");
 
-                    b.ToTable("UserAuthentication");
+                    b.ToTable("UserAuthentications");
                 });
 
             modelBuilder.Entity("PermissionRole", b =>

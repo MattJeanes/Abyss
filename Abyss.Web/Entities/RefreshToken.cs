@@ -2,6 +2,7 @@
 
 namespace Abyss.Web.Entities;
 
+[Table("RefreshTokens")]
 public class RefreshToken : BaseEntity
 {
     public DateTime FromDate { get; set; }

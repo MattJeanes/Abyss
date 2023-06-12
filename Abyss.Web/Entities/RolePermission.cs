@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Abyss.Web.Entities;
 
+[Table("RolePermissions")]
 [PrimaryKey(nameof(RoleId), nameof(PermissionId))]
 public class RolePermission
 {

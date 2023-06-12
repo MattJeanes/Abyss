@@ -2,6 +2,7 @@
 
 namespace Abyss.Web.Entities;
 
+[Table("Users")]
 public class User : BaseEntity
 {
     public string Name { get; set; }

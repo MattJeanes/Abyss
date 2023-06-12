@@ -115,7 +115,7 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateTable(
-            name: "RolePermission",
+            name: "RolePermissions",
             columns: table => new
             {
                 RoleId = table.Column<int>(type: "integer", nullable: false),
@@ -123,15 +123,15 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_RolePermission", x => new { x.RoleId, x.PermissionId });
+                table.PrimaryKey("PK_RolePermissions", x => new { x.RoleId, x.PermissionId });
                 table.ForeignKey(
-                    name: "FK_RolePermission_Permissions_PermissionId",
+                    name: "FK_RolePermissions_Permissions_PermissionId",
                     column: x => x.PermissionId,
                     principalTable: "Permissions",
                     principalColumn: "Id",
                     onDelete: ReferentialAction.Cascade);
                 table.ForeignKey(
-                    name: "FK_RolePermission_Roles_RoleId",
+                    name: "FK_RolePermissions_Roles_RoleId",
                     column: x => x.RoleId,
                     principalTable: "Roles",
                     principalColumn: "Id",
@@ -180,7 +180,7 @@ public partial class InitialCreate : Migration
             });
 
         migrationBuilder.CreateTable(
-            name: "UserAuthentication",
+            name: "UserAuthentications",
             columns: table => new
             {
                 UserId = table.Column<int>(type: "integer", nullable: false),
@@ -189,9 +189,9 @@ public partial class InitialCreate : Migration
             },
             constraints: table =>
             {
-                table.PrimaryKey("PK_UserAuthentication", x => new { x.UserId, x.SchemeTypeId });
+                table.PrimaryKey("PK_UserAuthentications", x => new { x.UserId, x.SchemeTypeId });
                 table.ForeignKey(
-                    name: "FK_UserAuthentication_Users_UserId",
+                    name: "FK_UserAuthentications_Users_UserId",
                     column: x => x.UserId,
                     principalTable: "Users",
                     principalColumn: "Id",
@@ -214,8 +214,8 @@ public partial class InitialCreate : Migration
             column: "UserId");
 
         migrationBuilder.CreateIndex(
-            name: "IX_RolePermission_PermissionId",
-            table: "RolePermission",
+            name: "IX_RolePermissions_PermissionId",
+            table: "RolePermissions",
             column: "PermissionId");
 
         migrationBuilder.CreateIndex(
@@ -237,13 +237,13 @@ public partial class InitialCreate : Migration
             name: "RefreshTokens");
 
         migrationBuilder.DropTable(
-            name: "RolePermission");
+            name: "RolePermissions");
 
         migrationBuilder.DropTable(
             name: "Servers");
 
         migrationBuilder.DropTable(
-            name: "UserAuthentication");
+            name: "UserAuthentications");
 
         migrationBuilder.DropTable(
             name: "Permissions");

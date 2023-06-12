@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Abyss.Web.Entities;
 
+[Table("UserAuthentications")]
 [PrimaryKey(nameof(UserId), nameof(SchemeType))]
 public class UserAuthentication
 {

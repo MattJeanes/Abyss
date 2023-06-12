@@ -1,5 +1,8 @@
-﻿namespace Abyss.Web.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace Abyss.Web.Entities;
+
+[Table("Permissions")]
 public class Permission : BaseEntity
 {
     public string Identifier { get; set; }

@@ -2,6 +2,7 @@
 
 namespace Abyss.Web.Entities;
 
+[Table("GPTModels")]
 public class GPTModel : BaseEntity
 {
     public string Name { get; set; }
