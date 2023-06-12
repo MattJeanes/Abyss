@@ -48,7 +48,7 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand
         {
             return null;
         }
-        var clientUser = await _userHelper.GetClientUser(user);
+        var clientUser = _userHelper.GetClientUser(user);
         return clientUser;
     }
 

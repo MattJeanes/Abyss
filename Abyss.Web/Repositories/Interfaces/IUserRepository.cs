@@ -1,8 +1,9 @@
-﻿using Abyss.Web.Entities;
+﻿using Abyss.Web.Data;
+using Abyss.Web.Entities;
 
 namespace Abyss.Web.Repositories.Interfaces;
 
 public interface IUserRepository : IRepository<User>
 {
-    Task<User> GetByExternalIdentifier(string schemeId, string identifier);
+    Task<User> GetByExternalIdentifier(AuthSchemeType schemeId, string identifier);
 }

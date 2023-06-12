@@ -3,11 +3,9 @@ using Abyss.Web.Data.Options;
 using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -18,20 +16,19 @@ namespace Abyss.Web.Helpers;
 public class UserHelper : IUserHelper
 {
     private readonly IUserRepository _userRepository;
-    private readonly IRepository<Role> _roleRepository;
+    private readonly IRoleRepository _roleRepository;
     private readonly IRepository<Permission> _permissionRepository;
     private readonly JwtOptions _jwtOptions;
     private readonly AuthenticationOptions _authenticationOptions;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
     private const string UserClaimField = "User";
-    private const string TokenTypeField = "TokenType";
     private const string RefreshExpiryField = "RefreshExpiry";
     private const string RefreshTokenIdField = "uid";
 
     public UserHelper(
         IUserRepository userRepository,
-        IRepository<Role> roleRepository,
+        IRoleRepository roleRepository,
         IRepository<Permission> permissionRepository,
         IOptions<JwtOptions> jwtOptions,
         IOptions<AuthenticationOptions> authenticationOptions,
@@ -48,29 +45,21 @@ public class UserHelper : IUserHelper
         _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<ClientUser> GetClientUser(User user)
+    public ClientUser GetClientUser(User user)
     {
-        var permissionList = new List<string>();
-        var role = await _roleRepository.GetById(user.RoleId);
-        if (role != null)
-        {
-            var rolePermissions = role.Permissions ?? new List<ObjectId>();
-            var permissions = await _permissionRepository.GetAll().Where(x => rolePermissions.Contains(x.Id)).ToListAsync();
-            permissionList = permissions.Select(x => x.Identifier).Where(x => x != null).ToList()!;
-        }
         return new ClientUser
         {
-            Id = user.Id.ToString(),
+            Id = user.Id,
             Name = user.Name,
-            Authentication = user.Authentication,
-            Permissions = permissionList,
-            RoleId = user.RoleId.ToString()
+            Authentication = user.Authentications.ToDictionary(x => (int)x.SchemeType, x => x.Identifier),
+            Permissions = user?.Role?.Permissions.Select(x => x.Identifier).ToList() ?? new List<string>(),
+            RoleId = user.RoleId
         };
     }
 
     public async Task<User> GetUser(ClientUser clientUser)
     {
-        if (clientUser.Id == null) { throw new Exception("Invalid id"); }
+        if (clientUser.Id == default) { throw new Exception("Invalid id"); }
         var user = await _userRepository.GetById(clientUser.Id);
         return user;
     }
@@ -119,7 +108,7 @@ public class UserHelper : IUserHelper
         if (currentToken != null)
         {
             currentToken.Revoked = true;
-            await _refreshTokenRepository.Update(currentToken);
+            await _refreshTokenRepository.SaveChanges();
         }
         if (_httpContextAccessor.HttpContext == null) { throw new Exception("HttpContext is invalid"); }
         _httpContextAccessor.HttpContext.Response.Cookies.Append(AuthSchemes.RefreshToken, refreshToken, new CookieOptions
@@ -140,7 +129,7 @@ public class UserHelper : IUserHelper
         {
             refreshToken = await AddRefreshToken(user, refreshToken);
         }
-        var clientUser = await GetClientUser(user);
+        var clientUser = GetClientUser(user);
         var clientUserSerialized = JsonSerializer.Serialize(clientUser);
         var claims = new List<Claim>
             {
@@ -172,13 +161,14 @@ public class UserHelper : IUserHelper
             Expiry = expiry,
             UserId = user.Id
         };
-        await _refreshTokenRepository.Add(entity);
+        _refreshTokenRepository.Add(entity);
+        await _refreshTokenRepository.SaveChanges();
 
         var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(RefreshTokenIdField, entity.Id.ToString())
-            };
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(RefreshTokenIdField, entity.Id.ToString())
+        };
 
         var token = GetToken(claims, expiry, TokenType.Refresh);
         return (token, entity);
@@ -211,7 +201,7 @@ public class UserHelper : IUserHelper
                 ValidIssuer = _jwtOptions.Issuer,
                 ValidAudience = type.ToString(),
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key)),
-                ClockSkew = TimeSpan.FromHours(DateTime.Now.Hour - DateTimeOffset.UtcNow.Hour)
+                ClockSkew = TimeSpan.FromSeconds(5)
             };
             var handler = new JwtSecurityTokenHandler();
             return handler.ValidateToken(token, validationParameters, out _);
@@ -229,9 +219,9 @@ public class UserHelper : IUserHelper
         {
             var id = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? throw new Exception("Invalid refresh token");
             var dbId = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == RefreshTokenIdField)?.Value ?? throw new Exception("Invalid refresh token");
-            var dbToken = await _refreshTokenRepository.GetById(new ObjectId(dbId));
+            var dbToken = await _refreshTokenRepository.GetById(int.Parse(dbId));
             if (dbToken?.Revoked ?? false) { throw new Exception("Token is revoked"); }
-            var user = await _userRepository.GetById(new ObjectId(id));
+            var user = await _userRepository.GetById(int.Parse(id));
             if (user == null)
             {
                 throw new Exception("Invalid user in refresh token");
@@ -255,13 +245,13 @@ public class UserHelper : IUserHelper
                 foreach (var token in userTokens)
                 {
                     token.Revoked = true;
-                    await _refreshTokenRepository.Update(token);
+                    await _refreshTokenRepository.SaveChanges();
                 }
             }
             else
             {
                 currentToken.Revoked = true;
-                await _refreshTokenRepository.Update(currentToken);
+                await _refreshTokenRepository.SaveChanges();
             }
         }
 
@@ -275,7 +265,7 @@ public class UserHelper : IUserHelper
         var refreshTokenId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(x => x.Type == RefreshTokenIdField);
         if (refreshTokenId != null)
         {
-            var refreshToken = await _refreshTokenRepository.GetById(new ObjectId(refreshTokenId.Value));
+            var refreshToken = await _refreshTokenRepository.GetById(int.Parse(refreshTokenId.Value));
             return refreshToken;
         }
         return null;
@@ -300,10 +290,8 @@ public class UserHelper : IUserHelper
 
     public async Task<IList<Permission>> GetPermissions(ClientUser user)
     {
-        if (string.IsNullOrEmpty(user?.RoleId)) { return new List<Permission>(); }
-        var role = await _roleRepository.GetById(user.RoleId);
-        if (role?.Permissions == null) { return new List<Permission>(); }
-        var permissions = await _permissionRepository.GetAll().Where(x => role.Permissions.Contains(x.Id)).ToListAsync();
-        return permissions;
+        if (!(user?.RoleId.HasValue ?? false)) { return new List<Permission>(); }
+        var role = await _roleRepository.GetById(user.RoleId.Value);
+        return role.Permissions;
     }
 }

@@ -6,5 +6,5 @@ namespace Abyss.Web.Managers.Interfaces;
 public interface IGPTManager
 {
     Task<GPTResponse> Generate(GPTRequest message);
-    Task<IList<GPTModel>> GetModels();
+    Task<IList<GPTModelResponse>> GetModels();
 }

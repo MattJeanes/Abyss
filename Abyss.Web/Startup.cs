@@ -3,7 +3,6 @@ using Abyss.Web.Clients.Interfaces;
 using Abyss.Web.Commands.Discord;
 using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Contexts;
-using Abyss.Web.Contexts.Interfaces;
 using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
 using Abyss.Web.Helpers;
@@ -25,14 +24,14 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Driver;
 using StackExchange.Exceptional;
 using StackExchange.Exceptional.Stores;
 using System.Text;
 using System.Text.Json;
+using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
 namespace Abyss.Web;
 
@@ -100,20 +99,20 @@ public class Startup
                     ClockSkew = TimeSpan.FromMinutes(5)
                 };
             })
-            .AddSteam(AuthSchemes.Steam.Id, options =>
+            .AddSteam(AuthSchemes.Steam.Name, options =>
             {
                 options.CallbackPath = "/auth/steam";
                 options.ApplicationKey = _config["Authentication:Steam:ApplicationKey"];
                 options.SignInScheme = AuthSchemes.ExternalLogin;
             })
-            .AddGoogle(AuthSchemes.Google.Id, options =>
+            .AddGoogle(AuthSchemes.Google.Name, options =>
             {
                 options.CallbackPath = "/auth/google";
                 options.ClientId = _config["Authentication:Google:ClientId"];
                 options.ClientSecret = _config["Authentication:Google:ClientSecret"];
                 options.SignInScheme = AuthSchemes.ExternalLogin;
             })
-            .AddDiscord(AuthSchemes.Discord.Id, options =>
+            .AddDiscord(AuthSchemes.Discord.Name, options =>
             {
                 options.CallbackPath = "/auth/discord";
                 options.ClientId = _config["Authentication:Discord:ClientId"];
@@ -126,11 +125,10 @@ public class Startup
         services.AddTransient<IOnlineManager, OnlineManager>();
         services.AddTransient<IWhoSaidManager, WhoSaidManager>();
         services.AddTransient<IGPTManager, GPTManager>();
-        services.AddTransient<IAbyssContext, AbyssContext>();
-        services.AddSingleton<IMongoClient>(_ => new MongoClient(_config.GetConnectionString("Abyss")));
-        services.AddSingleton(serviceProvider => serviceProvider.GetRequiredService<IMongoClient>().GetDatabase(_config["Database:Name"]));
         services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IRoleRepository, RoleRepository>();
+        services.AddTransient<IGPTModelRepository, GPTModelRepository>();
         services.AddTransient<IUserHelper, UserHelper>();
         services.AddTransient<IServerManager, ServerManager>();
         services.AddTransient<ICloudflareHelper, CloudflareHelper>();
@@ -145,6 +143,8 @@ public class Startup
             client.BaseAddress = new Uri(_config["GPTClient:BaseUrl"]);
         });
         services.AddHttpClient<ISpaceEngineersHelper, SpaceEngineersHelper>();
+        services.AddDbContext<AbyssContext>(options =>
+            options.UseNpgsql(_config.GetConnectionString("Abyss")));
 
         services.AddPredictionEnginePool<InputData, Prediction>().FromFile(_config["WhoSaidIt:ModelPath"]);
 
@@ -204,16 +204,7 @@ public class Startup
             c.CronExpression = _config["QuoteOfTheDay:CronExpression"];
         });
 
-        ErrorStore errorStore;
-        var databaseLogging = _config.GetValue<bool>("Logging:Database");
-        if (databaseLogging)
-        {
-            errorStore = new MongoDBErrorStore(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["ApplicationId"]);
-        }
-        else
-        {
-            errorStore = new MemoryErrorStore();
-        }
+        ErrorStore errorStore = new MemoryErrorStore();
         Exceptional.Configure(settings =>
         {
             settings.DefaultStore = errorStore;
@@ -228,11 +219,8 @@ public class Startup
         services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.AddDebug();
+            loggingBuilder.AddConsole();
             loggingBuilder.AddExceptional();
-            if (databaseLogging)
-            {
-                loggingBuilder.AddMongoDB(_config.GetConnectionString("Abyss"), _config["Database:Name"], _config["Logging:CollectionName"], _config.GetValue<int>("Logging:MaxEntries"), _config);
-            }
         });
 
         services.AddSpaStaticFiles(configuration =>
@@ -247,12 +235,6 @@ public class Startup
 
         services.AddRouting();
 
-        var pack = new ConventionPack
-            {
-                new IgnoreExtraElementsConvention(true)
-            };
-        ConventionRegistry.Register("Abyss Conventions", pack, t => true);
-
         services.AddHealthChecks();
     }
 
@@ -261,7 +243,6 @@ public class Startup
         o.PropertyNameCaseInsensitive = true;
         o.PropertyNamingPolicy = null;
         o.DictionaryKeyPolicy = null;
-        o.Converters.Add(new ObjectIdConverter());
         o.IncludeFields = true;
         return o;
     }

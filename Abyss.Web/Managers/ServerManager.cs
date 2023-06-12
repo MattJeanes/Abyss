@@ -4,8 +4,7 @@ using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Logging;
 using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
-using MongoDB.Driver;
-using MongoDB.Driver.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Managers;
 
@@ -47,7 +46,7 @@ public class ServerManager : IServerManager
             .FirstOrDefaultAsync();
     }
 
-    public async Task Start(string serverId, Func<LogItem, Task> logHandler = null)
+    public async Task Start(int serverId, Func<LogItem, Task> logHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -64,7 +63,7 @@ public class ServerManager : IServerManager
             logger.LogInformation($"Starting server {server.Name}");
             await _notificationHelper.SendMessage($"Starting server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Activating;
-            await _serverRepository.Update(server);
+            await _serverRepository.SaveChanges();
 
             string ipAddress;
             if (server.CloudType == CloudType.Azure)
@@ -99,7 +98,7 @@ public class ServerManager : IServerManager
             {
                 server.NextReminder = DateTime.UtcNow.AddMinutes(server.RemindAfterMinutes.Value);
             }
-            await _serverRepository.Update(server);
+            await _serverRepository.SaveChanges();
             logger.LogInformation($"Successfully started server {server.Name}");
             await _notificationHelper.SendMessage($"Started server {server.Name}", MessagePriority.HighPriority);
         }
@@ -114,13 +113,13 @@ public class ServerManager : IServerManager
             if (server?.StatusId == ServerStatus.Activating)
             {
                 server.StatusId = ServerStatus.Inactive;
-                await _serverRepository.Update(server);
+                await _serverRepository.SaveChanges();
             }
         }
 
     }
 
-    public async Task Stop(string serverId, Func<LogItem, Task> logHandler = null)
+    public async Task Stop(int serverId, Func<LogItem, Task> logHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -136,7 +135,7 @@ public class ServerManager : IServerManager
             logger.LogInformation($"Stopping server {server.Name}");
             await _notificationHelper.SendMessage($"Stopping server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Deactivating;
-            await _serverRepository.Update(server);
+            await _serverRepository.SaveChanges();
             if (server.CloudType == CloudType.Azure)
             {
                 await _azureHelper.StopServer(server, logger);
@@ -148,7 +147,7 @@ public class ServerManager : IServerManager
             server.IPAddress = null;
             server.NextReminder = null;
             server.StatusId = ServerStatus.Inactive;
-            await _serverRepository.Update(server);
+            await _serverRepository.SaveChanges();
             logger.LogInformation($"Successfully stopped server {server.Name}");
             await _notificationHelper.SendMessage($"Stopped server {server.Name}", MessagePriority.HighPriority);
         }
@@ -163,12 +162,12 @@ public class ServerManager : IServerManager
             if (server?.StatusId == ServerStatus.Deactivating)
             {
                 server.StatusId = ServerStatus.Active;
-                await _serverRepository.Update(server);
+                await _serverRepository.SaveChanges();
             }
         }
     }
 
-    public async Task Restart(string serverId, Func<LogItem, Task> logHandler = null)
+    public async Task Restart(int serverId, Func<LogItem, Task> logHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)

@@ -31,8 +31,8 @@ export class UserService {
     public getUsers(): Promise<IUser[]> {
         return firstValueFrom(this.httpClient.get<IUser[]>('/api/user'));
     }
-    public async deleteAuthScheme(schemeId: string): Promise<void> {
-        const result = await firstValueFrom(this.httpClient.delete<IAuthResult>(`/api/user/scheme/${schemeId}`));
+    public async deleteAuthScheme(schemeType: number): Promise<void> {
+        const result = await firstValueFrom(this.httpClient.delete<IAuthResult>(`/api/user/scheme/${schemeType}`));
         this.authService.setToken(result.Token);
     }
 }

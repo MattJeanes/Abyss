@@ -9,13 +9,13 @@ namespace Abyss.Web.Middleware;
 public class ErrorViewerMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly IUserHelper _userHelper;
+    private readonly IServiceProvider _serviceProvider;
     private readonly AuthenticationOptions _options;
 
-    public ErrorViewerMiddleware(RequestDelegate next, IUserHelper userHelper, IOptions<AuthenticationOptions> options)
+    public ErrorViewerMiddleware(RequestDelegate next, IServiceProvider serviceProvider, IOptions<AuthenticationOptions> options)
     {
         _next = next;
-        _userHelper = userHelper;
+        _serviceProvider = serviceProvider;
         _options = options.Value;
     }
 
@@ -58,13 +58,15 @@ public class ErrorViewerMiddleware
             errorMessage = "No token specified";
             return false;
         }
-        var user = _userHelper.GetClientUser(token);
+        using var scope = _serviceProvider.CreateScope();
+        var userHelper = scope.ServiceProvider.GetRequiredService<IUserHelper>();
+        var user = userHelper.GetClientUser(token);
         if (user == null)
         {
             errorMessage = "Invalid token specified";
             return false;
         }
-        if (!_userHelper.HasPermission(user, Permissions.ErrorViewer))
+        if (!userHelper.HasPermission(user, Permissions.ErrorViewer))
         {
             errorMessage = $"User does not have {Permissions.ErrorViewer} permission";
             return false;

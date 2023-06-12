@@ -77,7 +77,7 @@ export class AccountDialogComponent implements OnInit {
         }
     }
 
-    public async deleteAuthScheme(scheme: string): Promise<void> {
+    public async deleteAuthScheme(scheme: number): Promise<void> {
         try {
             this.loading = true;
             await this.userService.deleteAuthScheme(scheme);

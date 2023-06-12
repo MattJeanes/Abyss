@@ -6,7 +6,7 @@ using Abyss.Web.Managers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Driver;
+using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Controllers;
 
@@ -49,12 +49,12 @@ public class UserController : BaseController
     }
 
     [HttpDelete]
-    [Route("scheme/{schemeId}")]
-    public async Task<AuthResult> DeleteAuthScheme(string schemeId)
+    [Route("scheme/{schemeType}")]
+    public async Task<AuthResult> DeleteAuthScheme(AuthSchemeType schemeType)
     {
         var user = await GetUser();
         if (user == null) { throw new Exception("Invalid user"); }
-        var token = await _userManager.DeleteAuthScheme(user, schemeId);
+        var token = await _userManager.DeleteAuthScheme(user, schemeType);
 
         return new AuthResult
         {

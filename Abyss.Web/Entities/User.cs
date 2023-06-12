@@ -1,10 +1,16 @@
-﻿using MongoDB.Bson;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Abyss.Web.Entities;
 
+[Table("Users")]
 public class User : BaseEntity
 {
     public string Name { get; set; }
-    public Dictionary<string, string> Authentication { get; set; }
-    public ObjectId RoleId { get; set; }
+
+    public List<UserAuthentication> Authentications { get; } = new();
+
+    [ForeignKey(nameof(Role))]
+    public int? RoleId { get; set; }
+
+    public Role Role { get; set; }
 }

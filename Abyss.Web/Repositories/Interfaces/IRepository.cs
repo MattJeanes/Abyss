@@ -1,16 +1,10 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver.Linq;
-
-namespace Abyss.Web.Repositories.Interfaces;
+﻿namespace Abyss.Web.Repositories.Interfaces;
 
 public interface IRepository<T>
 {
-    IMongoQueryable<T> GetAll();
-    Task<T> GetById(ObjectId id);
-    Task<T> GetById(string id);
-    Task AddOrUpdate(T item);
-    Task Add(T item);
-    Task Update(T item);
-    Task Remove(T item);
-    Task Remove(ObjectId id);
+    IQueryable<T> GetAll();
+    Task<T> GetById(int id);
+    void Add(T item);
+    void Remove(T item);
+    Task SaveChanges();
 }
