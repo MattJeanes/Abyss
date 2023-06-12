@@ -21,7 +21,9 @@ public class UserRepository : Repository<User>, IUserRepository
 
     public async Task<User> GetByExternalIdentifier(AuthSchemeType schemeType, string identifier)
     {
-        var user = await _repository.Include(x => x.Authentications)
+        var user = await _repository
+            .Include(x => x.Authentications)
+            .Include(x => x.Role).ThenInclude(x => x.Permissions)
             .FirstOrDefaultAsync(x => x.Authentications.Any(y => y.SchemeType == schemeType && y.Identifier == identifier));
 
         return user;

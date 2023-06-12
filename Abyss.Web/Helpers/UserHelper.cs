@@ -165,10 +165,10 @@ public class UserHelper : IUserHelper
         await _refreshTokenRepository.SaveChanges();
 
         var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(RefreshTokenIdField, entity.Id.ToString())
-            };
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(RefreshTokenIdField, entity.Id.ToString())
+        };
 
         var token = GetToken(claims, expiry, TokenType.Refresh);
         return (token, entity);
@@ -201,7 +201,7 @@ public class UserHelper : IUserHelper
                 ValidIssuer = _jwtOptions.Issuer,
                 ValidAudience = type.ToString(),
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key)),
-                ClockSkew = TimeSpan.FromHours(DateTime.Now.Hour - DateTimeOffset.UtcNow.Hour)
+                ClockSkew = TimeSpan.FromSeconds(5)
             };
             var handler = new JwtSecurityTokenHandler();
             return handler.ValidateToken(token, validationParameters, out _);
