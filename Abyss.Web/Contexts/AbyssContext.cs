@@ -10,6 +10,14 @@ public class AbyssContext : DbContext
 
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Role>()
+            .HasMany(e => e.Permissions)
+            .WithMany(e => e.Roles)
+            .UsingEntity<RolePermission>();
+    }
+
     public DbSet<GPTModel> GPTModels { get; set; }
     public DbSet<Permission> Permissions { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }

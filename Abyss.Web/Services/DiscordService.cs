@@ -36,28 +36,10 @@ public class DiscordService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Discord service is starting");
-
-        _client.MessageCreated += async (c, e) =>
-        {
-            try
-            {
-                await MessageCreated(e);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Failed to run {nameof(MessageCreated)}");
-            }
-        }
-;
+        ;
         _client.GuildMemberRemoved += GuildMemberRemovedAsync;
 
         await _client.ConnectAsync();
-    }
-
-    private async Task MessageCreated(MessageCreateEventArgs e)
-    {
-        if (!e.Message.Content.ToLower().StartsWith(_options.CommandPrefix)) { return; }
-        await e.Message.RespondAsync($"AbyssBot commands have been migrated to Discord Slash Commands, type / to view commands");
     }
 
     private async Task GuildMemberRemovedAsync(DiscordClient client, GuildMemberRemoveEventArgs e)

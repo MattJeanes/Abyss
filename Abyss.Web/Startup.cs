@@ -128,6 +128,7 @@ public class Startup
         services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IRoleRepository, RoleRepository>();
+        services.AddTransient<IGPTModelRepository, GPTModelRepository>();
         services.AddTransient<IUserHelper, UserHelper>();
         services.AddTransient<IServerManager, ServerManager>();
         services.AddTransient<ICloudflareHelper, CloudflareHelper>();

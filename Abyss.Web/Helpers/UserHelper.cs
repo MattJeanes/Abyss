@@ -290,7 +290,7 @@ public class UserHelper : IUserHelper
 
     public async Task<IList<Permission>> GetPermissions(ClientUser user)
     {
-        if (!user.RoleId.HasValue) { return new List<Permission>(); }
+        if (!(user?.RoleId.HasValue ?? false)) { return new List<Permission>(); }
         var role = await _roleRepository.GetById(user.RoleId.Value);
         return role.Permissions;
     }

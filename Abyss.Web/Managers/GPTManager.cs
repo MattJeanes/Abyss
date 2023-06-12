@@ -12,23 +12,20 @@ public class GPTManager : IGPTManager
 {
     private readonly ILogger<GPTManager> _logger;
     private readonly IGPTClient _gptClient;
-    private readonly IRepository<GPTModel> _gptModelRepository;
+    private readonly IGPTModelRepository _gptModelRepository;
     private readonly IUserHelper _userHelper;
-    private readonly IRepository<Permission> _permissionRepository;
 
     public GPTManager(
         ILogger<GPTManager> logger,
         IGPTClient gptClient,
-        IRepository<GPTModel> gptModelRepository,
-        IUserHelper userHelper,
-        IRepository<Permission> permissionRepository
+        IGPTModelRepository gptModelRepository,
+        IUserHelper userHelper
         )
     {
         _logger = logger;
         _gptClient = gptClient;
         _gptModelRepository = gptModelRepository;
         _userHelper = userHelper;
-        _permissionRepository = permissionRepository;
     }
 
     public async Task<GPTResponse> Generate(GPTRequest message)
@@ -50,13 +47,19 @@ public class GPTManager : IGPTManager
         return response;
     }
 
-    public async Task<IList<GPTModel>> GetModels()
+    public async Task<IList<GPTModelResponse>> GetModels()
     {
         var permissions = await _userHelper.GetPermissions();
-        var models = await _gptModelRepository.GetAll().ToListAsync();
+        var models = await _gptModelRepository.GetAll().Include(x => x.Permission).ToListAsync();
         return models
             .Where(x => x.Permission == null || permissions.Any(y => y.Id.Equals(x.Permission.Id)))
             .OrderBy(x => x.Name)
+            .Select(x => new GPTModelResponse
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Identifier = x.Identifier,
+            })
             .ToList();
     }
 }
