@@ -47,19 +47,13 @@ public class GPTManager : IGPTManager
         return response;
     }
 
-    public async Task<IList<GPTModelResponse>> GetModels()
+    public async Task<IList<GPTModel>> GetModels()
     {
         var permissions = await _userHelper.GetPermissions();
         var models = await _gptModelRepository.GetAll().Include(x => x.Permission).ToListAsync();
         return models
             .Where(x => x.Permission == null || permissions.Any(y => y.Id.Equals(x.Permission.Id)))
             .OrderBy(x => x.Name)
-            .Select(x => new GPTModelResponse
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Identifier = x.Identifier,
-            })
             .ToList();
     }
 }

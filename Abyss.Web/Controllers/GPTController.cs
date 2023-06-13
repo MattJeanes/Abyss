@@ -17,7 +17,7 @@ public class GPTController : BaseController
     }
 
     [HttpGet("models")]
-    public async Task<IList<GPTModelResponse>> GetModels()
+    public async Task<IList<GPTModel>> GetModels()
     {
         return await _gptManager.GetModels();
     }

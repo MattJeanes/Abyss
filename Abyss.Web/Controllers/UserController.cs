@@ -45,7 +45,11 @@ public class UserController : BaseController
     [AuthorizePermission(Permissions.UserManager)]
     public async Task<List<User>> GetUsers()
     {
-        return await _userRepository.GetAll().ToListAsync();
+        return await _userRepository
+            .GetAll()
+            .Include(x => x.Authentications)
+            .Include(x => x.Role)
+            .ToListAsync();
     }
 
     [HttpDelete]
