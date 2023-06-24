@@ -7,8 +7,10 @@ ingress:
   host: ""
 resources:
   requests:
-    memory: 250Mi
+    memory: 256Mi
     cpu: 100m
+  limits:
+    memory: 256Mi
 env:
   secret:
     Authentication__Discord__ClientSecret: ""
