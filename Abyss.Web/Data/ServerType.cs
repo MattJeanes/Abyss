@@ -6,4 +6,6 @@ public enum ServerType
     GMod = 1,
     SpaceEngineers = 2,
     Satisfactory = 3,
+    CSGO = 4,
+    SevenDaysToDie = 5
 }
