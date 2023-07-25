@@ -53,6 +53,7 @@ export enum AuthSchemeType {
 export interface IServer {
     Id: string;
     Tag: string;
+    Name: string;
     SnapshotId?: number;
     Size?: string;
     Region?: string;

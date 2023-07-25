@@ -36,7 +36,7 @@ public class ServerManager : IServerManager
 
     public async Task<List<Server>> GetServers()
     {
-        return await _serverRepository.GetAll().ToListAsync();
+        return await _serverRepository.GetAll().OrderBy(x => x.Id).ToListAsync();
     }
 
     public async Task<Server> GetServerByAlias(string alias)
@@ -46,7 +46,7 @@ public class ServerManager : IServerManager
             .FirstOrDefaultAsync();
     }
 
-    public async Task Start(int serverId, Func<LogItem, Task> logHandler = null)
+    public async Task Start(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -64,6 +64,10 @@ public class ServerManager : IServerManager
             await _notificationHelper.SendMessage($"Starting server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Activating;
             await _serverRepository.SaveChanges();
+            if (statusHandler != null)
+            {
+                await statusHandler(server.StatusId);
+            }
 
             string ipAddress;
             if (server.CloudType == CloudType.Azure)
@@ -99,6 +103,10 @@ public class ServerManager : IServerManager
                 server.NextReminder = DateTime.UtcNow.AddMinutes(server.RemindAfterMinutes.Value);
             }
             await _serverRepository.SaveChanges();
+            if (statusHandler != null)
+            {
+                await statusHandler(server.StatusId);
+            }
             logger.LogInformation($"Successfully started server {server.Name}");
             await _notificationHelper.SendMessage($"Started server {server.Name}", MessagePriority.HighPriority);
         }
@@ -114,12 +122,16 @@ public class ServerManager : IServerManager
             {
                 server.StatusId = ServerStatus.Inactive;
                 await _serverRepository.SaveChanges();
+                if (statusHandler != null)
+                {
+                    await statusHandler(server.StatusId);
+                }
             }
         }
 
     }
 
-    public async Task Stop(int serverId, Func<LogItem, Task> logHandler = null)
+    public async Task Stop(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -136,6 +148,10 @@ public class ServerManager : IServerManager
             await _notificationHelper.SendMessage($"Stopping server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Deactivating;
             await _serverRepository.SaveChanges();
+            if (statusHandler != null)
+            {
+                await statusHandler(server.StatusId);
+            }
             if (server.CloudType == CloudType.Azure)
             {
                 await _azureHelper.StopServer(server, logger);
@@ -148,6 +164,10 @@ public class ServerManager : IServerManager
             server.NextReminder = null;
             server.StatusId = ServerStatus.Inactive;
             await _serverRepository.SaveChanges();
+            if (statusHandler != null)
+            {
+                await statusHandler(server.StatusId);
+            }
             logger.LogInformation($"Successfully stopped server {server.Name}");
             await _notificationHelper.SendMessage($"Stopped server {server.Name}", MessagePriority.HighPriority);
         }
@@ -163,6 +183,10 @@ public class ServerManager : IServerManager
             {
                 server.StatusId = ServerStatus.Active;
                 await _serverRepository.SaveChanges();
+                if (statusHandler != null)
+                {
+                    await statusHandler(server.StatusId);
+                }
             }
         }
     }

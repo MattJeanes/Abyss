@@ -16,6 +16,7 @@ export class OnlineComponent implements OnInit, OnDestroy {
     public loading = false;
     private hub = new HubConnectionBuilder()
         .withUrl('hub/online', { transport: HttpTransportType.WebSockets })
+        .withAutomaticReconnect()
         .build();
     private hubReady = false;
     constructor(public onlineService: OnlineService, public dialogService: DialogService, private ngZone: NgZone) {
@@ -24,6 +25,21 @@ export class OnlineComponent implements OnInit, OnDestroy {
             this.ngZone.run(() => {
                 this.channels = channels;
                 this.clients = clients;
+            });
+        });
+        this.hub.onclose(() => {
+            this.ngZone.run(() => {
+                this.hubReady = false;
+            });
+        });
+        this.hub.onreconnecting((err) => {
+            this.ngZone.run(() => {
+                this.hubReady = false;
+            });
+        });
+        this.hub.onreconnected(() => {
+            this.ngZone.run(() => {
+                this.hubReady = true;
             });
         });
     }

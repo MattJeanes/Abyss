@@ -136,6 +136,7 @@ public class Startup
         services.AddTransient<IGModHelper, GModHelper>();
         services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
         services.AddSingleton<IQuoteHelper, QuoteHelper>();
+        services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
         services.AddHttpClient();
         services.AddHttpClient<IGPTClient, GPTClient>(client =>
@@ -198,6 +199,7 @@ public class Startup
         services.AddHostedService<DiscordService>();
         services.AddHostedService<TeamSpeakService>();
         services.AddHostedService<ReminderService>();
+        services.AddHostedService<BackgroundWorkerService>();
         services.AddCronJob<QuoteOfTheDayService>(c =>
         {
             c.TimeZoneInfo = TimeZoneInfo.Utc;
@@ -283,6 +285,7 @@ public class Startup
         {
             routes.MapHealthChecks("/healthz");
             routes.MapHub<OnlineHub>("/hub/online");
+            routes.MapHub<ServerManagerHub>("/hub/servermanager");
             routes.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
         });
 

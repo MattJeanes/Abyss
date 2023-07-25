@@ -1,13 +1,16 @@
 <h1>Server Manager</h1>
+<h1 *ngIf="!loading && !hubReady">Lost connection to server manager hub, reconnecting...</h1>
 <mat-form-field>
     <mat-select [disabled]="loading" placeholder="Select server" [(ngModel)]="selectedId">
-        <mat-option *ngFor="let server of servers" [value]="server.Id">{{ server.Tag }}</mat-option>
+        <mat-option *ngFor="let server of servers" [value]="server.Id">{{ server.Name }}</mat-option>
     </mat-select>
 </mat-form-field>
 &nbsp;
 <button mat-raised-button [disabled]="loading" (click)="refresh()">Refresh</button>
-<h2>Status: {{ selected ? ServerStatus[selected.StatusId] : 'N/A' }}</h2>
-<button mat-raised-button [disabled]="!selected || loading || selected.StatusId !== ServerStatus.Inactive" (click)="start()">Start</button>
+<h2>Status: {{ selected ? ServerStatus[selected.StatusId] : 'N/A' }}&nbsp;&nbsp;<mat-progress-spinner class="spinner" *ngIf="loading" mode="indeterminate" [diameter]="30"></mat-progress-spinner></h2>
+
+<button mat-raised-button [disabled]="!selected || loading || !hubReady || selected.StatusId !== ServerStatus.Inactive" (click)="start()">Start</button>
 &nbsp;
-<button mat-raised-button [disabled]="!selected || loading || selected.StatusId !== ServerStatus.Active" (click)="stop()">Stop</button>
-<pre>{{ servers | json }}</pre>
+<button mat-raised-button [disabled]="!selected || loading || !hubReady || selected.StatusId !== ServerStatus.Active" (click)="stop()">Stop</button>
+<h2 *ngIf="log.length > 0">Log</h2>
+<pre *ngFor="let line of log.slice().reverse()">{{ line }}</pre>
