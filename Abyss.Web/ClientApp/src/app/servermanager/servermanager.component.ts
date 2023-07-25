@@ -56,11 +56,13 @@ export class ServerManagerComponent implements OnInit {
         this.hub.onreconnecting((err) => {
             this.ngZone.run(() => {
                 this.hubReady = false;
+                this.log.push(`Lost connection to server manager, attempting to reconnect...${err ? `\n${err}` : ''}`)
             });
         });
         this.hub.onreconnected(() => {
             this.ngZone.run(() => {
                 this.hubReady = true;
+                this.log.push(`Reconnected to server manager`);
             });
         });
     }
