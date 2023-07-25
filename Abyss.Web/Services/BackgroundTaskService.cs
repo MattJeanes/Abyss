@@ -21,9 +21,10 @@ public class BackgroundWorkerService : BackgroundService
         {
             var workItem = await _queue.DequeueAsync(cancellationToken);
 
+            await using var scope = _serviceScopeFactory.CreateAsyncScope();
             try
             {
-                await workItem(_serviceScopeFactory, cancellationToken);
+                await workItem(scope.ServiceProvider, cancellationToken);
             }
             catch (Exception ex)
             {

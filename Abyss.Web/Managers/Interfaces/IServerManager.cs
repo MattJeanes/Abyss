@@ -6,8 +6,8 @@ namespace Abyss.Web.Managers.Interfaces;
 
 public interface IServerManager
 {
-    Task Start(int serverId, Func<LogItem, Task> logHandler = null);
-    Task Stop(int serverId, Func<LogItem, Task> logHandler = null);
+    Task Start(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null);
+    Task Stop(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null);
     Task Restart(int serverId, Func<LogItem, Task> logHandler = null);
     Task<List<Server>> GetServers();
     Task<Server> GetServerByAlias(string alias);

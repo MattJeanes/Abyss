@@ -2,6 +2,6 @@
 
 public interface IBackgroundTaskQueue
 {
-    void Queue(Func<IServiceScopeFactory, CancellationToken, Task> workItem);
-    Task<Func<IServiceScopeFactory, CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken);
+    void Queue(Func<IServiceProvider, CancellationToken, Task> workItem);
+    Task<Func<IServiceProvider, CancellationToken, Task>> DequeueAsync(CancellationToken cancellationToken);
 }

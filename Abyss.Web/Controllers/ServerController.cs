@@ -33,15 +33,27 @@ public class ServerController
     [HttpPost]
     public IActionResult Start(int serverId, [Required][FromQuery] string connectionId)
     {
-        _backgroundTaskQueue.Queue(async (serviceScopeFactory, cancellationToken) =>
+        _backgroundTaskQueue.Queue(async (serviceProvider, cancellationToken) =>
         {
-            using var scope = serviceScopeFactory.CreateScope();
-            var serverManagerHub = scope.ServiceProvider.GetRequiredService<IHubContext<ServerManagerHub>>();
-            var serverManager = scope.ServiceProvider.GetRequiredService<IServerManager>();
-            await _serverManager.Start(serverId, async (logItem) =>
+            var serverManagerHub = serviceProvider.GetRequiredService<IHubContext<ServerManagerHub>>();
+            var scopedServerManager = serviceProvider.GetRequiredService<IServerManager>();
+            var client = serverManagerHub.Clients.Clients(connectionId);
+            string err = null;
+            try
             {
-                await serverManagerHub.Clients.Clients(connectionId).SendAsync("update", logItem);
-            });
+                await scopedServerManager.Start(serverId, async (logItem) =>
+                {
+                    await client.SendAsync("log", logItem.Message);
+                }, async (status) =>
+                {
+                    await client.SendAsync("status", status);
+                });
+            }
+            catch (Exception e)
+            {
+                err = e.Message;
+            }
+            await client.SendAsync("complete", err);
         });
 
         return new AcceptedResult();
@@ -51,15 +63,27 @@ public class ServerController
     [HttpPost]
     public IActionResult Stop(int serverId, [Required][FromQuery] string connectionId)
     {
-        _backgroundTaskQueue.Queue(async (serviceScopeFactory, cancellationToken) =>
+        _backgroundTaskQueue.Queue(async (serviceProvider, cancellationToken) =>
         {
-            using var scope = serviceScopeFactory.CreateScope();
-            var serverManagerHub = scope.ServiceProvider.GetRequiredService<IHubContext<ServerManagerHub>>();
-            var serverManager = scope.ServiceProvider.GetRequiredService<IServerManager>();
-            await _serverManager.Stop(serverId, async (logItem) =>
+            var serverManagerHub = serviceProvider.GetRequiredService<IHubContext<ServerManagerHub>>();
+            var scopedServerManager = serviceProvider.GetRequiredService<IServerManager>();
+            var client = serverManagerHub.Clients.Clients(connectionId);
+            string err = null;
+            try
             {
-                await serverManagerHub.Clients.Clients(connectionId).SendAsync("update", logItem);
-            });
+                await scopedServerManager.Stop(serverId, async (logItem) =>
+                {
+                    await client.SendAsync("log", logItem.Message);
+                }, async (status) =>
+                {
+                    await client.SendAsync("status", status);
+                });
+            }
+            catch (Exception e)
+            {
+                err = e.Message;
+            }
+            await client.SendAsync("complete", err);
         });
 
         return new AcceptedResult();

@@ -8,13 +8,14 @@ import { DialogService } from '../services';
 
 @Component({
     templateUrl: './servermanager.component.html',
+    styleUrls: ['./servermanager.component.scss'],
 })
 export class ServerManagerComponent implements OnInit {
     public servers?: IServer[];
     public ServerStatus = ServerStatus;
     public selectedId?: string;
     public loading = false;
-    public log = '';
+    public log: string[] = [];
     public hubReady = false;
     private hub = new HubConnectionBuilder()
         .withUrl('hub/servermanager', { transport: HttpTransportType.WebSockets })
@@ -24,10 +25,27 @@ export class ServerManagerComponent implements OnInit {
     public get selected(): IServer | undefined { return this.servers ? this.servers.find(x => x.Id === this.selectedId) : undefined; }
 
     constructor(public serverManagerService: ServerManagerService, public dialogService: DialogService, private ngZone: NgZone) {
-        this.hub.on('update', (log: string) => {
-            // Because this is a call from the server, Angular change detection won't detect it so we must force ngZone to run
+        this.hub.on('status', (status: ServerStatus) => {
             this.ngZone.run(() => {
-                this.log = log;
+                let selectedServer = this.selected;
+                if (!selectedServer) { return; }
+                selectedServer.StatusId = status;
+            });
+        });
+        this.hub.on('complete', (err: string) => {
+            this.ngZone.run(() => {
+                this.loading = false;
+                if (err) {
+                    this.dialogService.alert({
+                        title: 'Failed to complete server operation',
+                        message: err.toString(),
+                    });
+                }
+            });
+        });
+        this.hub.on('log', (log: string) => {
+            this.ngZone.run(() => {
+                this.log.push(log);
             });
         });
         this.hub.onclose(() => {
@@ -73,15 +91,13 @@ export class ServerManagerComponent implements OnInit {
         if (!this.selected || this.loading || !this.hubReady) { return; }
         try {
             this.loading = true;
+            this.log = [];
             await this.serverManagerService.start(this.selected.Id, this.hub.connectionId!);
         } catch (e: any) {
             this.dialogService.alert({
                 title: 'Failed to start server',
                 message: e.toString(),
             });
-        } finally {
-            this.loading = false;
-            await this.refresh();
         }
     }
 
@@ -89,15 +105,13 @@ export class ServerManagerComponent implements OnInit {
         if (!this.selected || this.loading || !this.hubReady) { return; }
         try {
             this.loading = true;
+            this.log = [];
             await this.serverManagerService.stop(this.selected.Id, this.hub.connectionId!);
         } catch (e: any) {
             this.dialogService.alert({
                 title: 'Failed to stop server',
                 message: e.toString(),
             });
-        } finally {
-            this.loading = false;
-            await this.refresh();
         }
     }
 
