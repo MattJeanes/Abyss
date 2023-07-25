@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
+import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 
 import { IServer, ServerStatus } from '../app.data';
 import { ServerManagerService } from './servermanager.service';
@@ -13,15 +14,45 @@ export class ServerManagerComponent implements OnInit {
     public ServerStatus = ServerStatus;
     public selectedId?: string;
     public loading = false;
+    public log = '';
+    public hubReady = false;
+    private hub = new HubConnectionBuilder()
+        .withUrl('hub/servermanager', { transport: HttpTransportType.WebSockets })
+        .withAutomaticReconnect()
+        .build();
 
     public get selected(): IServer | undefined { return this.servers ? this.servers.find(x => x.Id === this.selectedId) : undefined; }
 
-    constructor(public serverManagerService: ServerManagerService, public dialogService: DialogService) { }
+    constructor(public serverManagerService: ServerManagerService, public dialogService: DialogService, private ngZone: NgZone) {
+        this.hub.on('update', (log: string) => {
+            // Because this is a call from the server, Angular change detection won't detect it so we must force ngZone to run
+            this.ngZone.run(() => {
+                this.log = log;
+            });
+        });
+        this.hub.onclose(() => {
+            this.ngZone.run(() => {
+                this.hubReady = false;
+            });
+        });
+        this.hub.onreconnecting((err) => {
+            this.ngZone.run(() => {
+                this.hubReady = false;
+            });
+        });
+        this.hub.onreconnected(() => {
+            this.ngZone.run(() => {
+                this.hubReady = true;
+            });
+        });
+    }
 
     public async ngOnInit(): Promise<void> {
         try {
             this.loading = true;
             await this.refresh();
+            await this.hub.start();
+            this.hubReady = true;
         } catch (e: any) {
             this.dialogService.alert({
                 title: 'Failed to load server manager',
@@ -32,11 +63,17 @@ export class ServerManagerComponent implements OnInit {
         }
     }
 
+    public ngOnDestroy(): void {
+        if (this.hubReady) {
+            this.hub.stop();
+        }
+    }
+
     public async start(): Promise<void> {
-        if (!this.selected || this.loading) { return; }
+        if (!this.selected || this.loading || !this.hubReady) { return; }
         try {
             this.loading = true;
-            await this.serverManagerService.start(this.selected.Id);
+            await this.serverManagerService.start(this.selected.Id, this.hub.connectionId!);
         } catch (e: any) {
             this.dialogService.alert({
                 title: 'Failed to start server',
@@ -49,10 +86,10 @@ export class ServerManagerComponent implements OnInit {
     }
 
     public async stop(): Promise<void> {
-        if (!this.selected || this.loading) { return; }
+        if (!this.selected || this.loading || !this.hubReady) { return; }
         try {
             this.loading = true;
-            await this.serverManagerService.stop(this.selected.Id);
+            await this.serverManagerService.stop(this.selected.Id, this.hub.connectionId!);
         } catch (e: any) {
             this.dialogService.alert({
                 title: 'Failed to stop server',
