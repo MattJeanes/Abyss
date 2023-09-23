@@ -15,12 +15,7 @@ public abstract class CronJobService : IHostedService, IDisposable
             throw new ArgumentNullException(nameof(cronExpression));
         }
         _expression = CronExpression.Parse(cronExpression);
-
-        if (timeZoneInfo == null)
-        {
-            throw new ArgumentNullException(nameof(timeZoneInfo));
-        }
-        _timeZoneInfo = timeZoneInfo;
+        _timeZoneInfo = timeZoneInfo ?? throw new ArgumentNullException(nameof(timeZoneInfo));
     }
 
     public virtual async Task StartAsync(CancellationToken cancellationToken)
@@ -73,6 +68,7 @@ public abstract class CronJobService : IHostedService, IDisposable
     public virtual void Dispose()
     {
         _timer?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 
@@ -101,7 +97,9 @@ public static class ScheduledServiceExtensions
         options.Invoke(config);
         if (string.IsNullOrWhiteSpace(config.CronExpression))
         {
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
             throw new ArgumentNullException(nameof(ScheduleConfig<T>.CronExpression), @"Empty Cron Expression is not allowed.");
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
         }
 
         services.AddSingleton<IScheduleConfig<T>>(config);

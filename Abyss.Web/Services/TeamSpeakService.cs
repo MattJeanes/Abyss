@@ -68,5 +68,6 @@ public class TeamSpeakService : IHostedService, IDisposable
     public void Dispose()
     {
         _timer?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

@@ -55,9 +55,10 @@ public class QuoteCommand : BaseCommand
         }
 
         var quote = ctx.TargetMessage.Content;
-        var author = ctx.TargetMessage.Author.Username;
+        var author = ctx.TargetMessage.Author;
+        var member = await ctx.Guild.GetMemberAsync(author.Id);
 
-        var result = await _quoteHelper.AddQuote(quote, author);
+        var result = await _quoteHelper.AddQuote(quote, member.DisplayName);
         if (result.Success)
         {
             await ctx.EditResponseAsync(_quoteHelper.FormatQuote(result.Quote));

@@ -11,19 +11,19 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Commands.Discord;
 
-public class BaseCommand : ApplicationCommandModule, IDiscordCommand
+public class BaseCommand : ApplicationCommandModule, IDiscordCommand, IDisposable
 {
-    protected readonly IServiceProvider _serviceProvider;
+    protected readonly IServiceScope _serviceScope;
     protected readonly IUserHelper _userHelper;
     protected readonly IUserRepository _userRepository;
     protected readonly DiscordOptions _baseOptions;
 
     public BaseCommand(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider;
-        _userHelper = _serviceProvider.GetRequiredService<IUserHelper>();
-        _userRepository = _serviceProvider.GetRequiredService<IUserRepository>();
-        _baseOptions = _serviceProvider.GetRequiredService<IOptions<DiscordOptions>>().Value;
+        _serviceScope = serviceProvider.CreateScope();
+        _userHelper = _serviceScope.ServiceProvider.GetRequiredService<IUserHelper>();
+        _userRepository = _serviceScope.ServiceProvider.GetRequiredService<IUserRepository>();
+        _baseOptions = _serviceScope.ServiceProvider.GetRequiredService<IOptions<DiscordOptions>>().Value;
     }
 
     public virtual Task MemberRemoved(GuildMemberRemoveEventArgs e)
@@ -67,5 +67,11 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand
             return false;
         }
         return true;
+    }
+
+    public void Dispose()
+    {
+        _serviceScope.Dispose();
+        GC.SuppressFinalize(this);
     }
 }
