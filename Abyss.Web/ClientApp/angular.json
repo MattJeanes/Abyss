@@ -98,18 +98,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "abyss:build"
+            "buildTarget": "abyss:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "abyss:build:production"
+              "buildTarget": "abyss:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "abyss:build"
+            "buildTarget": "abyss:build"
           }
         },
         "lint": {
