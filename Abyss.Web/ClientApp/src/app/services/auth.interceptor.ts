@@ -5,9 +5,6 @@ import { catchError, map, mergeMap } from 'rxjs/operators';
 
 import { AuthService } from './auth.service';
 
-// The nature of this interceptor means the type of request cannot be determined
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
     private refreshing?: Promise<void>;

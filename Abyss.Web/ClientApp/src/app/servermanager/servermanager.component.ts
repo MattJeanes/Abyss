@@ -10,7 +10,7 @@ import { DialogService } from '../services';
     templateUrl: './servermanager.component.html',
     styleUrls: ['./servermanager.component.scss'],
 })
-export class ServerManagerComponent implements OnInit {
+export class ServerManagerComponent implements OnInit, OnDestroy {
     public servers?: IServer[];
     public ServerStatus = ServerStatus;
     public selectedId?: string;
