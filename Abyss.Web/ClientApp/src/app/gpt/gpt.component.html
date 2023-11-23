@@ -10,7 +10,7 @@
         matTooltip="Higher values result in more creative text but may be less coherent, recommend 0.9 for good balance"
         matTooltipPosition="right">
         <mat-label>Temperature</mat-label>
-        <mat-slider min="0.1" max="1" step="0.01" thumbLabel [(ngModel)]="temperature"></mat-slider>
+        <mat-slider min="0.1" max="1" step="0.01" thumbLabel [(ngModel)]="temperature"><input matSliderThumb /></mat-slider>
         <button mat-icon-button matSuffix aria-label="Reset" *ngIf="temperature !== 0.9" (click)="temperature = 0.9">
             <mat-icon>settings_backup_restore</mat-icon>
         </button>
@@ -19,7 +19,7 @@
         matTooltip="Percentage of total vocabulary to use, recommend 0.9 for good balance"
         matTooltipPosition="right">
         <mat-label>Top P</mat-label>
-        <mat-slider min="0" max="1" step="0.01" thumbLabel [(ngModel)]="top_p"></mat-slider>
+        <mat-slider min="0" max="1" step="0.01" thumbLabel [(ngModel)]="top_p"><input matSliderThumb /></mat-slider>
         <button mat-icon-button matSuffix aria-label="Reset" *ngIf="top_p !== 0.9" (click)="top_p = 0.9">
             <mat-icon>settings_backup_restore</mat-icon>
         </button>
