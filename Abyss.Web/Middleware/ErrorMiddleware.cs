@@ -3,14 +3,13 @@ using System.Text.Json;
 
 namespace Abyss.Web.Middleware;
 
-public class ErrorHandlingMiddleware
+public class ErrorHandlingMiddleware(RequestDelegate next)
 {
     private static readonly JsonSerializerOptions errorSerializerOptions = new JsonSerializerOptions
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
-    private readonly RequestDelegate _next;
-    public ErrorHandlingMiddleware(RequestDelegate next) => _next = next;
+    private readonly RequestDelegate _next = next;
 
     public async Task Invoke(HttpContext context)
     {

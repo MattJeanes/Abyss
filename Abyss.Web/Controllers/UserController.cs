@@ -12,16 +12,10 @@ namespace Abyss.Web.Controllers;
 
 [Route("api/user")]
 [Authorize]
-public class UserController : BaseController
+public class UserController(IUserManager userManager, IUserHelper userHelper, IUserRepository userRepository) : BaseController(userHelper)
 {
-    private readonly IUserManager _userManager;
-    private readonly IUserRepository _userRepository;
-
-    public UserController(IUserManager userManager, IUserHelper userHelper, IUserRepository userRepository) : base(userHelper)
-    {
-        _userManager = userManager;
-        _userRepository = userRepository;
-    }
+    private readonly IUserManager _userManager = userManager;
+    private readonly IUserRepository _userRepository = userRepository;
 
     [Route("username")]
     [HttpPost]

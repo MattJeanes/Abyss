@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Repositories;
 
-public class RoleRepository : Repository<Role>, IRoleRepository
+public class RoleRepository(AbyssContext context) : Repository<Role>(context), IRoleRepository
 {
-    public RoleRepository(AbyssContext context) : base(context) { }
-
     public async override Task<Role> GetById(int id)
     {
         var role = await GetAll().Where(x => x.Id == id)

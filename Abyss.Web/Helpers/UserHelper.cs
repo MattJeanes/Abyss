@@ -13,37 +13,26 @@ using System.Text.Json;
 
 namespace Abyss.Web.Helpers;
 
-public class UserHelper : IUserHelper
+public class UserHelper(
+    IUserRepository userRepository,
+    IRoleRepository roleRepository,
+    IRepository<Permission> permissionRepository,
+    IOptions<JwtOptions> jwtOptions,
+    IOptions<AuthenticationOptions> authenticationOptions,
+    IHttpContextAccessor httpContextAccessor,
+    IRepository<RefreshToken> refreshTokenRepository
+        ) : IUserHelper
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IRoleRepository _roleRepository;
-    private readonly IRepository<Permission> _permissionRepository;
-    private readonly JwtOptions _jwtOptions;
-    private readonly AuthenticationOptions _authenticationOptions;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IRepository<RefreshToken> _refreshTokenRepository;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IRoleRepository _roleRepository = roleRepository;
+    private readonly IRepository<Permission> _permissionRepository = permissionRepository;
+    private readonly JwtOptions _jwtOptions = jwtOptions.Value;
+    private readonly AuthenticationOptions _authenticationOptions = authenticationOptions.Value;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly IRepository<RefreshToken> _refreshTokenRepository = refreshTokenRepository;
     private const string UserClaimField = "User";
     private const string RefreshExpiryField = "RefreshExpiry";
     private const string RefreshTokenIdField = "uid";
-
-    public UserHelper(
-        IUserRepository userRepository,
-        IRoleRepository roleRepository,
-        IRepository<Permission> permissionRepository,
-        IOptions<JwtOptions> jwtOptions,
-        IOptions<AuthenticationOptions> authenticationOptions,
-        IHttpContextAccessor httpContextAccessor,
-        IRepository<RefreshToken> refreshTokenRepository
-        )
-    {
-        _userRepository = userRepository;
-        _roleRepository = roleRepository;
-        _permissionRepository = permissionRepository;
-        _jwtOptions = jwtOptions.Value;
-        _authenticationOptions = authenticationOptions.Value;
-        _httpContextAccessor = httpContextAccessor;
-        _refreshTokenRepository = refreshTokenRepository;
-    }
 
     public ClientUser GetClientUser(User user)
     {

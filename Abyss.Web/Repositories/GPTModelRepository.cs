@@ -5,10 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Repositories;
 
-public class GPTModelRepository : Repository<GPTModel>, IGPTModelRepository
+public class GPTModelRepository(AbyssContext context) : Repository<GPTModel>(context), IGPTModelRepository
 {
-    public GPTModelRepository(AbyssContext context) : base(context) { }
-
     public async override Task<GPTModel> GetById(int id)
     {
         var role = await GetAll().Where(x => x.Id == id)

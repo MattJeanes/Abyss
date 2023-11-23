@@ -4,11 +4,10 @@ using Abyss.Web.Managers.Interfaces;
 
 namespace Abyss.Web.Managers;
 
-public class OnlineManager : IOnlineManager
+public class OnlineManager(ITeamSpeakHelper teamSpeakHelper) : IOnlineManager
 {
-    private readonly ITeamSpeakHelper _teamSpeakHelper;
+    private readonly ITeamSpeakHelper _teamSpeakHelper = teamSpeakHelper;
 
-    public OnlineManager(ITeamSpeakHelper teamSpeakHelper) => _teamSpeakHelper = teamSpeakHelper;
     public async Task<List<Client>> GetClients()
     {
         return await _teamSpeakHelper.GetClients();

@@ -23,7 +23,6 @@ public static class AuthSchemes
     {
         Id = AuthSchemeType.Google,
         Name = "Google",
-        ProfileUrl = "https://plus.google.com/",
         IconUrl = "/images/google.png"
     };
 

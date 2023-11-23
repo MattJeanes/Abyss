@@ -5,11 +5,9 @@ using Microsoft.ML.Data;
 
 namespace Abyss.Web.Helpers;
 
-public class WhoSaidHelper : IWhoSaidHelper
+public class WhoSaidHelper(PredictionEnginePool<InputData, Prediction> predictionEnginePool) : IWhoSaidHelper
 {
-    private readonly PredictionEnginePool<InputData, Prediction> _predictionEnginePool;
-
-    public WhoSaidHelper(PredictionEnginePool<InputData, Prediction> predictionEnginePool) => _predictionEnginePool = predictionEnginePool;
+    private readonly PredictionEnginePool<InputData, Prediction> _predictionEnginePool = predictionEnginePool;
 
     public async Task<WhoSaid> WhoSaid(string message)
     {

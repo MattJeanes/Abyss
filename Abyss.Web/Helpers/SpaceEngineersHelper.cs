@@ -9,16 +9,10 @@ using System.Text;
 
 namespace Abyss.Web.Helpers;
 
-public class SpaceEngineersHelper : ISpaceEngineersHelper
+public class SpaceEngineersHelper(HttpClient httpClient) : ISpaceEngineersHelper
 {
-    private readonly Random _random;
-    private readonly RestClient _client;
-
-    public SpaceEngineersHelper(HttpClient httpClient)
-    {
-        _random = new Random();
-        _client = new RestClient(httpClient);
-    }
+    private readonly Random _random = new Random();
+    private readonly RestClient _client = new RestClient(httpClient);
 
     public async Task<List<SpaceEngineersCharacters.Character>> GetCharacters(Server server)
     {

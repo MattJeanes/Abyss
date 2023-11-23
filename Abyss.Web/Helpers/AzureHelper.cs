@@ -11,16 +11,10 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Helpers;
 
-public class AzureHelper : IAzureHelper
+public class AzureHelper(ArmClient azure, IOptions<AzureOptions> options) : IAzureHelper
 {
-    private readonly ArmClient _azure;
-    private readonly AzureOptions _options;
-
-    public AzureHelper(ArmClient azure, IOptions<AzureOptions> options)
-    {
-        _azure = azure;
-        _options = options.Value;
-    }
+    private readonly ArmClient _azure = azure;
+    private readonly AzureOptions _options = options.Value;
 
     public async Task<VirtualMachineResource> StartServer(Server server, TaskLogger logger)
     {

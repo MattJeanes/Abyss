@@ -9,26 +9,19 @@ using TeamSpeak3QueryApi.Net.Specialized.Responses;
 
 namespace Abyss.Web.Helpers;
 
-public class TeamSpeakHelper : ITeamSpeakHelper, IDisposable
+public class TeamSpeakHelper(
+    IOptions<TeamSpeakOptions> options,
+    IHubContext<OnlineHub> onlineHub,
+    ILogger<TeamSpeakHelper> logger
+        ) : ITeamSpeakHelper, IDisposable
 {
-    private readonly TeamSpeakOptions _options;
-    private readonly IHubContext<OnlineHub> _onlineHub;
-    private readonly ILogger<TeamSpeakHelper> _logger;
+    private readonly TeamSpeakOptions _options = options.Value;
+    private readonly IHubContext<OnlineHub> _onlineHub = onlineHub;
+    private readonly ILogger<TeamSpeakHelper> _logger = logger;
     private List<Client> _clients;
     private List<Channel> _channels;
     private Task _updateTask;
     private TeamSpeakClient _teamspeak;
-
-    public TeamSpeakHelper(
-        IOptions<TeamSpeakOptions> options,
-        IHubContext<OnlineHub> onlineHub,
-        ILogger<TeamSpeakHelper> logger
-        )
-    {
-        _options = options.Value;
-        _onlineHub = onlineHub;
-        _logger = logger;
-    }
 
     public async Task<List<Client>> GetClients()
     {

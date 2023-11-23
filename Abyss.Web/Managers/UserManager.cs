@@ -10,28 +10,19 @@ using System.Security.Claims;
 
 namespace Abyss.Web.Managers;
 
-public class UserManager : IUserManager
+public class UserManager(
+    IUserHelper userHelper,
+    IUserRepository userRepository,
+    IGModHelper gmodHelper,
+    IHttpContextAccessor httpContextAccessor,
+    IOptions<DiscordOptions> discordOptions
+        ) : IUserManager
 {
-    private readonly IUserHelper _userHelper;
-    private readonly IUserRepository _userRepository;
-    private readonly IGModHelper _gmodHelper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly DiscordOptions _discordOptions;
-
-    public UserManager(
-        IUserHelper userHelper,
-        IUserRepository userRepository,
-        IGModHelper gmodHelper,
-        IHttpContextAccessor httpContextAccessor,
-        IOptions<DiscordOptions> discordOptions
-        )
-    {
-        _userHelper = userHelper;
-        _userRepository = userRepository;
-        _gmodHelper = gmodHelper;
-        _httpContextAccessor = httpContextAccessor;
-        _discordOptions = discordOptions.Value;
-    }
+    private readonly IUserHelper _userHelper = userHelper;
+    private readonly IUserRepository _userRepository = userRepository;
+    private readonly IGModHelper _gmodHelper = gmodHelper;
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly DiscordOptions _discordOptions = discordOptions.Value;
 
     public async Task<string> Login(AuthSchemeType schemeType)
     {

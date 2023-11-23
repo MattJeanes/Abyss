@@ -4,16 +4,18 @@
     <p class="schemes">{{ schemes ? 'Auth schemes:' : 'Loading..' }}</p>
     <mat-list *ngIf="schemes">
         <mat-list-item *ngFor="let scheme of schemes">
-            <img class="provider-icon" [ngClass]="{'provider-profile':userSchemes[scheme.Id] && scheme.ProfileUrl}" src="{{scheme.IconUrl}}" alt="{{scheme.Name}}"
-                matTooltip="{{scheme.Name}}{{userSchemes[scheme.Id] && scheme.ProfileUrl ? ' (click to open profile)' : ''}}" matTooltipPosition="left" (click)="openProfile(scheme)" />
-            <button *ngIf="!userSchemes[scheme.Id]" class="button" mat-raised-button color="primary" (click)="login(scheme.Name)" [disabled]="loading">Login</button>
-            <button *ngIf="userSchemes[scheme.Id]" class="button" mat-raised-button color="warn" (click)="deleteAuthScheme(scheme.Id)" [disabled]="onlyScheme || loading"
-                [matTooltip]="onlyScheme ? 'You must have at least one login provider active' : 'Delete the ' + scheme.Name + ' login provider'">Delete</button>
+            <div class="scheme">
+                <img class="provider-icon" [ngClass]="{'provider-profile':userSchemes[scheme.Id] && scheme.ProfileUrl}" src="{{scheme.IconUrl}}" alt="{{scheme.Name}}"
+                    matTooltip="{{scheme.Name}}{{userSchemes[scheme.Id] && scheme.ProfileUrl ? ' (click to open profile)' : ''}}" matTooltipPosition="left" (click)="openProfile(scheme)" />
+                <button *ngIf="!userSchemes[scheme.Id]" class="button" mat-raised-button color="primary" (click)="login(scheme.Name)" [disabled]="loading">Login</button>
+                <button *ngIf="userSchemes[scheme.Id]" class="button" mat-raised-button color="warn" (click)="deleteAuthScheme(scheme.Id)" [disabled]="onlyScheme || loading"
+                    [matTooltip]="onlyScheme ? 'You must have at least one login provider active' : 'Delete the ' + scheme.Name + ' login provider'" matTooltipPosition="right">Delete</button>
+            </div>
         </mat-list-item>
     </mat-list>
     <!-- <pre>{{authService.getUser() | json}}</pre> -->
 </div>
 <div mat-dialog-actions>
-    <button mat-raised-button color="primary" (click)="dialogRef.close()" [disabled]="loading">Close</button>
-    <button mat-raised-button color="accent" (click)="logout();" [disabled]="!authService.isLoggedIn() || loading">Logout</button>
+    <button mat-button (click)="dialogRef.close()" [disabled]="loading">Close</button>
+    <button mat-button color="accent" (click)="logout();" [disabled]="!authService.isLoggedIn() || loading">Logout</button>
 </div>

@@ -2,13 +2,8 @@
 
 namespace Abyss.Web.Commands.Discord;
 
-public class PingCommand : BaseCommand
+public class PingCommand(IServiceProvider serviceProvider) : BaseCommand(serviceProvider)
 {
-    public PingCommand(IServiceProvider serviceProvider) : base(serviceProvider)
-    {
-
-    }
-
     [SlashCommand("ping", "A simple ping test command")]
     public async Task Ping(InteractionContext ctx)
     {

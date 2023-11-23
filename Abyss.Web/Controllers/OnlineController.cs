@@ -6,11 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Abyss.Web.Controllers;
 
 [Route("api/online")]
-public class OnlineController : BaseController
+public class OnlineController(IOnlineManager manager, IUserHelper userHelper) : BaseController(userHelper)
 {
-    private readonly IOnlineManager _manager;
-
-    public OnlineController(IOnlineManager manager, IUserHelper userHelper) : base(userHelper) => _manager = manager;
+    private readonly IOnlineManager _manager = manager;
 
     [Route("client")]
     public async Task<List<Client>> GetClients()

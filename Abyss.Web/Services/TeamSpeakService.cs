@@ -4,19 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Services;
 
-public class TeamSpeakService : IHostedService, IDisposable
+public class TeamSpeakService(ILogger<TeamSpeakService> logger, IOptions<TeamSpeakOptions> options, IServiceProvider serviceProvider) : IHostedService, IDisposable
 {
-    private readonly ILogger _logger;
-    private readonly TeamSpeakOptions _options;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger _logger = logger;
+    private readonly TeamSpeakOptions _options = options.Value;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private Timer _timer;
-
-    public TeamSpeakService(ILogger<TeamSpeakService> logger, IOptions<TeamSpeakOptions> options, IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _options = options.Value;
-        _serviceProvider = serviceProvider;
-    }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {

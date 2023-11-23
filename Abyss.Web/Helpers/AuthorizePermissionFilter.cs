@@ -3,11 +3,10 @@ using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Abyss.Web.Helpers;
 
-public class AuthorizePermissionFilter : IAuthorizationFilter
+public class AuthorizePermissionFilter(List<string> permissions) : IAuthorizationFilter
 {
-    private readonly List<string> _permissions;
+    private readonly List<string> _permissions = permissions;
 
-    public AuthorizePermissionFilter(List<string> permissions) => _permissions = permissions;
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var user = UserHelper.GetClientUser(context.HttpContext);

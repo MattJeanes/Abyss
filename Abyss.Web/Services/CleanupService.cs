@@ -6,19 +6,12 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Services;
 
-public class CleanupService : IHostedService, IDisposable
+public class CleanupService(ILogger<CleanupService> logger, IOptions<CleanupOptions> options, IServiceProvider serviceProvider) : IHostedService, IDisposable
 {
-    private readonly ILogger _logger;
-    private readonly CleanupOptions _options;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger _logger = logger;
+    private readonly CleanupOptions _options = options.Value;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
     private Timer _timer;
-
-    public CleanupService(ILogger<CleanupService> logger, IOptions<CleanupOptions> options, IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _options = options.Value;
-        _serviceProvider = serviceProvider;
-    }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {

@@ -7,16 +7,10 @@ using System.Text.Json.Serialization;
 
 namespace Abyss.Web.Helpers;
 
-public class CloudflareHelper : ICloudflareHelper
+public class CloudflareHelper(IHttpClientFactory httpClientFactory, IOptions<CloudflareOptions> options) : ICloudflareHelper
 {
-    private readonly HttpClient _client;
-    private readonly CloudflareOptions _options;
-
-    public CloudflareHelper(IHttpClientFactory httpClientFactory, IOptions<CloudflareOptions> options)
-    {
-        _client = httpClientFactory.CreateClient("cloudflare");
-        _options = options.Value;
-    }
+    private readonly HttpClient _client = httpClientFactory.CreateClient("cloudflare");
+    private readonly CloudflareOptions _options = options.Value;
 
     public async Task<CloudflareDNSRecord> GetDNSRecord(string name)
     {
@@ -35,7 +29,7 @@ public class CloudflareHelper : ICloudflareHelper
     private async Task<CloudflareZone> GetZone(string name)
     {
         var resp = await _client.GetAsync($"zones?name={name}");
-        var zones = await JsonSerializer.DeserializeAsync<CloudflareResponse<List<CloudflareZone>>>(await resp.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
+        var zones = await JsonSerializer.DeserializeAsync<CloudflareResponse<List<CloudflareZone>>>(await resp.Content.ReadAsStreamAsync(), Program.JsonSerializerOptions);
         var zone = zones!.Result.FirstOrDefault();
         return zone;
     }
@@ -49,7 +43,7 @@ public class CloudflareHelper : ICloudflareHelper
 
     private async Task<T> GetResponse<T>(HttpResponseMessage message)
     {
-        var resp = await JsonSerializer.DeserializeAsync<CloudflareResponse<T>>(await message.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
+        var resp = await JsonSerializer.DeserializeAsync<CloudflareResponse<T>>(await message.Content.ReadAsStreamAsync(), Program.JsonSerializerOptions);
         if (!resp!.Success)
         {
             throw new Exception(resp.Errors.Any() ? string.Join(", ", resp.Errors.Select(x => x.Message)) : "Unknown Cloudflare error");

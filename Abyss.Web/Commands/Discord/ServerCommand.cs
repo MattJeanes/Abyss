@@ -9,16 +9,10 @@ using DSharpPlus.SlashCommands;
 namespace Abyss.Web.Commands.Discord;
 
 [SlashCommandGroup("server", "View or manage servers")]
-public class ServerCommand : BaseCommand
+public class ServerCommand(IServiceProvider serviceProvider, IServerManager serverManager, ILogger<ServerCommand> logger) : BaseCommand(serviceProvider)
 {
-    private readonly IServerManager _serverManager;
-    private readonly ILogger<ServerCommand> _logger;
-
-    public ServerCommand(IServiceProvider serviceProvider, IServerManager serverManager, ILogger<ServerCommand> logger) : base(serviceProvider)
-    {
-        _serverManager = serverManager;
-        _logger = logger;
-    }
+    private readonly IServerManager _serverManager = serverManager;
+    private readonly ILogger<ServerCommand> _logger = logger;
 
     [SlashCommand("status", "Get server status")]
     public async Task GetStatus(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)

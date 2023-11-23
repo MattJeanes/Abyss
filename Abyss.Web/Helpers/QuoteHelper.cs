@@ -7,19 +7,13 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Helpers;
 
-public class QuoteHelper : IQuoteHelper
+public class QuoteHelper(TumblrClient client, IOptions<TumblrOptions> options) : IQuoteHelper
 {
-    private readonly TumblrClient _client;
-    private readonly TumblrOptions _options;
+    private readonly TumblrClient _client = client;
+    private readonly TumblrOptions _options = options.Value;
     private List<QuotePost> _posts = new List<QuotePost>();
     private List<QuotePost> _localPosts = new List<QuotePost>();
     private DateTime _cacheExpiry = DateTime.UtcNow;
-
-    public QuoteHelper(TumblrClient client, IOptions<TumblrOptions> options)
-    {
-        _client = client;
-        _options = options.Value;
-    }
 
     public async Task<QuotePost> GetQuote()
     {

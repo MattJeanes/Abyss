@@ -7,22 +7,15 @@ using System.Text.Json;
 
 namespace Abyss.Web.Helpers;
 
-public class GModHelper : IGModHelper
+public class GModHelper(
+    IHttpClientFactory httpClientFactory,
+    ILogger<GModHelper> logger,
+    IOptions<GModOptions> options
+        ) : IGModHelper
 {
-    private readonly HttpClient _client;
-    private readonly ILogger<GModHelper> _logger;
-    private readonly GModOptions _options;
-
-    public GModHelper(
-        IHttpClientFactory httpClientFactory,
-        ILogger<GModHelper> logger,
-        IOptions<GModOptions> options
-        )
-    {
-        _client = httpClientFactory.CreateClient("gmod");
-        _logger = logger;
-        _options = options.Value;
-    }
+    private readonly HttpClient _client = httpClientFactory.CreateClient("gmod");
+    private readonly ILogger<GModHelper> _logger = logger;
+    private readonly GModOptions _options = options.Value;
 
     public async Task<string> ChangeRank(ChangeRankDTO request)
     {
@@ -39,7 +32,7 @@ public class GModHelper : IGModHelper
         GModResponse<T> resp;
         try
         {
-            resp = await JsonSerializer.DeserializeAsync<GModResponse<T>>(await message.Content.ReadAsStreamAsync(), Startup.JsonSerializerOptions);
+            resp = await JsonSerializer.DeserializeAsync<GModResponse<T>>(await message.Content.ReadAsStreamAsync(), Program.JsonSerializerOptions);
         }
         catch (Exception e)
         {

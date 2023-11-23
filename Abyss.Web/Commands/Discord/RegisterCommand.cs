@@ -11,24 +11,16 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Commands.Discord;
 
-public class RegisterCommand : BaseCommand
+public class RegisterCommand(
+    IServiceProvider serviceProvider,
+    IUserManager userManager,
+    ILogger<RegisterCommand> logger,
+    IOptions<DiscordOptions> discordOptions
+        ) : BaseCommand(serviceProvider)
 {
-    private readonly IUserManager _userManager;
-    private readonly ILogger<RegisterCommand> _logger;
-    private readonly DiscordOptions _discordOptions;
-
-    public RegisterCommand(
-        IServiceProvider serviceProvider,
-        IUserManager userManager,
-        ILogger<RegisterCommand> logger,
-        IOptions<DiscordOptions> discordOptions
-        ) : base(serviceProvider)
-    {
-        _userManager = userManager;
-        _logger = logger;
-        _discordOptions = discordOptions.Value;
-    }
-
+    private readonly IUserManager _userManager = userManager;
+    private readonly ILogger<RegisterCommand> _logger = logger;
+    private readonly DiscordOptions _discordOptions = discordOptions.Value;
 
     [SlashCommand("register", "Register your account")]
     public async Task Register(InteractionContext ctx)

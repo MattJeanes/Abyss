@@ -8,10 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Abyss.Web.Controllers;
 
 [Route("api/auth")]
-public class AuthenticationController : BaseController
+public class AuthenticationController(IUserManager userManager, IUserHelper userHelper) : BaseController(userHelper)
 {
-    private readonly IUserManager _userManager;
-    public AuthenticationController(IConfiguration config, IUserManager userManager, IUserHelper userHelper) : base(userHelper) => _userManager = userManager;
+    private readonly IUserManager _userManager = userManager;
 
     [Route("login/{schemeId}")]
     public IActionResult Login(string schemeId)

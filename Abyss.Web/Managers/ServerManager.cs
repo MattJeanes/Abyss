@@ -8,31 +8,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Managers;
 
-public class ServerManager : IServerManager
+public class ServerManager(
+    IRepository<Server> serverRepository,
+    IAzureHelper azureHelper,
+    INotificationHelper notificationHelper,
+    ICloudflareHelper cloudflareHelper,
+    ILogger<ServerManager> logger,
+    ISpaceEngineersHelper spaceEngineersHelper
+        ) : IServerManager
 {
-    private readonly IRepository<Server> _serverRepository;
-    private readonly ICloudflareHelper _cloudflareHelper;
-    private readonly IAzureHelper _azureHelper;
-    private readonly INotificationHelper _notificationHelper;
-    private readonly ILogger<ServerManager> _baseLogger;
-    private readonly ISpaceEngineersHelper _spaceEngineersHelper;
-
-    public ServerManager(
-        IRepository<Server> serverRepository,
-        IAzureHelper azureHelper,
-        INotificationHelper notificationHelper,
-        ICloudflareHelper cloudflareHelper,
-        ILogger<ServerManager> logger,
-        ISpaceEngineersHelper spaceEngineersHelper
-        )
-    {
-        _serverRepository = serverRepository;
-        _cloudflareHelper = cloudflareHelper;
-        _azureHelper = azureHelper;
-        _notificationHelper = notificationHelper;
-        _baseLogger = logger;
-        _spaceEngineersHelper = spaceEngineersHelper;
-    }
+    private readonly IRepository<Server> _serverRepository = serverRepository;
+    private readonly ICloudflareHelper _cloudflareHelper = cloudflareHelper;
+    private readonly IAzureHelper _azureHelper = azureHelper;
+    private readonly INotificationHelper _notificationHelper = notificationHelper;
+    private readonly ILogger<ServerManager> _baseLogger = logger;
+    private readonly ISpaceEngineersHelper _spaceEngineersHelper = spaceEngineersHelper;
 
     public async Task<List<Server>> GetServers()
     {

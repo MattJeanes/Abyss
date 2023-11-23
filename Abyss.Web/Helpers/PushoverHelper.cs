@@ -7,18 +7,11 @@ using System.Text.Json.Serialization;
 
 namespace Abyss.Web.Helpers;
 
-public class PushoverHelper : INotificationHelper
+public class PushoverHelper(HttpClient httpClient, IOptions<PushoverOptions> options, ILogger<PushoverHelper> logger) : INotificationHelper
 {
-    private readonly HttpClient _httpClient;
-    private readonly PushoverOptions _options;
-    private readonly ILogger<PushoverHelper> _logger;
-
-    public PushoverHelper(HttpClient httpClient, IOptions<PushoverOptions> options, ILogger<PushoverHelper> logger)
-    {
-        _httpClient = httpClient;
-        _options = options.Value;
-        _logger = logger;
-    }
+    private readonly HttpClient _httpClient = httpClient;
+    private readonly PushoverOptions _options = options.Value;
+    private readonly ILogger<PushoverHelper> _logger = logger;
 
     public async Task SendMessage(string message, MessagePriority messagePriority = MessagePriority.Normal)
     {

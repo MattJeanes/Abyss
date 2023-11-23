@@ -6,10 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Repositories;
 
-public class UserRepository : Repository<User>, IUserRepository
+public class UserRepository(AbyssContext context) : Repository<User>(context), IUserRepository
 {
-    public UserRepository(AbyssContext context) : base(context) { }
-
     public async override Task<User> GetById(int id)
     {
         var user = await GetAll().Where(x => x.Id == id)

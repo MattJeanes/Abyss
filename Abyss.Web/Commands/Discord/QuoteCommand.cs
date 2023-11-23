@@ -6,11 +6,9 @@ using DSharpPlus.SlashCommands;
 namespace Abyss.Web.Commands.Discord;
 
 [SlashCommandGroup("quote", "Add or view quotes")]
-public class QuoteCommand : BaseCommand
+public class QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHelper) : BaseCommand(serviceProvider)
 {
-    private readonly IQuoteHelper _quoteHelper;
-
-    public QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHelper) : base(serviceProvider) => _quoteHelper = quoteHelper;
+    private readonly IQuoteHelper _quoteHelper = quoteHelper;
 
     [SlashCommand("get", "Get a random Abyss quote")]
     public async Task GetQuote(InteractionContext ctx)

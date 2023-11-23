@@ -5,11 +5,9 @@ using System.Text.Json;
 
 namespace Abyss.Web.Clients;
 
-public class GPTClient : IGPTClient
+public class GPTClient(HttpClient httpClient) : IGPTClient
 {
-    private readonly HttpClient _httpClient;
-
-    public GPTClient(HttpClient httpClient) => _httpClient = httpClient;
+    private readonly HttpClient _httpClient = httpClient;
 
     public async Task<GPTResponse> Generate(string model, string message, decimal temperature, decimal top_p)
     {

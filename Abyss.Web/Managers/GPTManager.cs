@@ -8,25 +8,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Managers;
 
-public class GPTManager : IGPTManager
+public class GPTManager(
+    ILogger<GPTManager> logger,
+    IGPTClient gptClient,
+    IGPTModelRepository gptModelRepository,
+    IUserHelper userHelper
+        ) : IGPTManager
 {
-    private readonly ILogger<GPTManager> _logger;
-    private readonly IGPTClient _gptClient;
-    private readonly IGPTModelRepository _gptModelRepository;
-    private readonly IUserHelper _userHelper;
-
-    public GPTManager(
-        ILogger<GPTManager> logger,
-        IGPTClient gptClient,
-        IGPTModelRepository gptModelRepository,
-        IUserHelper userHelper
-        )
-    {
-        _logger = logger;
-        _gptClient = gptClient;
-        _gptModelRepository = gptModelRepository;
-        _userHelper = userHelper;
-    }
+    private readonly ILogger<GPTManager> _logger = logger;
+    private readonly IGPTClient _gptClient = gptClient;
+    private readonly IGPTModelRepository _gptModelRepository = gptModelRepository;
+    private readonly IUserHelper _userHelper = userHelper;
 
     public async Task<GPTResponse> Generate(GPTRequest message)
     {

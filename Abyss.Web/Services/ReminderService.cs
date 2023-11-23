@@ -9,25 +9,17 @@ using System.Text;
 
 namespace Abyss.Web.Services;
 
-public class ReminderService : IHostedService, IDisposable
+public class ReminderService(
+    ILogger<ReminderService> logger,
+    IOptions<ReminderOptions> options,
+    IServiceProvider serviceProvider,
+    DiscordClient discordClient) : IHostedService, IDisposable
 {
-    private readonly ILogger<ReminderService> _logger;
-    private readonly ReminderOptions _options;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly DiscordClient _discordClient;
+    private readonly ILogger<ReminderService> _logger = logger;
+    private readonly ReminderOptions _options = options.Value;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly DiscordClient _discordClient = discordClient;
     private Timer _timer;
-
-    public ReminderService(
-        ILogger<ReminderService> logger,
-        IOptions<ReminderOptions> options,
-        IServiceProvider serviceProvider,
-        DiscordClient discordClient)
-    {
-        _logger = logger;
-        _options = options.Value;
-        _serviceProvider = serviceProvider;
-        _discordClient = discordClient;
-    }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {

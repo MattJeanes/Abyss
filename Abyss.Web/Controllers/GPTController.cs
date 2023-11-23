@@ -7,11 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace Abyss.Web.Controllers;
 
 [Route("api/gpt")]
-public class GPTController : BaseController
+public class GPTController(IGPTManager gptManager, IUserHelper userHelper) : BaseController(userHelper)
 {
-    private readonly IGPTManager _gptManager;
-
-    public GPTController(IGPTManager gptManager, IUserHelper userHelper) : base(userHelper) => _gptManager = gptManager;
+    private readonly IGPTManager _gptManager = gptManager;
 
     [HttpGet("models")]
     public async Task<IList<GPTModel>> GetModels()

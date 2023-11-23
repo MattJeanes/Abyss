@@ -5,26 +5,17 @@ using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Services;
 
-public class QuoteOfTheDayService : CronJobService
+public class QuoteOfTheDayService(
+    IServiceProvider serviceProvider,
+    IQuoteHelper quoteHelper,
+    IScheduleConfig<QuoteOfTheDayService> config,
+    IOptions<QuoteOfTheDayOptions> options,
+    ILogger<QuoteOfTheDayService> logger) : CronJobService(config.CronExpression, config.TimeZoneInfo)
 {
-    private readonly IServiceProvider _serviceProvider;
-    private readonly IQuoteHelper _quoteHelper;
-    private readonly QuoteOfTheDayOptions _options;
-    private readonly ILogger<QuoteOfTheDayService> _logger;
-
-    public QuoteOfTheDayService(
-        IServiceProvider serviceProvider,
-        IQuoteHelper quoteHelper,
-        IScheduleConfig<QuoteOfTheDayService> config,
-        IOptions<QuoteOfTheDayOptions> options,
-        ILogger<QuoteOfTheDayService> logger)
-        : base(config.CronExpression, config.TimeZoneInfo)
-    {
-        _serviceProvider = serviceProvider;
-        _quoteHelper = quoteHelper;
-        _options = options.Value;
-        _logger = logger;
-    }
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly IQuoteHelper _quoteHelper = quoteHelper;
+    private readonly QuoteOfTheDayOptions _options = options.Value;
+    private readonly ILogger<QuoteOfTheDayService> _logger = logger;
 
     public override Task StartAsync(CancellationToken cancellationToken)
     {

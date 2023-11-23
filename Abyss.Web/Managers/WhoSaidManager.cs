@@ -4,16 +4,10 @@ using Abyss.Web.Managers.Interfaces;
 
 namespace Abyss.Web.Managers;
 
-public class WhoSaidManager : IWhoSaidManager
+public class WhoSaidManager(IWhoSaidHelper whoSaidHelper, ILogger<WhoSaidManager> logger) : IWhoSaidManager
 {
-    private readonly IWhoSaidHelper _whoSaidHelper;
-    private readonly ILogger<WhoSaidManager> _logger;
-
-    public WhoSaidManager(IWhoSaidHelper whoSaidHelper, ILogger<WhoSaidManager> logger)
-    {
-        _whoSaidHelper = whoSaidHelper;
-        _logger = logger;
-    }
+    private readonly IWhoSaidHelper _whoSaidHelper = whoSaidHelper;
+    private readonly ILogger<WhoSaidManager> _logger = logger;
 
     public async Task<WhoSaid> WhoSaid(string message)
     {

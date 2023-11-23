@@ -3,10 +3,9 @@ using StackExchange.Exceptional;
 
 namespace Abyss.Web.Logging;
 
-public class ExceptionalLoggerProvider : ILoggerProvider
+public class ExceptionalLoggerProvider(IHttpContextAccessor httpContextAccessor) : ILoggerProvider
 {
-    public readonly IHttpContextAccessor _httpContextAccessor;
-    public ExceptionalLoggerProvider(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
+    public readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public ILogger CreateLogger(string categoryName)
     {
@@ -20,15 +19,11 @@ public class ExceptionalLoggerProvider : ILoggerProvider
 }
 
 
-public class ExceptionalLogger : ILogger
+public class ExceptionalLogger(IHttpContextAccessor httpContextAccessor, string categoryName) : ILogger
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly string _categoryName;
-    public ExceptionalLogger(IHttpContextAccessor httpContextAccessor, string categoryName)
-    {
-        _httpContextAccessor = httpContextAccessor;
-        _categoryName = categoryName;
-    }
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+    private readonly string _categoryName = categoryName;
+
     public IDisposable BeginScope<TState>(TState state)
     {
 #pragma warning disable CS8603 // Possible null reference return.

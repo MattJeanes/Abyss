@@ -12,16 +12,10 @@ namespace Abyss.Web.Controllers;
 
 [AuthorizePermission(Permissions.ServerManager)]
 [Route("api/server")]
-public class ServerController
+public class ServerController(IServerManager serverManager, IBackgroundTaskQueue backgroundTaskQueue)
 {
-    private readonly IServerManager _serverManager;
-    private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-
-    public ServerController(IServerManager serverManager, IBackgroundTaskQueue backgroundTaskQueue)
-    {
-        _serverManager = serverManager;
-        _backgroundTaskQueue = backgroundTaskQueue;
-    }
+    private readonly IServerManager _serverManager = serverManager;
+    private readonly IBackgroundTaskQueue _backgroundTaskQueue = backgroundTaskQueue;
 
     [HttpGet]
     public async Task<List<Server>> GetServers()

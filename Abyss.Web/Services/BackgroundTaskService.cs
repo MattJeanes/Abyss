@@ -2,18 +2,11 @@
 
 namespace Abyss.Web.Services;
 
-public class BackgroundWorkerService : BackgroundService
+public class BackgroundWorkerService(IBackgroundTaskQueue queue, IServiceScopeFactory serviceScopeFactory, ILogger<BackgroundWorkerService> logger) : BackgroundService
 {
-    private readonly IBackgroundTaskQueue _queue;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
-    private readonly ILogger<BackgroundWorkerService> _logger;
-
-    public BackgroundWorkerService(IBackgroundTaskQueue queue, IServiceScopeFactory serviceScopeFactory, ILogger<BackgroundWorkerService> logger)
-    {
-        _queue = queue;
-        _serviceScopeFactory = serviceScopeFactory;
-        _logger = logger;
-    }
+    private readonly IBackgroundTaskQueue _queue = queue;
+    private readonly IServiceScopeFactory _serviceScopeFactory = serviceScopeFactory;
+    private readonly ILogger<BackgroundWorkerService> _logger = logger;
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {

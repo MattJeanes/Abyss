@@ -6,18 +6,11 @@ using StackExchange.Exceptional;
 
 namespace Abyss.Web.Middleware;
 
-public class ErrorViewerMiddleware
+public class ErrorViewerMiddleware(RequestDelegate next, IServiceProvider serviceProvider, IOptions<AuthenticationOptions> options)
 {
-    private readonly RequestDelegate _next;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly AuthenticationOptions _options;
-
-    public ErrorViewerMiddleware(RequestDelegate next, IServiceProvider serviceProvider, IOptions<AuthenticationOptions> options)
-    {
-        _next = next;
-        _serviceProvider = serviceProvider;
-        _options = options.Value;
-    }
+    private readonly RequestDelegate _next = next;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly AuthenticationOptions _options = options.Value;
 
     public async Task Invoke(HttpContext context)
     {

@@ -7,11 +7,9 @@ namespace Abyss.Web.Controllers;
 
 [AuthorizePermission(Permissions.WhoSaid)]
 [Route("api/whosaid")]
-public class WhoSaidController
+public class WhoSaidController(IWhoSaidManager whoSaidManager)
 {
-    private readonly IWhoSaidManager _whoSaidManager;
-
-    public WhoSaidController(IWhoSaidManager whoSaidManager) => _whoSaidManager = whoSaidManager;
+    private readonly IWhoSaidManager _whoSaidManager = whoSaidManager;
 
     [HttpPost]
     public async Task<WhoSaid> WhoSaid([FromBody] string message)

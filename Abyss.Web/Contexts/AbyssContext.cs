@@ -3,13 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Abyss.Web.Contexts;
 
-public class AbyssContext : DbContext
+public class AbyssContext(DbContextOptions<AbyssContext> options) : DbContext(options)
 {
-    public AbyssContext(DbContextOptions<AbyssContext> options) : base(options)
-    {
-
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Role>()

@@ -2,13 +2,11 @@
 
 namespace Abyss.Web.Logging;
 
-public class TaskLogger : ITaskLogger
+public class TaskLogger(ILogger logger) : ITaskLogger
 {
-    private readonly ILogger _logger;
+    private readonly ILogger _logger = logger;
     private readonly List<LogItem> _log = new List<LogItem>();
     private readonly Dictionary<string, Func<LogItem, Task>> _logHandlers = new Dictionary<string, Func<LogItem, Task>>();
-
-    public TaskLogger(ILogger logger) => _logger = logger;
 
     public void AddLogHandler(string name, Func<LogItem, Task> handler)
     {
