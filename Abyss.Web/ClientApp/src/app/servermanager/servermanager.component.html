@@ -1,11 +1,16 @@
 <h1>Server Manager</h1>
-<mat-form-field>
-    <mat-select [disabled]="loading" placeholder="Select server" [(ngModel)]="selectedId">
-        <mat-option *ngFor="let server of servers" [value]="server.Id">{{ server.Name }}</mat-option>
-    </mat-select>
-</mat-form-field>
-&nbsp;
-<button mat-raised-button [disabled]="loading" (click)="refresh()">Refresh</button>
+<div class="select">
+    <mat-form-field subscriptSizing="dynamic">
+        <mat-select [disabled]="loading" placeholder="Select server" [(ngModel)]="selectedId">
+            <mat-option *ngFor="let server of servers" [value]="server.Id">{{ server.Name }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div class="button">
+        <button [disabled]="loading" mat-fab (click)="refresh()">
+            <mat-icon>refresh</mat-icon>
+        </button>
+    </div>
+</div>
 <h2>
     Status: {{ selected ? ServerStatus[selected.StatusId] : 'N/A' }}
     &nbsp;

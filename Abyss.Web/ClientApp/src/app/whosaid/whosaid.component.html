@@ -1,7 +1,7 @@
 <h1>Who Said It?</h1>
 <div class="main">
     <div class="name">{{ name }}:</div>
-    <mat-form-field class="field">
+    <mat-form-field class="field" subscriptSizing="dynamic">
         <input class="input" matInput placeholder="Message" type="text" [(ngModel)]="message"
             (keyup.enter)="whoSaid()" />
         <button mat-icon-button matSuffix *ngIf="message" aria-label="Clear" (click)="message=''">
@@ -9,9 +9,12 @@
         </button>
     </mat-form-field>
     <div class="button">
-        <button [disabled]="loading || !message" mat-raised-button (click)="whoSaid()">Submit</button>
+        <button [disabled]="loading || !message" mat-fab (click)="whoSaid()">
+            <mat-icon>search</mat-icon>
+        </button>
     </div>
 </div>
+<br />
 <div class="log">
     <button mat-raised-button (click)="clear()" *ngIf="log.length">Clear</button>
     &nbsp;

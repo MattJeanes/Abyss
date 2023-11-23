@@ -11,6 +11,7 @@ import { ServerManagerComponent } from './servermanager.component';
 import { ServerManagerService } from './servermanager.service';
 
 import { AuthGuard } from '../services/auth.guard';
+import { MatIconModule } from '@angular/material/icon';
 
 export const routes: Routes = [
     {
@@ -29,6 +30,7 @@ export const routes: Routes = [
         MatSelectModule,
         MatButtonModule,
         MatProgressSpinnerModule,
+        MatIconModule,
     ],
     declarations: [
         ServerManagerComponent,
