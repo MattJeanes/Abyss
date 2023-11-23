@@ -9,10 +9,7 @@ public class GPTClient : IGPTClient
 {
     private readonly HttpClient _httpClient;
 
-    public GPTClient(HttpClient httpClient)
-    {
-        _httpClient = httpClient;
-    }
+    public GPTClient(HttpClient httpClient) => _httpClient = httpClient;
 
     public async Task<GPTResponse> Generate(string model, string message, decimal temperature, decimal top_p)
     {

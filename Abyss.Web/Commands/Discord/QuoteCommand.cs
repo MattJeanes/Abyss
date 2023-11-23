@@ -10,10 +10,7 @@ public class QuoteCommand : BaseCommand
 {
     private readonly IQuoteHelper _quoteHelper;
 
-    public QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHelper) : base(serviceProvider)
-    {
-        _quoteHelper = quoteHelper;
-    }
+    public QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHelper) : base(serviceProvider) => _quoteHelper = quoteHelper;
 
     [SlashCommand("get", "Get a random Abyss quote")]
     public async Task GetQuote(InteractionContext ctx)

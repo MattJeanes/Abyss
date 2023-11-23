@@ -6,10 +6,7 @@ namespace Abyss.Web.Logging;
 public class ExceptionalLoggerProvider : ILoggerProvider
 {
     public readonly IHttpContextAccessor _httpContextAccessor;
-    public ExceptionalLoggerProvider(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+    public ExceptionalLoggerProvider(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
     public ILogger CreateLogger(string categoryName)
     {

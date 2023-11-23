@@ -10,10 +10,7 @@ public class ErrorHandlingMiddleware
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
     private readonly RequestDelegate _next;
-    public ErrorHandlingMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
+    public ErrorHandlingMiddleware(RequestDelegate next) => _next = next;
 
     public async Task Invoke(HttpContext context)
     {

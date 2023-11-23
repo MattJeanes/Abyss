@@ -11,10 +11,7 @@ namespace Abyss.Web.Controllers;
 public class AuthenticationController : BaseController
 {
     private readonly IUserManager _userManager;
-    public AuthenticationController(IConfiguration config, IUserManager userManager, IUserHelper userHelper) : base(userHelper)
-    {
-        _userManager = userManager;
-    }
+    public AuthenticationController(IConfiguration config, IUserManager userManager, IUserHelper userHelper) : base(userHelper) => _userManager = userManager;
 
     [Route("login/{schemeId}")]
     public IActionResult Login(string schemeId)

@@ -8,10 +8,7 @@ public class OnlineManager : IOnlineManager
 {
     private readonly ITeamSpeakHelper _teamSpeakHelper;
 
-    public OnlineManager(ITeamSpeakHelper teamSpeakHelper)
-    {
-        _teamSpeakHelper = teamSpeakHelper;
-    }
+    public OnlineManager(ITeamSpeakHelper teamSpeakHelper) => _teamSpeakHelper = teamSpeakHelper;
     public async Task<List<Client>> GetClients()
     {
         return await _teamSpeakHelper.GetClients();

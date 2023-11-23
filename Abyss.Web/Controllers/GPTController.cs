@@ -11,10 +11,7 @@ public class GPTController : BaseController
 {
     private readonly IGPTManager _gptManager;
 
-    public GPTController(IGPTManager gptManager, IUserHelper userHelper) : base(userHelper)
-    {
-        _gptManager = gptManager;
-    }
+    public GPTController(IGPTManager gptManager, IUserHelper userHelper) : base(userHelper) => _gptManager = gptManager;
 
     [HttpGet("models")]
     public async Task<IList<GPTModel>> GetModels()

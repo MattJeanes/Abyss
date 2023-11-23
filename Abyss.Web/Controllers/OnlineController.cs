@@ -10,10 +10,7 @@ public class OnlineController : BaseController
 {
     private readonly IOnlineManager _manager;
 
-    public OnlineController(IOnlineManager manager, IUserHelper userHelper) : base(userHelper)
-    {
-        _manager = manager;
-    }
+    public OnlineController(IOnlineManager manager, IUserHelper userHelper) : base(userHelper) => _manager = manager;
 
     [Route("client")]
     public async Task<List<Client>> GetClients()

@@ -9,10 +9,7 @@ public class WhoSaidHelper : IWhoSaidHelper
 {
     private readonly PredictionEnginePool<InputData, Prediction> _predictionEnginePool;
 
-    public WhoSaidHelper(PredictionEnginePool<InputData, Prediction> predictionEnginePool)
-    {
-        _predictionEnginePool = predictionEnginePool;
-    }
+    public WhoSaidHelper(PredictionEnginePool<InputData, Prediction> predictionEnginePool) => _predictionEnginePool = predictionEnginePool;
 
     public async Task<WhoSaid> WhoSaid(string message)
     {

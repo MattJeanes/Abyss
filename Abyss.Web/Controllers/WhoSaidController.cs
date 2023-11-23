@@ -11,10 +11,7 @@ public class WhoSaidController
 {
     private readonly IWhoSaidManager _whoSaidManager;
 
-    public WhoSaidController(IWhoSaidManager whoSaidManager)
-    {
-        _whoSaidManager = whoSaidManager;
-    }
+    public WhoSaidController(IWhoSaidManager whoSaidManager) => _whoSaidManager = whoSaidManager;
 
     [HttpPost]
     public async Task<WhoSaid> WhoSaid([FromBody] string message)

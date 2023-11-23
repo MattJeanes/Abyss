@@ -7,10 +7,7 @@ public class AuthorizePermissionFilter : IAuthorizationFilter
 {
     private readonly List<string> _permissions;
 
-    public AuthorizePermissionFilter(List<string> permissions)
-    {
-        _permissions = permissions;
-    }
+    public AuthorizePermissionFilter(List<string> permissions) => _permissions = permissions;
     public void OnAuthorization(AuthorizationFilterContext context)
     {
         var user = UserHelper.GetClientUser(context.HttpContext);

@@ -9,10 +9,7 @@ public class BaseController : Controller
 {
     public readonly IUserHelper _userHelper;
 
-    public BaseController(IUserHelper userHelper)
-    {
-        _userHelper = userHelper;
-    }
+    public BaseController(IUserHelper userHelper) => _userHelper = userHelper;
 
     protected async Task<User> GetUser()
     {

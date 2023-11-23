@@ -8,10 +8,7 @@ public class TaskLogger : ITaskLogger
     private readonly List<LogItem> _log = new List<LogItem>();
     private readonly Dictionary<string, Func<LogItem, Task>> _logHandlers = new Dictionary<string, Func<LogItem, Task>>();
 
-    public TaskLogger(ILogger logger)
-    {
-        _logger = logger;
-    }
+    public TaskLogger(ILogger logger) => _logger = logger;
 
     public void AddLogHandler(string name, Func<LogItem, Task> handler)
     {
