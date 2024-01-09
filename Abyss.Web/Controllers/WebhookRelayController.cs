@@ -33,6 +33,7 @@ public class WebhookRelayController : Controller
         }
 
         var statusCode = HttpStatusCode.Accepted;
+        var resp = string.Empty;
         foreach (var url in relay.Value.Urls)
         {
             using var req = new HttpRequestMessage(new HttpMethod(Request.Method), url);
@@ -45,13 +46,18 @@ public class WebhookRelayController : Controller
             Request.Body.Seek(0, SeekOrigin.Begin);
             requestBodyStream.Seek(0, SeekOrigin.Begin);
             req.Content = new StreamContent(requestBodyStream);
+            if (Request.Headers.ContainsKey("Content-Type"))
+            {
+                req.Content.Headers.Add("Content-Type", Request.ContentType);
+            }
             var res = await _client.SendAsync(req);
             if (!res.IsSuccessStatusCode)
             {
                 statusCode = res.StatusCode;
+                resp = await res.Content.ReadAsStringAsync();
             }
         }
 
-        return StatusCode((int)statusCode);
+        return StatusCode((int)statusCode, resp);
     }
 }
