@@ -179,6 +179,7 @@ public class Program
         services.Configure<AzureOptions>(config.GetSection("Azure"));
         services.Configure<GModOptions>(config.GetSection("GMod"));
         services.Configure<PushoverOptions>(config.GetSection("Pushover"));
+        services.Configure<WebhookRelayOptions>(config.GetSection("WebhookRelay"));
         services.AddHttpContextAccessor();
         services.AddHttpClient("cloudflare", options =>
         {
@@ -273,6 +274,12 @@ public class Program
         app.MapHub<ServerManagerHub>("/hub/servermanager");
         app.MapControllers();
         app.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+
+        app.UseWhen(ctx => ctx.Request.Path.StartsWithSegments(new PathString("/api/webhookrelay")), then => then.Use(async (context, next) =>
+        {
+            context.Request.EnableBuffering();
+            await next();
+        }));
 
         var excludedPaths = new PathString[] { "/api", "/hub", "/healthz" };
         app.UseWhen((ctx) =>

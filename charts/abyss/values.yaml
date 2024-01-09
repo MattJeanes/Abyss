@@ -28,6 +28,12 @@ env:
     Tumblr__ConsumerSecret: ""
     Tumblr__Token: ""
     Tumblr__TokenSecret: ""
+    WebhookRelay__Relays__GitHub__Key: ""
+    WebhookRelay__Relays__GitHub__Urls__0: ""
+    WebhookRelay__Relays__GitHub__Urls__1: ""
+    WebhookRelay__Relays__GitLab__Key: ""
+    WebhookRelay__Relays__GitLab__Urls__0: ""
+    WebhookRelay__Relays__GitLab__Urls__1: ""
   normal:
     ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
     Authentication__Discord__ClientId: ""
