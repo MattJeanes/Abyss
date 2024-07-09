@@ -7,5 +7,6 @@ public enum ServerType
     SpaceEngineers = 2,
     Satisfactory = 3,
     CSGO = 4,
-    SevenDaysToDie = 5
+    SevenDaysToDie = 5,
+    Minecraft = 6
 }
