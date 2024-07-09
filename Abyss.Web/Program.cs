@@ -133,6 +133,7 @@ public class Program
         services.AddTransient<IGModHelper, GModHelper>();
         services.AddSingleton<ITeamSpeakHelper, TeamSpeakHelper>();
         services.AddSingleton<IQuoteHelper, QuoteHelper>();
+        services.AddSingleton<IMinecraftHelper, MinecraftHelper>();
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
         services.AddHttpClient();

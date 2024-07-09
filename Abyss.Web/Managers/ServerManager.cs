@@ -14,7 +14,8 @@ public class ServerManager(
     INotificationHelper notificationHelper,
     ICloudflareHelper cloudflareHelper,
     ILogger<ServerManager> logger,
-    ISpaceEngineersHelper spaceEngineersHelper
+    ISpaceEngineersHelper spaceEngineersHelper,
+    IMinecraftHelper minecraftHelper
         ) : IServerManager
 {
     private readonly IRepository<Server> _serverRepository = serverRepository;
@@ -23,6 +24,7 @@ public class ServerManager(
     private readonly INotificationHelper _notificationHelper = notificationHelper;
     private readonly ILogger<ServerManager> _baseLogger = logger;
     private readonly ISpaceEngineersHelper _spaceEngineersHelper = spaceEngineersHelper;
+    private readonly IMinecraftHelper _minecraftHelper = minecraftHelper;
 
     public async Task<List<Server>> GetServers()
     {
@@ -226,6 +228,14 @@ public class ServerManager(
                 return new ServerRichStatus
                 {
                     Players = characters.Select(x => x.DisplayName).ToList(),
+                };
+            }
+            else if (server.Type == ServerType.Minecraft)
+            {
+                var players = await _minecraftHelper.GetPlayers(server.DNSRecord);
+                return new ServerRichStatus
+                {
+                    Players = players
                 };
             }
         }

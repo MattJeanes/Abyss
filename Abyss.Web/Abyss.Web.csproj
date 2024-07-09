@@ -14,20 +14,21 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OpenId.Steam" Version="8.0.0" />
-    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="8.0.0" />
-    <PackageReference Include="Azure.ResourceManager.Network" Version="1.7.0" />
+    <PackageReference Include="AspNet.Security.OAuth.Discord" Version="8.1.0" />
+    <PackageReference Include="Azure.ResourceManager.Network" Version="1.8.0" />
     <PackageReference Include="Cronos" Version="0.8.4" />
     <PackageReference Include="DSharpPlus.SlashCommands" Version="5.0.0-nightly-01898" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.6">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.7">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.ML" Version="3.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.6" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.20.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
+    <PackageReference Include="MineStat" Version="3.1.2" />
     <PackageReference Include="NewTumblrSharp" Version="1.2.0.156" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="Serilog" Version="4.0.0" />
@@ -38,9 +39,9 @@
     <PackageReference Include="Microsoft.ML" Version="3.0.1" />
     <PackageReference Include="Azure.ResourceManager.Compute" Version="1.5.0" />
     <PackageReference Include="Azure.ResourceManager" Version="1.12.0" />
-    <PackageReference Include="Azure.Identity" Version="1.11.3" />
-    <PackageReference Include="RestSharp" Version="111.2.0" />
-    <PackageReference Include="FluentValidation" Version="11.9.1" />
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+    <PackageReference Include="RestSharp" Version="111.3.0" />
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
   </ItemGroup>
   <ItemGroup>
