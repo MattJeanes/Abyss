@@ -2,5 +2,6 @@
 
 public enum CloudType
 {
-    Azure = 1
+    Azure = 1,
+    Crafty = 2
 }
