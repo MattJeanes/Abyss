@@ -153,15 +153,15 @@ public class Program
 
         services.AddPredictionEnginePool<InputData, Prediction>().FromFile(config["WhoSaidIt:ModelPath"]);
 
-        services.AddDiscordClient(config["Discord:Token"], DiscordIntents.GuildMembers | SlashCommandProcessor.RequiredIntents);
-        //discordClientBuilder.ConfigureEventHandlers(eventBuilder =>
-        //{
-        //    eventBuilder.HandleGuildMemberRemoved(async (client, e) =>
-        //    {
-        //        var commands = client.ServiceProvider.GetServices<IDiscordCommand>();
-        //        await Task.WhenAll(commands.Select(x => x.MemberRemoved(e)).ToArray());
-        //    });
-        //});
+        services.AddDiscordClient(config["Discord:Token"], DiscordIntents.GuildMembers | SlashCommandProcessor.RequiredIntents)
+            .ConfigureEventHandlers(eventBuilder =>
+            {
+                eventBuilder.HandleGuildMemberRemoved(async (client, e) =>
+                {
+                    var commands = client.ServiceProvider.GetServices<IDiscordCommand>();
+                    await Task.WhenAll(commands.Select(x => x.MemberRemoved(e)).ToArray());
+                });
+            });
 
         services.AddSingleton<TumblrClientFactory>();
         services.AddTransient(serviceProvider =>
