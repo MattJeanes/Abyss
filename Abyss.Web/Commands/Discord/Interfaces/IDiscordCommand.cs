@@ -6,9 +6,9 @@ namespace Abyss.Web.Commands.Discord.Interfaces;
 
 public interface IDiscordCommand
 {
-    Task MemberRemoved(GuildMemberRemoveEventArgs e);
-    Task<ClientUser> GetClientUser(MessageCreateEventArgs e);
-    Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e);
+    Task MemberRemoved(GuildMemberRemovedEventArgs e);
+    Task<ClientUser> GetClientUser(MessageCreatedEventArgs e);
+    Task<ClientUser> GetClientUser(GuildMemberRemovedEventArgs e);
     Task<ClientUser> GetClientUser(DiscordUser discordUser);
-    Task<bool> HasPermission(MessageCreateEventArgs e, string permission);
+    Task<bool> HasPermission(MessageCreatedEventArgs e, string permission);
 }

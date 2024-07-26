@@ -11,6 +11,7 @@ namespace Abyss.Web.Managers;
 public class ServerManager(
     IRepository<Server> serverRepository,
     IAzureHelper azureHelper,
+    IOvhHelper ovhHelper,
     INotificationHelper notificationHelper,
     ICloudflareHelper cloudflareHelper,
     ILogger<ServerManager> logger,
@@ -21,6 +22,7 @@ public class ServerManager(
     private readonly IRepository<Server> _serverRepository = serverRepository;
     private readonly ICloudflareHelper _cloudflareHelper = cloudflareHelper;
     private readonly IAzureHelper _azureHelper = azureHelper;
+    private readonly IOvhHelper _ovhHelper = ovhHelper;
     private readonly INotificationHelper _notificationHelper = notificationHelper;
     private readonly ILogger<ServerManager> _baseLogger = logger;
     private readonly ISpaceEngineersHelper _spaceEngineersHelper = spaceEngineersHelper;
@@ -62,14 +64,18 @@ public class ServerManager(
             }
 
             string ipAddress;
-            if (server.CloudType == CloudType.Azure)
+            switch (server.CloudType)
             {
-                await _azureHelper.StartServer(server, logger);
-                ipAddress = await _azureHelper.GetServerIpAddress(server);
-            }
-            else
-            {
-                throw new Exception($"Unsupported cloud type {server.CloudType}");
+                case CloudType.Azure:
+                    await _azureHelper.StartServer(server, logger);
+                    ipAddress = await _azureHelper.GetServerIpAddress(server);
+                    break;
+                case CloudType.Ovh:
+                    await _ovhHelper.StartServer(server, logger);
+                    ipAddress = await _ovhHelper.GetServerIpAddress(server);
+                    break;
+                default:
+                    throw new Exception($"Unsupported cloud type {server.CloudType}");
             }
 
             var dnsRecord = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
@@ -144,13 +150,16 @@ public class ServerManager(
             {
                 await statusHandler(server.StatusId);
             }
-            if (server.CloudType == CloudType.Azure)
+            switch (server.CloudType)
             {
-                await _azureHelper.StopServer(server, logger);
-            }
-            else
-            {
-                throw new Exception($"Unsupported cloud type {server.CloudType}");
+                case CloudType.Azure:
+                    await _azureHelper.StopServer(server, logger);
+                    break;
+                case CloudType.Ovh:
+                    await _ovhHelper.StopServer(server, logger);
+                    break;
+                default:
+                    throw new Exception($"Unsupported cloud type {server.CloudType}");
             }
             server.IPAddress = null;
             server.NextReminder = null;
@@ -198,13 +207,16 @@ public class ServerManager(
             if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot restart server that is not active"); }
             logger.LogInformation($"Restarting server {server.Name}");
             await _notificationHelper.SendMessage($"Restarting server {server.Name}", MessagePriority.HighPriority);
-            if (server.CloudType == CloudType.Azure)
+            switch (server.CloudType)
             {
-                await _azureHelper.RestartServer(server, logger);
-            }
-            else
-            {
-                throw new Exception($"Unsupported cloud type {server.CloudType}");
+                case CloudType.Azure:
+                    await _azureHelper.RestartServer(server, logger);
+                    break;
+                case CloudType.Ovh:
+                    await _ovhHelper.RestartServer(server, logger);
+                    break;
+                default:
+                    throw new Exception($"Unsupported cloud type {server.CloudType}");
             }
             logger.LogInformation($"Successfully restarted server {server.Name}");
             await _notificationHelper.SendMessage($"Restarted server {server.Name}", MessagePriority.HighPriority);

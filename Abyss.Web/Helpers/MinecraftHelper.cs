@@ -8,13 +8,20 @@ public class MinecraftHelper() : IMinecraftHelper
     public async Task<List<string>> GetPlayers(string host, ushort port = 25565)
     {
         var ms = await Task.Run(() => new MineStat(host, port));
-        if (ms.ServerUp && ms.PlayerList != null)
+        if (ms.ServerUp)
         {
-            return new List<string>(ms.PlayerList);
+            if (ms.PlayerList != null)
+            {
+                return new List<string>(ms.PlayerList);
+            }
+            else
+            {
+                return [];
+            }
         }
         else
         {
-            return [];
+            throw new Exception("Unable to query server, it might be down or still starting up");
         }
     }
 }

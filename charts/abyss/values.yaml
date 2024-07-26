@@ -18,6 +18,8 @@ env:
     Authentication__Steam__ApplicationKey: ""
     Azure__ClientSecret: ""
     Cloudflare__ApiKey: ""
+    Ovh__ClientId: ""
+    Ovh__ClientSecret: ""
     ConnectionStrings__Abyss: ""
     Discord__Token: ""
     GMod__ApiKey: ""

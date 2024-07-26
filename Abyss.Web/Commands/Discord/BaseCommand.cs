@@ -1,17 +1,16 @@
 ﻿using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
-using Abyss.Web.Helpers;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
+using DSharpPlus.Commands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
-using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Options;
 
 namespace Abyss.Web.Commands.Discord;
 
-public class BaseCommand : ApplicationCommandModule, IDiscordCommand, IDisposable
+public class BaseCommand : IDiscordCommand, IDisposable
 {
     protected readonly IServiceScope _serviceScope;
     protected readonly IUserHelper _userHelper;
@@ -26,17 +25,17 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand, IDisposabl
         _baseOptions = _serviceScope.ServiceProvider.GetRequiredService<IOptions<DiscordOptions>>().Value;
     }
 
-    public virtual Task MemberRemoved(GuildMemberRemoveEventArgs e)
+    public virtual Task MemberRemoved(GuildMemberRemovedEventArgs e)
     {
         return Task.CompletedTask;
     }
 
-    public async Task<ClientUser> GetClientUser(MessageCreateEventArgs e)
+    public async Task<ClientUser> GetClientUser(MessageCreatedEventArgs e)
     {
         return await GetClientUser(e.Author);
     }
 
-    public async Task<ClientUser> GetClientUser(GuildMemberRemoveEventArgs e)
+    public async Task<ClientUser> GetClientUser(GuildMemberRemovedEventArgs e)
     {
         return await GetClientUser(e.Member);
     }
@@ -52,13 +51,13 @@ public class BaseCommand : ApplicationCommandModule, IDiscordCommand, IDisposabl
         return clientUser;
     }
 
-    public async Task<bool> HasPermission(MessageCreateEventArgs e, string permission)
+    public async Task<bool> HasPermission(MessageCreatedEventArgs e, string permission)
     {
         var user = await GetClientUser(e.Author);
         return _userHelper.HasPermission(user, permission);
     }
 
-    public async Task<bool> CheckPermission(BaseContext ctx, string permission)
+    public async Task<bool> CheckPermission(CommandContext ctx, string permission)
     {
         var clientUser = await GetClientUser(ctx.User);
         if (!_userHelper.HasPermission(clientUser, permission))

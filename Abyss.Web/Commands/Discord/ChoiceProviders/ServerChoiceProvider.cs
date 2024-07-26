@@ -1,17 +1,22 @@
 ﻿using Abyss.Web.Managers.Interfaces;
-using DSharpPlus.Entities;
-using DSharpPlus.SlashCommands;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Commands.Trees;
 
 namespace Abyss.Web.Commands.Discord.ChoiceProviders;
 
-public class ServerChoiceProvider : ChoiceProvider
+public class ServerChoiceProvider : IChoiceProvider
 {
-    public override async Task<IEnumerable<DiscordApplicationCommandOptionChoice>> Provider()
-    {
-        using var scope = Services.CreateScope();
-        var serverManager = scope.ServiceProvider.GetRequiredService<IServerManager>();
-        var servers = await serverManager.GetServers();
+    private readonly IServerManager _serverManager;
 
-        return servers.OrderBy(x => x.Name).Select(x => new DiscordApplicationCommandOptionChoice(x.Name, x.Alias));
+    public ServerChoiceProvider(IServerManager serverManager)
+    {
+        _serverManager = serverManager;
+    }
+
+    public async ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
+    {
+        var servers = await _serverManager.GetServers();
+
+        return servers.OrderBy(x => x.Name).ToDictionary(x => x.Name, x => (object)x.Alias);
     }
 }

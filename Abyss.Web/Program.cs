@@ -20,6 +20,8 @@ using Azure.ResourceManager;
 using DontPanic.TumblrSharp;
 using DontPanic.TumblrSharp.Client;
 using DSharpPlus;
+using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Extensions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -142,16 +144,25 @@ public class Program
             client.BaseAddress = new Uri(config["GPTClient:BaseUrl"]);
         });
         services.AddHttpClient<ISpaceEngineersHelper, SpaceEngineersHelper>();
+        services.AddHttpClient<IOvhHelper, OvhHelper>(client =>
+        {
+            client.BaseAddress = new Uri(config["Ovh:BaseUrl"]);
+        });
         services.AddDbContext<AbyssContext>(options =>
             options.UseNpgsql(config.GetConnectionString("Abyss")));
 
         services.AddPredictionEnginePool<InputData, Prediction>().FromFile(config["WhoSaidIt:ModelPath"]);
 
-        services.AddTransient(_ => new DiscordClient(new DiscordConfiguration
-        {
-            Token = config["Discord:Token"],
-            TokenType = DSharpPlus.TokenType.Bot
-        }));
+        services.AddDiscordClient(config["Discord:Token"], DiscordIntents.GuildMembers | SlashCommandProcessor.RequiredIntents);
+        //discordClientBuilder.ConfigureEventHandlers(eventBuilder =>
+        //{
+        //    eventBuilder.HandleGuildMemberRemoved(async (client, e) =>
+        //    {
+        //        var commands = client.ServiceProvider.GetServices<IDiscordCommand>();
+        //        await Task.WhenAll(commands.Select(x => x.MemberRemoved(e)).ToArray());
+        //    });
+        //});
+
         services.AddSingleton<TumblrClientFactory>();
         services.AddTransient(serviceProvider =>
             serviceProvider.GetRequiredService<TumblrClientFactory>().Create<TumblrClient>(
@@ -172,6 +183,7 @@ public class Program
         services.Configure<AuthenticationOptions>(config.GetSection("Authentication"));
         services.Configure<CleanupOptions>(config.GetSection("Services:Cleanup"));
         services.Configure<CloudflareOptions>(config.GetSection("Cloudflare"));
+        services.Configure<OvhOptions>(config.GetSection("Ovh"));
         services.Configure<DiscordOptions>(config.GetSection("Discord"));
         services.Configure<TeamSpeakOptions>(config.GetSection("TeamSpeak"));
         services.Configure<TumblrOptions>(config.GetSection("Tumblr"));

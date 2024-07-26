@@ -1,10 +1,8 @@
-﻿using Abyss.Web.Commands.Discord.Interfaces;
-using Abyss.Web.Data.Options;
+﻿using Abyss.Web.Data.Options;
 using DSharpPlus;
-using DSharpPlus.EventArgs;
-using DSharpPlus.SlashCommands;
+using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using Microsoft.Extensions.Options;
-using System.Reflection;
 
 namespace Abyss.Web.Services;
 
@@ -12,41 +10,29 @@ public class DiscordService : IHostedService
 {
     private readonly ILogger _logger;
     private readonly DiscordClient _client;
-    private readonly SlashCommandsExtension _slash;
-    private readonly DiscordOptions _options;
-    private readonly IServiceProvider _serviceProvider;
+    private readonly CommandsExtension _commandsExtension;
 
     public DiscordService(
         ILogger<DiscordService> logger,
         DiscordClient client,
-        IOptions<DiscordOptions> options,
-        IServiceProvider serviceProvider)
+        IOptions<DiscordOptions> options)
     {
         _logger = logger;
         _client = client;
-        _slash = _client.UseSlashCommands(new SlashCommandsConfiguration
+        _commandsExtension = _client.UseCommands(new CommandsConfiguration
         {
-            Services = serviceProvider
+            DebugGuildId = options.Value.GuildId ?? default,
+            RegisterDefaultCommandProcessors = false
         });
-        _options = options.Value;
-        _slash.RegisterCommands(Assembly.GetExecutingAssembly(), _options.GuildId);
-        _serviceProvider = serviceProvider;
+        _commandsExtension.AddCommands(typeof(Program).Assembly);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Discord service is starting");
-        ;
-        _client.GuildMemberRemoved += GuildMemberRemovedAsync;
 
+        await _commandsExtension.AddProcessorAsync(new SlashCommandProcessor());
         await _client.ConnectAsync();
-    }
-
-    private async Task GuildMemberRemovedAsync(DiscordClient client, GuildMemberRemoveEventArgs e)
-    {
-        using var scope = _serviceProvider.CreateScope();
-        var commands = scope.ServiceProvider.GetServices<IDiscordCommand>();
-        await Task.WhenAll(commands.Select(x => x.MemberRemoved(e)).ToArray());
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

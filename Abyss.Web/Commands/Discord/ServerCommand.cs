@@ -1,25 +1,25 @@
 ﻿using Abyss.Web.Commands.Discord.ChoiceProviders;
 using Abyss.Web.Data;
-using Abyss.Web.Helpers;
 using Abyss.Web.Managers.Interfaces;
-using DSharpPlus;
+using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
-using DSharpPlus.SlashCommands;
+using System.ComponentModel;
 
 namespace Abyss.Web.Commands.Discord;
 
-[SlashCommandGroup("server", "View or manage servers")]
+[Command("server"), Description("View or manage servers")]
 public class ServerCommand(IServiceProvider serviceProvider, IServerManager serverManager, ILogger<ServerCommand> logger) : BaseCommand(serviceProvider)
 {
     private readonly IServerManager _serverManager = serverManager;
     private readonly ILogger<ServerCommand> _logger = logger;
 
-    [SlashCommand("status", "Get server status")]
-    public async Task GetStatus(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    [Command("status"), Description("Get server status")]
+    public async Task GetStatus(CommandContext ctx, [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
 
-        var server = await _serverManager.GetServerByAlias(alias);
+        var server = await _serverManager.GetServerByAlias(name);
         if (server != null)
         {
             var richStatus = await _serverManager.GetServerRichStatus(server);
@@ -31,17 +31,17 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         }
     }
 
-    [SlashCommand("start", "Start a server")]
-    public async Task StartServer(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    [Command("start"), Description("Start a server")]
+    public async Task StartServer(CommandContext ctx, [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
 
-        if (!await CheckPermission(ctx, Data.Permissions.ServerManager))
+        if (!await CheckPermission(ctx, Permissions.ServerManager))
         {
             return;
         }
 
-        var server = await _serverManager.GetServerByAlias(alias);
+        var server = await _serverManager.GetServerByAlias(name);
         if (server == null)
         {
             await ctx.EditResponseAsync("Server not found");
@@ -60,7 +60,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             {
                 if (thread == null)
                 {
-                    await ctx.CreateFollowupMessageAsync(logItem.ToString());
+                    await ctx.FollowupAsync(logItem.ToString());
                 }
                 else
                 {
@@ -78,7 +78,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             await ctx.EditResponseAsync(response);
             if (thread == null)
             {
-                await ctx.CreateFollowupMessageAsync($"{response} {ctx.User.Mention}");
+                await ctx.FollowupAsync($"{response} {ctx.User.Mention}");
             }
             else
             {
@@ -87,17 +87,17 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         }
     }
 
-    [SlashCommand("stop", "Stop a server")]
-    public async Task StopServer(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    [Command("stop"), Description("Stop a server")]
+    public async Task StopServer(CommandContext ctx, [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
 
-        if (!await CheckPermission(ctx, Data.Permissions.ServerManager))
+        if (!await CheckPermission(ctx, Permissions.ServerManager))
         {
             return;
         }
 
-        var server = await _serverManager.GetServerByAlias(alias);
+        var server = await _serverManager.GetServerByAlias(name);
         if (server == null)
         {
             await ctx.EditResponseAsync("Server not found");
@@ -116,7 +116,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             {
                 if (thread == null)
                 {
-                    await ctx.CreateFollowupMessageAsync(logItem.ToString());
+                    await ctx.FollowupAsync(logItem.ToString());
                 }
                 else
                 {
@@ -134,7 +134,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             await ctx.EditResponseAsync(response);
             if (thread == null)
             {
-                await ctx.CreateFollowupMessageAsync($"{response} {ctx.User.Mention}");
+                await ctx.FollowupAsync($"{response} {ctx.User.Mention}");
             }
             else
             {
@@ -143,20 +143,20 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         }
     }
 
-    [SlashCommand("restart", "Restart a server, also updates it")]
-    public async Task RestartServer(InteractionContext ctx, [ChoiceProvider(typeof(ServerChoiceProvider))][Option("server", "Server name")] string alias)
+    [Command("restart"), Description("Restart a server, also updates it")]
+    public async Task RestartServer(CommandContext ctx, [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
 
-        if (!await CheckPermission(ctx, Data.Permissions.ServerManager))
+        if (!await CheckPermission(ctx, Permissions.ServerManager))
         {
             return;
         }
 
-        var server = await _serverManager.GetServerByAlias(alias);
+        var server = await _serverManager.GetServerByAlias(name);
         if (server == null)
         {
-            await ctx.EditResponseAsync($"Server '{alias}' not found");
+            await ctx.EditResponseAsync("Server not found");
             return;
         }
         if (server.StatusId != ServerStatus.Active)
@@ -172,7 +172,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             {
                 if (thread == null)
                 {
-                    await ctx.CreateFollowupMessageAsync(logItem.ToString());
+                    await ctx.FollowupAsync(logItem.ToString());
                 }
                 else
                 {
@@ -190,7 +190,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             await ctx.EditResponseAsync(response);
             if (thread == null)
             {
-                await ctx.CreateFollowupMessageAsync($"{response} {ctx.User.Mention}");
+                await ctx.FollowupAsync($"{response} {ctx.User.Mention}");
             }
             else
             {
@@ -234,15 +234,16 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         return status;
     }
 
-    private async Task<DiscordThreadChannel> TryCreateThread(InteractionContext ctx, string name)
+    private async Task<DiscordThreadChannel> TryCreateThread(CommandContext ctx, string name)
     {
         DiscordThreadChannel thread = null;
         if (!ctx.Channel.IsPrivate)
         {
             try
             {
-                var response = await ctx.GetOriginalResponseAsync();
-                thread = await response.CreateThreadAsync(name, AutoArchiveDuration.Hour);
+                var response = await ctx.GetResponseAsync();
+                var channel = await ctx.Client.GetChannelAsync(response.ChannelId);
+                thread = await channel.CreateThreadAsync(response, name, DiscordAutoArchiveDuration.Hour);
             }
             catch (Exception ex)
             {

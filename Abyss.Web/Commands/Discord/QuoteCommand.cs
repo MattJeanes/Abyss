@@ -1,27 +1,28 @@
-﻿using Abyss.Web.Helpers;
-using Abyss.Web.Helpers.Interfaces;
-using DSharpPlus;
-using DSharpPlus.SlashCommands;
+﻿using Abyss.Web.Helpers.Interfaces;
+using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Entities;
+using System.ComponentModel;
 
 namespace Abyss.Web.Commands.Discord;
 
-[SlashCommandGroup("quote", "Add or view quotes")]
+[Command("quote"), Description("Add or view quotes")]
 public class QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHelper) : BaseCommand(serviceProvider)
 {
     private readonly IQuoteHelper _quoteHelper = quoteHelper;
 
-    [SlashCommand("get", "Get a random Abyss quote")]
-    public async Task GetQuote(InteractionContext ctx)
+    [Command("get"), Description("Get a random Abyss quote")]
+    public async Task GetQuote(CommandContext ctx)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
         var quote = await _quoteHelper.GetQuote();
         await ctx.EditResponseAsync(_quoteHelper.FormatQuote(quote));
     }
 
-    [SlashCommand("add", "Add a quote")]
-    public async Task AddQuote(InteractionContext ctx, [Option("quote", "Quote text")] string quote, [Option("author", "Quote author")] string author)
+    [Command("add"), Description("Add a quote")]
+    public async Task AddQuote(CommandContext ctx, [Description("Quote text")] string quote, [Description("Quote author")] string author)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
 
         if (!await CheckPermission(ctx, Data.Permissions.QuoteManager))
         {
@@ -39,18 +40,18 @@ public class QuoteCommand(IServiceProvider serviceProvider, IQuoteHelper quoteHe
         }
     }
 
-    [ContextMenu(ApplicationCommandType.MessageContextMenu, "Add Quote")]
-    public async Task AddQuoteFromMessage(ContextMenuContext ctx)
+    [Command("Add Quote"), SlashCommandTypes(DiscordApplicationCommandType.MessageContextMenu)]
+    public async Task AddQuoteFromMessage(SlashCommandContext ctx, DiscordMessage message)
     {
-        await ctx.CreateDeferredResponseAsync();
+        await ctx.DeferResponseAsync();
 
         if (!await CheckPermission(ctx, Data.Permissions.QuoteManager))
         {
             return;
         }
 
-        var quote = ctx.TargetMessage.Content;
-        var author = ctx.TargetMessage.Author;
+        var quote = message.Content;
+        var author = message.Author;
         var member = await ctx.Guild.GetMemberAsync(author.Id);
 
         var result = await _quoteHelper.AddQuote(quote, member.DisplayName);

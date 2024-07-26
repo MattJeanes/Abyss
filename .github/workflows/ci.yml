@@ -77,6 +77,8 @@ jobs:
           --set env.secret.Authentication__Steam__ApplicationKey="${{ secrets.STEAM_APPLICATIONKEY }}" \
           --set env.secret.Azure__ClientSecret="${{ secrets.AZURE_CLIENTSECRET }}" \
           --set env.secret.Cloudflare__ApiKey="${{ secrets.CLOUDFLARE_APIKEY }}" \
+          --set env.secret.Ovh__ClientId="${{ secrets.OVH_CLIENTID }}" \
+          --set env.secret.Ovh__ClientSecret="${{ secrets.OVH_CLIENTSECRET }}" \
           --set env.secret.ConnectionStrings__Abyss="${{ secrets.DATABASECONNECTIONSTRING }}" \
           --set env.secret.Discord__Token="${{ secrets.DISCORD_TOKEN }}" \
           --set env.secret.GMod__ApiKey="${{ secrets.GMOD_APIKEY }}" \
