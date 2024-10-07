@@ -20,7 +20,10 @@ using Azure.ResourceManager;
 using DontPanic.TumblrSharp;
 using DontPanic.TumblrSharp.Client;
 using DSharpPlus;
+using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.MessageCommands;
 using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Commands.Processors.UserCommands;
 using DSharpPlus.Extensions;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -162,6 +165,22 @@ public class Program
                     await Task.WhenAll(commands.Select(x => x.MemberRemoved(e)).ToArray());
                 });
             });
+
+        services.AddCommandsExtension((serviceProvider, commandsExtension) =>
+            {
+                commandsExtension.AddCommands(typeof(Program).Assembly);
+                commandsExtension.AddProcessors(
+                    new SlashCommandProcessor(),
+                    new UserCommandProcessor(),
+                    new MessageCommandProcessor()
+                );
+            },
+            new CommandsConfiguration()
+            {
+                DebugGuildId = config.GetValue<ulong?>("Discord:GuildId") ?? default,
+                RegisterDefaultCommandProcessors = false
+            }
+        );
 
         services.AddSingleton<TumblrClientFactory>();
         services.AddTransient(serviceProvider =>
