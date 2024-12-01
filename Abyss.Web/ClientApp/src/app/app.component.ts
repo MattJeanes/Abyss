@@ -13,6 +13,7 @@ import { AccountDialogComponent } from './shared/account-dialog.component';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent implements OnInit {
     public Permissions = Permissions;

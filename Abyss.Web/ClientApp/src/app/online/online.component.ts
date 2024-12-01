@@ -9,6 +9,7 @@ import { DialogService } from '../services';
 @Component({
     templateUrl: './online.component.html',
     styleUrls: ['./online.component.scss'],
+    standalone: false
 })
 export class OnlineComponent implements OnInit, OnDestroy {
     public clients: ITeamSpeakClient[] = [];

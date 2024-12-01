@@ -6,6 +6,7 @@ import { AuthService, DialogService } from './services';
 
 @Component({
     template: 'Please wait, logging in..',
+    standalone: false
 })
 export class LoginComponent implements OnInit {
     constructor(private authService: AuthService, private router: Router, private activatedRoute: ActivatedRoute, private dialogService: DialogService) { }

@@ -9,6 +9,7 @@ import { DialogService } from '../services';
 @Component({
     templateUrl: './servermanager.component.html',
     styleUrls: ['./servermanager.component.scss'],
+    standalone: false
 })
 export class ServerManagerComponent implements OnInit, OnDestroy {
     public servers?: IServer[];

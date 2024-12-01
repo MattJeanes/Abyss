@@ -8,6 +8,7 @@ import { DialogService } from '../services';
 @Component({
     templateUrl: './gpt.component.html',
     styleUrls: ['./gpt.component.scss'],
+    standalone: false
 })
 export class GPTComponent implements OnInit {
     public name = 'Someone';

@@ -7,6 +7,7 @@ import { AuthService, UserService, DialogService } from '../services';
 @Component({
     templateUrl: './account-dialog.component.html',
     styleUrls: ['./account-dialog.component.scss'],
+    standalone: false
 })
 export class AccountDialogComponent implements OnInit {
     public schemes?: IAuthScheme[];

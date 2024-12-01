@@ -8,6 +8,7 @@ import { DialogService } from '../services';
 @Component({
     templateUrl: './whosaid.component.html',
     styleUrls: ['./whosaid.component.scss'],
+    standalone: false
 })
 export class WhoSaidComponent {
     public name = 'Someone';

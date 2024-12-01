@@ -76,6 +76,7 @@ export class DialogService {
         <button mat-button color="accent" [mat-dialog-close]="true" cdkFocusInitial>{{data.closeButtonText}}</button>
     </div>
     `,
+    standalone: false
 })
 export class DialogAlertComponent {
     constructor(
@@ -100,6 +101,7 @@ export class DialogAlertComponent {
         <button mat-button color="accent" [mat-dialog-close]="true" cdkFocusInitial>{{data.confirmButtonText}}</button>
     </div>
     `,
+    standalone: false
 })
 export class DialogConfirmComponent {
     constructor(
@@ -127,6 +129,7 @@ export class DialogConfirmComponent {
         <button mat-button color="accent" [mat-dialog-close]="data.value">{{data.acceptButtonText}}</button>
     </div>
     `,
+    standalone: false
 })
 export class DialogPromptComponent {
     constructor(

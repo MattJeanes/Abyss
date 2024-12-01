@@ -7,6 +7,7 @@ import { DialogService } from '../services';
 
 @Component({
     templateUrl: './usermanager.component.html',
+    standalone: false
 })
 export class UserManagerComponent implements OnInit {
     public users: IUser[] = [];
