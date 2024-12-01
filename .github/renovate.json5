@@ -9,7 +9,28 @@
   "pinDigest": {
     "automerge": true
   },
-  "ignoreDeps": [
-    "typescript" // TypeScript version is managed by the Angular CLI
+  "packageRules": [
+    {
+      // Angular limits TypeScript versions so we can't update to latest major/minor automatically
+      "matchDepNames": [
+        "typescript",
+        "@typescript-eslint/*"
+      ],
+      "matchUpdateTypes": [
+        "major",
+        "minor"
+      ],
+      "enabled": false
+    },
+    {
+      // Always want to use latest version
+      "matchDepNames": [
+        "ghcr.io/mattjeanes/abyss/abyss.web"
+      ],
+      "matchUpdateTypes": [
+        "pinDigest"
+      ],
+      "enabled": false
+    }
   ]
 }
