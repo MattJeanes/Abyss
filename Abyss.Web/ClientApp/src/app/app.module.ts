@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
@@ -41,20 +41,17 @@ export function JwtTokenGetter(): string {
     return localStorage.token;
 }
 
-@NgModule({
-    declarations: [
+@NgModule({ declarations: [
         AppComponent,
         AccountDialogComponent,
         DialogAlertComponent,
         DialogConfirmComponent,
         DialogPromptComponent,
     ],
-    imports: [
-        BrowserModule,
+    bootstrap: [AppComponent], imports: [BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
         AppRoutingModule,
-        HttpClientModule,
         MatButtonModule,
         MatListModule,
         MatTooltipModule,
@@ -62,9 +59,7 @@ export function JwtTokenGetter(): string {
         MatDialogModule,
         MatButtonModule,
         MatFormFieldModule,
-        MatInputModule,
-    ],
-    providers: [
+        MatInputModule], providers: [
         AuthService,
         UserService,
         ErrorService,
@@ -88,7 +83,6 @@ export function JwtTokenGetter(): string {
         },
         JwtHelperService,
         TitleService,
-    ],
-    bootstrap: [AppComponent]
-})
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule { }
