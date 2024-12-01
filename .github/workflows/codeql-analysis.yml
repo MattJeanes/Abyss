@@ -27,12 +27,12 @@ jobs:
         dotnet-version: 7.x
       
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@e2b57b01d64b69ac273abfbea5d3ed15231e1706 # v2
       with:
         languages: csharp, javascript
         
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v2
+      uses: github/codeql-action/autobuild@e2b57b01d64b69ac273abfbea5d3ed15231e1706 # v2
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@e2b57b01d64b69ac273abfbea5d3ed15231e1706 # v2
