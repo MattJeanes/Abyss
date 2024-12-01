@@ -8,5 +8,8 @@
   "automergeType": "branch",
   "pinDigest": {
     "automerge": true
-  }
+  },
+  "ignoreDeps": [
+    "typescript" // TypeScript version is managed by the Angular CLI
+  ]
 }
