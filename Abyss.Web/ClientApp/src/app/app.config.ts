@@ -5,14 +5,7 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 
 import { JwtModule } from '@auth0/angular-jwt';
 
-import { LoginComponent } from './login.component';
 import { PageNotFoundComponent } from './errors/not-found.component';
-import { GPTComponent } from './gpt/gpt.component';
-import { HomeComponent } from './home/home.component';
-import { OnlineComponent } from './online/online.component';
-import { ServerManagerComponent } from './servermanager/servermanager.component';
-import { UserManagerComponent } from './usermanager/usermanager.component';
-import { WhoSaidComponent } from './whosaid/whosaid.component';
 
 export function tokenGetter(): string {
   return localStorage.token;
@@ -21,36 +14,36 @@ export function tokenGetter(): string {
 const appRoutes: Routes = [
   {
     path: '',
-    component: HomeComponent,
+    loadComponent: () => import('./home/home.component').then(m => m.HomeComponent),
     data: { pageTitle: 'Home' },
   },
   {
     path: 'login/:scheme',
-    component: LoginComponent,
+    loadComponent: () => import('./login.component').then(m => m.LoginComponent),
   },
   {
     path: 'usermanager',
-    component: UserManagerComponent,
+    loadComponent: () => import('./usermanager/usermanager.component').then(m => m.UserManagerComponent),
     data: { pageTitle: 'User Manager' },
   },
   {
     path: 'servermanager',
-    component: ServerManagerComponent,
+    loadComponent: () => import('./servermanager/servermanager.component').then(m => m.ServerManagerComponent),
     data: { pageTitle: 'Server Manager' },
   },
   {
     path: 'online',
-    component: OnlineComponent,
+    loadComponent: () => import('./online/online.component').then(m => m.OnlineComponent),
     data: { pageTitle: 'Online' },
   },
   {
     path: 'whosaid',
-    component: WhoSaidComponent,
+    loadComponent: () => import('./whosaid/whosaid.component').then(m => m.WhoSaidComponent),
     data: { pageTitle: 'Who Said' },
   },
   {
     path: 'gpt',
-    component: GPTComponent,
+    loadComponent: () => import('./gpt/gpt.component').then(m => m.GPTComponent),
     data: { pageTitle: 'GPT' },
   },
   {
