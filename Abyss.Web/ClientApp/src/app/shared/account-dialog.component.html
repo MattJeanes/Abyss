@@ -1,8 +1,8 @@
 <h1 class="title" mat-dialog-title>{{ user ? user.Name : 'Please login' }}</h1>
-<div mat-dialog-content>
+<div mat-dialog-content class="dialog-content">
     <button mat-raised-button color="primary" (click)="userService.changeUsername()" [disabled]="!authService.isLoggedIn() || loading">Change username</button>
     <p class="schemes">{{ schemes ? 'Auth schemes:' : 'Loading..' }}</p>
-    <mat-list *ngIf="schemes">
+    <mat-list class="schemes-list" *ngIf="schemes">
         <mat-list-item *ngFor="let scheme of schemes">
             <div class="scheme">
                 <img class="provider-icon" [ngClass]="{'provider-profile':userSchemes[scheme.Id] && scheme.ProfileUrl}" src="{{scheme.IconUrl}}" alt="{{scheme.Name}}"

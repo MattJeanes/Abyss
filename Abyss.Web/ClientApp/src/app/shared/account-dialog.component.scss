@@ -12,14 +12,24 @@
     cursor: pointer;
 }
 
-.title{
+.title {
     margin-bottom: 15px;
 }
 
 .schemes {
     margin-bottom:0px;
+    align-self: center
+}
+
+.schemes-list {
+    align-self: center
 }
 
 .scheme {
     display: flex !important;
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
 }
