@@ -1,13 +1,28 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 
 import { IAuthScheme, IClientUserAuthentication, IClientUser } from '../app.data';
 import { AuthService, UserService, DialogService } from '../services';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { CommonModule } from '@angular/common';
+import { MatListModule } from '@angular/material/list';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
     templateUrl: './account-dialog.component.html',
     styleUrls: ['./account-dialog.component.scss'],
-    standalone: false
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatTooltipModule,
+        MatListModule,
+        MatButtonModule,
+    ],
+    providers: [
+        AuthService,
+        UserService,
+        DialogService,
+    ]
 })
 export class AccountDialogComponent implements OnInit {
     public schemes?: IAuthScheme[];

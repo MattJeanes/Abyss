@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { IUser } from '../app.data';
 import { UserManagerService } from './usermanager.service';
@@ -7,7 +8,12 @@ import { DialogService } from '../services';
 
 @Component({
     templateUrl: './usermanager.component.html',
-    standalone: false
+    imports: [
+        CommonModule
+    ],
+    providers: [
+        UserManagerService,
+    ]
 })
 export class UserManagerComponent implements OnInit {
     public users: IUser[] = [];

@@ -1,10 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ThemePalette } from '@angular/material/core';
-import { Router, ActivatedRoute, NavigationEnd } from '@angular/router';
-import { filter, map } from 'rxjs/operators';
+import { Router, ActivatedRoute, NavigationEnd, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { CommonModule } from '@angular/common';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
 
-import { TitleService, AuthService, DialogService } from './services';
+import { filter, map } from 'rxjs/operators';
+import { JwtInterceptor, JwtHelperService } from '@auth0/angular-jwt';
+
+import { TitleService, AuthService, DialogService, AuthGuard, AuthInterceptor, UserService } from './services';
 import { Permissions } from './app.data';
 import { ErrorService } from './services/error.service';
 import { AccountDialogComponent } from './shared/account-dialog.component';
@@ -13,7 +24,38 @@ import { AccountDialogComponent } from './shared/account-dialog.component';
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
-    standalone: false
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatListModule,
+        MatTooltipModule,
+        MatIconModule,
+        MatDialogModule,
+        MatButtonModule,
+        MatFormFieldModule,
+        MatInputModule,
+        RouterModule,
+    ],
+    providers: [
+        AuthService,
+        UserService,
+        ErrorService,
+        DialogService,
+        AuthGuard,
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: AuthInterceptor,
+            multi: true,
+        },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: JwtInterceptor,
+            multi: true,
+        },
+        JwtHelperService,
+        TitleService,
+    ]
 })
 export class AppComponent implements OnInit {
     public Permissions = Permissions;

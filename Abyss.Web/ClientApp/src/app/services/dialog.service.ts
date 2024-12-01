@@ -1,7 +1,12 @@
 import { Component, Inject, Injectable } from '@angular/core';
-import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA, MatDialogModule, MatDialogClose } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { CommonModule } from '@angular/common';
 
 import { IDialogAlert, IDialogConfirm, IDialogPrompt } from '../app.data';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
 
 const DIALOG_DEFAULT_WIDTH = '400px';
 const DIALOG_DEFAULT_CLOSE_TEXT = 'Close';
@@ -76,7 +81,11 @@ export class DialogService {
         <button mat-button color="accent" [mat-dialog-close]="true" cdkFocusInitial>{{data.closeButtonText}}</button>
     </div>
     `,
-    standalone: false
+    imports: [
+        CommonModule,
+        MatDialogModule,
+        MatButtonModule,
+    ]
 })
 export class DialogAlertComponent {
     constructor(
@@ -101,7 +110,14 @@ export class DialogAlertComponent {
         <button mat-button color="accent" [mat-dialog-close]="true" cdkFocusInitial>{{data.confirmButtonText}}</button>
     </div>
     `,
-    standalone: false
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatDialogModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatButtonModule,
+    ]
 })
 export class DialogConfirmComponent {
     constructor(
@@ -129,7 +145,14 @@ export class DialogConfirmComponent {
         <button mat-button color="accent" [mat-dialog-close]="data.value">{{data.acceptButtonText}}</button>
     </div>
     `,
-    standalone: false
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatInputModule,
+        MatFormFieldModule,
+        MatDialogModule,
+        MatButtonModule,
+    ]
 })
 export class DialogPromptComponent {
     constructor(

@@ -1,14 +1,31 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 
 import { IWhoSaid } from '../app.data';
 import { WhoSaidService } from './whosaid.service';
 
 import { DialogService } from '../services';
 
+
 @Component({
     templateUrl: './whosaid.component.html',
     styleUrls: ['./whosaid.component.scss'],
-    standalone: false
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+    ],
+    providers: [
+        WhoSaidService,
+    ],
 })
 export class WhoSaidComponent {
     public name = 'Someone';

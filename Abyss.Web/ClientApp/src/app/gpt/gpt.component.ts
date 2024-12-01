@@ -1,14 +1,39 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { GPTService } from './gpt.service';
 import { IGPTMessage, IGPTModel } from '../app.data';
 
 import { DialogService } from '../services';
 
+
 @Component({
     templateUrl: './gpt.component.html',
     styleUrls: ['./gpt.component.scss'],
-    standalone: false
+    imports: [
+        CommonModule,
+        FormsModule,
+        MatIconModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatCheckboxModule,
+        MatSliderModule,
+        MatTooltipModule,
+    ],
+    providers: [
+        GPTService,
+    ],
 })
 export class GPTComponent implements OnInit {
     public name = 'Someone';

@@ -1,4 +1,11 @@
 import { Component, NgZone, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
+
 import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 
 import { IServer, ServerStatus } from '../app.data';
@@ -6,10 +13,21 @@ import { ServerManagerService } from './servermanager.service';
 
 import { DialogService } from '../services';
 
+
 @Component({
     templateUrl: './servermanager.component.html',
     styleUrls: ['./servermanager.component.scss'],
-    standalone: false
+    imports: [
+        FormsModule,
+        CommonModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatProgressSpinnerModule,
+        MatIconModule,
+    ],
+    providers: [
+        ServerManagerService
+    ],
 })
 export class ServerManagerComponent implements OnInit, OnDestroy {
     public servers?: IServer[];

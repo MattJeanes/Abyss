@@ -1,15 +1,27 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+
 import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
+import { MomentModule } from 'ngx-moment';
 
 import { ITeamSpeakChannel, ITeamSpeakClient } from '../app.data';
 import { OnlineService } from './online.service';
 
 import { DialogService } from '../services';
 
+
 @Component({
     templateUrl: './online.component.html',
     styleUrls: ['./online.component.scss'],
-    standalone: false
+    imports: [
+        CommonModule,
+        MomentModule,
+        MatButtonModule,
+    ],
+    providers: [
+        OnlineService,
+    ],
 })
 export class OnlineComponent implements OnInit, OnDestroy {
     public clients: ITeamSpeakClient[] = [];
