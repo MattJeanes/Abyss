@@ -9,7 +9,7 @@
     <div class="slider">
         <mat-label>Temperature</mat-label>
         <mat-slider min="0.1" max="1" step="0.01" thumbLabel
-            matTooltip="Percentage of total vocabulary to use, recommend 0.9 for good balance"
+            matTooltip="Lower values are more deterministic, higher values are more creative, recommend 0.9 for good balance"
             matTooltipPosition="right">
             <input matSliderThumb [(ngModel)]="temperature" />
         </mat-slider>
