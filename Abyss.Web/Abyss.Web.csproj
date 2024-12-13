@@ -36,7 +36,7 @@
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="StackExchange.Exceptional.AspNetCore" Version="3.0.1" />
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02427" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02428" />
     <PackageReference Include="TeamSpeak3QueryApi" Version="1.13.0" />
     <PackageReference Include="Microsoft.ML" Version="4.0.0" />
     <PackageReference Include="Azure.ResourceManager.Compute" Version="1.6.0" />
