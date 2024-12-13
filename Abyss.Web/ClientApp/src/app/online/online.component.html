@@ -2,11 +2,27 @@
 <a mat-raised-button color="primary" href="ts3server://ts.mattjeanes.com">Join TeamSpeak</a>
 <br />
 <br />
-<div *ngFor="let client of clients; last as isLast">
-    Name: {{ client.Name }}
-    <br />
-    Channel: {{ getChannelName(client.ChannelId) }}
-    <br />
-    Connected: {{ client.ConnectedSeconds | amDuration:'seconds' }}<span *ngIf="client.IdleSeconds > 60"> (Idle: {{ client.IdleSeconds | amDuration:'seconds' }})</span>
-    <hr *ngIf="!isLast" />
-</div>
+<mat-card appearance="outlined">
+    <mat-card-content>
+        <table mat-table [dataSource]="clients">
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef>Name</th>
+                <td mat-cell *matCellDef="let client">{{ client.Name }}</td>
+            </ng-container>
+            <ng-container matColumnDef="channelName">
+                <th mat-header-cell *matHeaderCellDef>Channel</th>
+                <td mat-cell *matCellDef="let client">{{ getChannelName(client.ChannelId) }}</td>
+            </ng-container>
+            <ng-container matColumnDef="connectedTime">
+                <th mat-header-cell *matHeaderCellDef>Connected Time</th>
+                <td mat-cell *matCellDef="let client">{{ client.ConnectedSeconds | amDuration:'seconds' }}</td>
+            </ng-container>
+            <ng-container matColumnDef="idleTime">
+                <th mat-header-cell *matHeaderCellDef>Idle Time</th>
+                <td mat-cell *matCellDef="let client">{{ client.IdleSeconds | amDuration:'seconds' }}</td>
+            </ng-container>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </mat-card-content>
+</mat-card>

@@ -1,6 +1,8 @@
 import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
 
 import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 import { MomentModule } from 'ngx-moment';
@@ -18,6 +20,8 @@ import { DialogService } from '../services';
         CommonModule,
         MomentModule,
         MatButtonModule,
+        MatTableModule,
+        MatCardModule,
     ],
     providers: [
         OnlineService,
@@ -25,6 +29,7 @@ import { DialogService } from '../services';
 })
 export class OnlineComponent implements OnInit, OnDestroy {
     public clients: ITeamSpeakClient[] = [];
+    public displayedColumns = ['name', 'channelName', 'connectedTime', 'idleTime'];
     public channels: ITeamSpeakChannel[] = [];
     public loading = false;
     private hub = new HubConnectionBuilder()

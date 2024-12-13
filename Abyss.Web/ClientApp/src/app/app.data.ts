@@ -13,8 +13,16 @@ export interface IClientUser {
     Permissions: string[];
 }
 
+export interface IAuthentication {
+    UserId: number;
+    SchemeType: AuthSchemeType;
+    Identifier: string;
+}
+
 export interface IUser {
+    Id: number;
     Name: string;
+    Authentications: IAuthentication[];
 }
 
 export interface IToken {
