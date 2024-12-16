@@ -160,6 +160,16 @@ public class Program
         services.AddDbContext<AbyssContext>(options =>
             options.UseNpgsql(config.GetConnectionString("Abyss")));
 
+        // Check database connection
+        using (var scope = services.BuildServiceProvider().CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<AbyssContext>();
+            if (!dbContext.Database.CanConnect())
+            {
+                throw new Exception("Failed to connect to database. Check connection string and database server.");
+            }
+        }
+
         services.AddPredictionEnginePool<InputData, Prediction>().FromFile(config["WhoSaidIt:ModelPath"]);
 
         services.AddDiscordClient(config["Discord:Token"], DiscordIntents.GuildMembers | SlashCommandProcessor.RequiredIntents)
