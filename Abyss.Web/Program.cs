@@ -32,7 +32,6 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.ML;
 using Microsoft.IdentityModel.Tokens;
-using Serilog;
 using StackExchange.Exceptional;
 using StackExchange.Exceptional.Stores;
 using System.Text;
@@ -47,11 +46,6 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(builder.Configuration)
-            .CreateLogger();
-
         ConfigureServices(builder);
 
         var app = builder.Build();
@@ -266,8 +260,9 @@ public class Program
 
         services.AddLogging(loggingBuilder =>
         {
+            loggingBuilder.AddDebug();
+            loggingBuilder.AddConsole();
             loggingBuilder.AddExceptional();
-            loggingBuilder.AddSerilog(dispose: true);
         });
 
         services.AddSpaStaticFiles(configuration =>
