@@ -12,16 +12,16 @@ public class CloudflareHelper(IHttpClientFactory httpClientFactory, IOptions<Clo
     private readonly HttpClient _client = httpClientFactory.CreateClient("cloudflare");
     private readonly CloudflareOptions _options = options.Value;
 
-    public async Task<CloudflareDNSRecord> GetDNSRecord(string name)
+    public async Task<(string zoneId, CloudflareDNSRecord dnsRecord)> GetDNSRecord(string name)
     {
         var zone = await GetZone(_options.Zone);
-        if (zone == null) { return null; }
-        return await GetDNSRecord(zone.Id, name);
+        if (zone == null) { return (null, null); }
+        return (zone.Id, await GetDNSRecord(zone.Id, name));
     }
 
-    public async Task<CloudflareDNSRecord> UpdateDNSRecord(CloudflareDNSRecord record)
+    public async Task<CloudflareDNSRecord> UpdateDNSRecord(string zoneId, CloudflareDNSRecord record)
     {
-        var resp = await _client.PutAsync($"zones/{record.ZoneId}/dns_records/{record.Id}", new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json"));
+        var resp = await _client.PutAsync($"zones/{zoneId}/dns_records/{record.Id}", new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json"));
         var newRecord = await GetResponse<CloudflareDNSRecord>(resp);
         return newRecord;
     }
@@ -99,14 +99,8 @@ public class CloudflareDNSRecord
     [JsonPropertyName("locked")]
     public bool Locked { get; set; }
 
-    [JsonPropertyName("zone_id")]
-    public string ZoneId { get; set; }
-
-    [JsonPropertyName("zone_name")]
-    public string ZoneName { get; set; }
-
     [JsonPropertyName("created_on")]
-    public DateTime Created_on { get; set; }
+    public DateTime CreatedOn { get; set; }
 
     [JsonPropertyName("modified_on")]
     public DateTime ModifiedOn { get; set; }

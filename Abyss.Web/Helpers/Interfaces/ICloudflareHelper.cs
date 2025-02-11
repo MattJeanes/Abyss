@@ -2,6 +2,6 @@
 
 public interface ICloudflareHelper
 {
-    Task<CloudflareDNSRecord> GetDNSRecord(string name);
-    Task<CloudflareDNSRecord> UpdateDNSRecord(CloudflareDNSRecord record);
+    Task<(string zoneId, CloudflareDNSRecord dnsRecord)> GetDNSRecord(string name);
+    Task<CloudflareDNSRecord> UpdateDNSRecord(string zoneId, CloudflareDNSRecord record);
 }

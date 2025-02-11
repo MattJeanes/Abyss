@@ -78,7 +78,7 @@ public class ServerManager(
                     throw new Exception($"Unsupported cloud type {server.CloudType}");
             }
 
-            var dnsRecord = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
+            var (zoneId, dnsRecord) = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
             if (dnsRecord == null)
             {
                 logger.LogWarning($"DNS record for {server.DNSRecord} does not exist and must be created");
@@ -87,7 +87,7 @@ public class ServerManager(
             {
                 logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
                 dnsRecord.Content = ipAddress;
-                await _cloudflareHelper.UpdateDNSRecord(dnsRecord);
+                await _cloudflareHelper.UpdateDNSRecord(zoneId, dnsRecord);
             }
             else
             {
