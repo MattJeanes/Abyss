@@ -33,7 +33,7 @@
     <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02475" />
     <PackageReference Include="TeamSpeak3QueryApi" Version="1.13.0" />
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
-    <PackageReference Include="Azure.ResourceManager.Compute" Version="1.8.0" />
+    <PackageReference Include="Azure.ResourceManager.Compute" Version="1.9.0" />
     <PackageReference Include="Azure.ResourceManager" Version="1.13.0" />
     <PackageReference Include="Azure.Identity" Version="1.13.2" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
