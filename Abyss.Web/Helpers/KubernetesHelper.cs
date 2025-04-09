@@ -12,13 +12,11 @@ public class KubernetesHelper : IKubernetesHelper
     private readonly Kubernetes _client;
     private readonly ILogger<KubernetesHelper> _logger;
     private readonly KubernetesOptions _options;
-    private readonly HttpClient _httpClient;
 
-    public KubernetesHelper(IOptions<KubernetesOptions> options, ILogger<KubernetesHelper> logger, IHttpClientFactory httpClientFactory)
+    public KubernetesHelper(IOptions<KubernetesOptions> options, ILogger<KubernetesHelper> logger)
     {
         _logger = logger;
         _options = options.Value;
-        _httpClient = httpClientFactory.CreateClient("ipservice");
 
         KubernetesClientConfiguration config;
 
@@ -183,27 +181,6 @@ public class KubernetesHelper : IKubernetesHelper
             logger.LogError($"Error restarting Kubernetes resource: {ex.Message}");
             _logger.LogError(ex, "Error restarting Kubernetes resource {ResourceId}", server.ResourceId);
             throw;
-        }
-    }
-
-    public async Task<string> GetServerIpAddress(Server server)
-    {
-        try
-        {
-            var response = await _httpClient.GetStringAsync("https://api.ipify.org");
-            var publicIp = response.Trim();
-
-            if (!string.IsNullOrEmpty(publicIp))
-            {
-                return publicIp;
-            }
-
-            return "No IP available";
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting public IP address for {ResourceId}", server.ResourceId);
-            return "Error getting IP address";
         }
     }
 

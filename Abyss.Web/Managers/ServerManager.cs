@@ -65,7 +65,7 @@ public class ServerManager(
                 await statusHandler(server.StatusId);
             }
 
-            string ipAddress;
+            string ipAddress = null;
             switch (server.CloudType)
             {
                 case CloudType.Azure:
@@ -78,26 +78,28 @@ public class ServerManager(
                     break;
                 case CloudType.Kubernetes:
                     await _kubernetesHelper.StartServer(server, logger);
-                    ipAddress = await _kubernetesHelper.GetServerIpAddress(server);
                     break;
                 default:
                     throw new Exception($"Unsupported cloud type {server.CloudType}");
             }
 
-            var (zoneId, dnsRecord) = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
-            if (dnsRecord == null)
+            if (!string.IsNullOrEmpty(ipAddress))
             {
-                logger.LogWarning($"DNS record for {server.DNSRecord} does not exist and must be created");
-            }
-            else if (dnsRecord.Content != ipAddress)
-            {
-                logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
-                dnsRecord.Content = ipAddress;
-                await _cloudflareHelper.UpdateDNSRecord(zoneId, dnsRecord);
-            }
-            else
-            {
-                logger.LogInformation($"DNS record for {server.DNSRecord} already set to {ipAddress}");
+                var (zoneId, dnsRecord) = await _cloudflareHelper.GetDNSRecord(server.DNSRecord);
+                if (dnsRecord == null)
+                {
+                    logger.LogWarning($"DNS record for {server.DNSRecord} does not exist and must be created");
+                }
+                else if (dnsRecord.Content != ipAddress)
+                {
+                    logger.LogInformation($"Setting DNS record for {server.DNSRecord} to {ipAddress}");
+                    dnsRecord.Content = ipAddress;
+                    await _cloudflareHelper.UpdateDNSRecord(zoneId, dnsRecord);
+                }
+                else
+                {
+                    logger.LogInformation($"DNS record for {server.DNSRecord} already set to {ipAddress}");
+                }
             }
 
             server.StatusId = ServerStatus.Active;
@@ -132,7 +134,6 @@ public class ServerManager(
                 }
             }
         }
-
     }
 
     public async Task Stop(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)

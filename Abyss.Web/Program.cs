@@ -162,11 +162,6 @@ public class Program
             options.BaseAddress = new Uri(config["GMod:BaseUrl"]);
             options.DefaultRequestHeaders.Add("ApiKey", config["GMod:ApiKey"]);
         });
-        services.AddHttpClient("ipservice", options =>
-        {
-            options.DefaultRequestHeaders.Add("User-Agent", "AbyssApp/1.0");
-            options.Timeout = TimeSpan.FromSeconds(5);
-        });
         services.AddHttpClient<INotificationHelper, PushoverHelper>(x => x.BaseAddress = new Uri(config.GetValue<string>("Pushover:BaseUrl")));
         services.AddTransient<IKubernetesHelper, KubernetesHelper>();
         services.AddDbContext<AbyssContext>(options =>
