@@ -151,6 +151,7 @@ public class Program
         {
             client.BaseAddress = new Uri(config["Ovh:BaseUrl"]);
         });
+        services.AddTransient<IKubernetesHelper, KubernetesHelper>();
         services.AddDbContext<AbyssContext>(options =>
             options.UseNpgsql(config.GetConnectionString("Abyss")));
 

@@ -12,6 +12,7 @@ public class ServerManager(
     IRepository<Server> serverRepository,
     IAzureHelper azureHelper,
     IOvhHelper ovhHelper,
+    IKubernetesHelper kubernetesHelper,
     INotificationHelper notificationHelper,
     ICloudflareHelper cloudflareHelper,
     ILogger<ServerManager> logger,
@@ -23,6 +24,7 @@ public class ServerManager(
     private readonly ICloudflareHelper _cloudflareHelper = cloudflareHelper;
     private readonly IAzureHelper _azureHelper = azureHelper;
     private readonly IOvhHelper _ovhHelper = ovhHelper;
+    private readonly IKubernetesHelper _kubernetesHelper = kubernetesHelper;
     private readonly INotificationHelper _notificationHelper = notificationHelper;
     private readonly ILogger<ServerManager> _baseLogger = logger;
     private readonly ISpaceEngineersHelper _spaceEngineersHelper = spaceEngineersHelper;
@@ -73,6 +75,10 @@ public class ServerManager(
                 case CloudType.Ovh:
                     await _ovhHelper.StartServer(server, logger);
                     ipAddress = await _ovhHelper.GetServerIpAddress(server);
+                    break;
+                case CloudType.Kubernetes:
+                    await _kubernetesHelper.StartServer(server, logger);
+                    ipAddress = await _kubernetesHelper.GetServerIpAddress(server);
                     break;
                 default:
                     throw new Exception($"Unsupported cloud type {server.CloudType}");
@@ -158,6 +164,9 @@ public class ServerManager(
                 case CloudType.Ovh:
                     await _ovhHelper.StopServer(server, logger);
                     break;
+                case CloudType.Kubernetes:
+                    await _kubernetesHelper.StopServer(server, logger);
+                    break;
                 default:
                     throw new Exception($"Unsupported cloud type {server.CloudType}");
             }
@@ -214,6 +223,9 @@ public class ServerManager(
                     break;
                 case CloudType.Ovh:
                     await _ovhHelper.RestartServer(server, logger);
+                    break;
+                case CloudType.Kubernetes:
+                    await _kubernetesHelper.RestartServer(server, logger);
                     break;
                 default:
                     throw new Exception($"Unsupported cloud type {server.CloudType}");
