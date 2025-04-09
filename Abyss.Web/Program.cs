@@ -151,6 +151,23 @@ public class Program
         {
             client.BaseAddress = new Uri(config["Ovh:BaseUrl"]);
         });
+        services.AddHttpClient("cloudflare", options =>
+        {
+            options.BaseAddress = new Uri(config["Cloudflare:BaseUrl"]);
+            options.DefaultRequestHeaders.Add("X-Auth-Email", config["Cloudflare:Email"]);
+            options.DefaultRequestHeaders.Add("X-Auth-Key", config["Cloudflare:ApiKey"]);
+        });
+        services.AddHttpClient("gmod", options =>
+        {
+            options.BaseAddress = new Uri(config["GMod:BaseUrl"]);
+            options.DefaultRequestHeaders.Add("ApiKey", config["GMod:ApiKey"]);
+        });
+        services.AddHttpClient("ipservice", options =>
+        {
+            options.DefaultRequestHeaders.Add("User-Agent", "AbyssApp/1.0");
+            options.Timeout = TimeSpan.FromSeconds(5);
+        });
+        services.AddHttpClient<INotificationHelper, PushoverHelper>(x => x.BaseAddress = new Uri(config.GetValue<string>("Pushover:BaseUrl")));
         services.AddTransient<IKubernetesHelper, KubernetesHelper>();
         services.AddDbContext<AbyssContext>(options =>
             options.UseNpgsql(config.GetConnectionString("Abyss")));
@@ -223,19 +240,8 @@ public class Program
         services.Configure<GModOptions>(config.GetSection("GMod"));
         services.Configure<PushoverOptions>(config.GetSection("Pushover"));
         services.Configure<WebhookRelayOptions>(config.GetSection("WebhookRelay"));
+        services.Configure<KubernetesOptions>(config.GetSection("Kubernetes"));
         services.AddHttpContextAccessor();
-        services.AddHttpClient("cloudflare", options =>
-        {
-            options.BaseAddress = new Uri(config["Cloudflare:BaseUrl"]);
-            options.DefaultRequestHeaders.Add("X-Auth-Email", config["Cloudflare:Email"]);
-            options.DefaultRequestHeaders.Add("X-Auth-Key", config["Cloudflare:ApiKey"]);
-        });
-        services.AddHttpClient("gmod", options =>
-        {
-            options.BaseAddress = new Uri(config["GMod:BaseUrl"]);
-            options.DefaultRequestHeaders.Add("ApiKey", config["GMod:ApiKey"]);
-        });
-        services.AddHttpClient<INotificationHelper, PushoverHelper>(x => x.BaseAddress = new Uri(config.GetValue<string>("Pushover:BaseUrl")));
         services.AddHostedService<CleanupService>();
         services.AddHostedService<DiscordService>();
         services.AddHostedService<TeamSpeakService>();
