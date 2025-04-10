@@ -1,6 +1,7 @@
 ﻿using Abyss.Web.Commands.Discord.Interfaces;
 using Abyss.Web.Data;
 using Abyss.Web.Data.Options;
+using Abyss.Web.Entities;
 using Abyss.Web.Helpers.Interfaces;
 using Abyss.Web.Repositories.Interfaces;
 using DSharpPlus.Commands;
@@ -49,6 +50,13 @@ public class BaseCommand : IDiscordCommand, IDisposable
         }
         var clientUser = _userHelper.GetClientUser(user);
         return clientUser;
+    }
+
+    public async Task<User> GetUser(DiscordUser discordUser)
+    {
+        var clientUser = await GetClientUser(discordUser);
+        var user = await _userHelper.GetUser(clientUser);
+        return user;
     }
 
     public async Task<bool> HasPermission(MessageCreatedEventArgs e, string permission)

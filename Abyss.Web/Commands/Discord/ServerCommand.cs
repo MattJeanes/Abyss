@@ -56,7 +56,8 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         var response = string.Empty;
         try
         {
-            await _serverManager.Start(server.Id, async (logItem) =>
+            var user = await GetUser(ctx.User);
+            await _serverManager.Start(server.Id, user, async (logItem) =>
             {
                 if (thread == null)
                 {
@@ -112,7 +113,8 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         var response = string.Empty;
         try
         {
-            await _serverManager.Stop(server.Id, async (logItem) =>
+            var user = await GetUser(ctx.User);
+            await _serverManager.Stop(server.Id, user, async (logItem) =>
             {
                 if (thread == null)
                 {
@@ -168,7 +170,8 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         var response = string.Empty;
         try
         {
-            await _serverManager.Restart(server.Id, async (logItem) =>
+            var user = await GetUser(ctx.User);
+            await _serverManager.Restart(server.Id, user, async (logItem) =>
             {
                 if (thread == null)
                 {
@@ -200,8 +203,8 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
     }
 
     [Command("command"), Description("Run a command on a server")]
-    public async Task ExecuteCommand(CommandContext ctx, 
-        [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name, 
+    public async Task ExecuteCommand(CommandContext ctx,
+        [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name,
         [Description("Command to execute")] string command)
     {
         await ctx.DeferResponseAsync();
@@ -217,7 +220,7 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
             await ctx.EditResponseAsync("Server not found");
             return;
         }
-        
+
         if (server.StatusId != ServerStatus.Active)
         {
             await ctx.EditResponseAsync($"Cannot execute command on server: {FormatServerStatus(server)}");
@@ -226,7 +229,8 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
 
         try
         {
-            var response = await _serverManager.ExecuteCommand(server.Id, command);
+            var user = await GetUser(ctx.User);
+            var response = await _serverManager.ExecuteCommand(server.Id, command, user);
             await ctx.EditResponseAsync($"```\n> {command}\n{response}\n```");
         }
         catch (Exception ex)

@@ -12,7 +12,7 @@ namespace Abyss.Web.Controllers;
 
 [AuthorizePermission(Permissions.ServerManager)]
 [Route("api/server")]
-public class ServerController(IServerManager serverManager, IBackgroundTaskQueue backgroundTaskQueue)
+public class ServerController(IServerManager serverManager, IBackgroundTaskQueue backgroundTaskQueue, IUserHelper userHelper) : BaseController(userHelper)
 {
     private readonly IServerManager _serverManager = serverManager;
     private readonly IBackgroundTaskQueue _backgroundTaskQueue = backgroundTaskQueue;
@@ -25,8 +25,9 @@ public class ServerController(IServerManager serverManager, IBackgroundTaskQueue
 
     [Route("start/{serverId}")]
     [HttpPost]
-    public IActionResult Start(int serverId, [Required][FromQuery] string connectionId)
+    public async Task<IActionResult> Start(int serverId, [Required][FromQuery] string connectionId)
     {
+        var user = await GetUser();
         _backgroundTaskQueue.Queue(async (serviceProvider, cancellationToken) =>
         {
             var serverManagerHub = serviceProvider.GetRequiredService<IHubContext<ServerManagerHub>>();
@@ -35,7 +36,7 @@ public class ServerController(IServerManager serverManager, IBackgroundTaskQueue
             string err = null;
             try
             {
-                await scopedServerManager.Start(serverId, async (logItem) =>
+                await scopedServerManager.Start(serverId, user, async (logItem) =>
                 {
                     await client.SendAsync("log", logItem.Message);
                 }, async (status) =>
@@ -55,8 +56,9 @@ public class ServerController(IServerManager serverManager, IBackgroundTaskQueue
 
     [Route("stop/{serverId}")]
     [HttpPost]
-    public IActionResult Stop(int serverId, [Required][FromQuery] string connectionId)
+    public async Task<IActionResult> Stop(int serverId, [Required][FromQuery] string connectionId)
     {
+        var user = await GetUser();
         _backgroundTaskQueue.Queue(async (serviceProvider, cancellationToken) =>
         {
             var serverManagerHub = serviceProvider.GetRequiredService<IHubContext<ServerManagerHub>>();
@@ -65,7 +67,7 @@ public class ServerController(IServerManager serverManager, IBackgroundTaskQueue
             string err = null;
             try
             {
-                await scopedServerManager.Stop(serverId, async (logItem) =>
+                await scopedServerManager.Stop(serverId, user, async (logItem) =>
                 {
                     await client.SendAsync("log", logItem.Message);
                 }, async (status) =>
@@ -95,7 +97,8 @@ public class ServerController(IServerManager serverManager, IBackgroundTaskQueue
 
         try 
         {
-            var response = await _serverManager.ExecuteCommand(serverId, command);
+            var user = await GetUser();
+            var response = await _serverManager.ExecuteCommand(serverId, command, user);
             return new OkObjectResult(response);
         }
         catch (Exception ex)

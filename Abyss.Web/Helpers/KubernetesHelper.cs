@@ -42,7 +42,7 @@ public class KubernetesHelper : IKubernetesHelper
 
     public async Task StartServer(Server server, TaskLogger logger)
     {
-        logger.LogInformation("Starting Kubernetes resource...");
+        logger.LogInformation($"Starting Kubernetes resource {server.ResourceId}");
 
         try
         {
@@ -96,7 +96,7 @@ public class KubernetesHelper : IKubernetesHelper
 
     public async Task StopServer(Server server, TaskLogger logger)
     {
-        logger.LogInformation("Stopping Kubernetes resource...");
+        logger.LogInformation($"Stopping Kubernetes resource {server.ResourceId}");
 
         try
         {
@@ -136,7 +136,7 @@ public class KubernetesHelper : IKubernetesHelper
 
     public async Task RestartServer(Server server, TaskLogger logger)
     {
-        logger.LogInformation("Restarting Kubernetes resource...");
+        logger.LogInformation($"Restarting Kubernetes resource {server.ResourceId}");
 
         try
         {

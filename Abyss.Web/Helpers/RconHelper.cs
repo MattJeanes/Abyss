@@ -7,9 +7,10 @@ using System.Net.Sockets;
 
 namespace Abyss.Web.Helpers;
 
-public class RconHelper(ILogger<RconHelper> logger) : IRconHelper
+public class RconHelper(ILogger<RconHelper> logger, INotificationHelper notificationHelper) : IRconHelper
 {
     private readonly ILogger<RconHelper> _logger = logger;
+    private readonly INotificationHelper _notificationHelper = notificationHelper;
 
     public async Task<string> ExecuteCommand(Server server, string command)
     {
@@ -63,11 +64,18 @@ public class RconHelper(ILogger<RconHelper> logger) : IRconHelper
             var response = await rcon.SendCommandAsync(command);
             _logger.LogInformation($"RCON command response: {response}");
 
-            return string.IsNullOrEmpty(response) ? "Command executed successfully (no response)" : response;
+            var formattedResponse = string.IsNullOrEmpty(response) ? "Command executed successfully (no response)" : response;
+            
+            await _notificationHelper.SendMessage($"RCON Command on {server.Name}\nCommand: {command}\nResponse: {formattedResponse}", MessagePriority.Normal);
+
+            return formattedResponse;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"Error executing RCON command on server {server.Name}: {command}");
+            
+            await _notificationHelper.SendMessage($"RCON Command Error on {server.Name}\nCommand: {command}\nError: {ex.Message}", MessagePriority.HighPriority);
+            
             return $"Error executing command: {ex.Message}";
         }
     }

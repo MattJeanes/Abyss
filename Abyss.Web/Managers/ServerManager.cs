@@ -44,7 +44,7 @@ public class ServerManager(
             .FirstOrDefaultAsync();
     }
 
-    public async Task Start(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)
+    public async Task Start(int serverId, User user, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -59,7 +59,7 @@ public class ServerManager(
             if (string.IsNullOrEmpty(server.DNSRecord)) { throw new ArgumentNullException(nameof(server.DNSRecord)); }
             if (server.StatusId != ServerStatus.Inactive) { throw new Exception("Cannot start server that is active"); }
             logger.LogInformation($"Starting server {server.Name}");
-            await _notificationHelper.SendMessage($"Starting server {server.Name}", MessagePriority.HighPriority);
+            await _notificationHelper.SendMessage($"{user.Name} is starting server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Activating;
             await _serverRepository.SaveChanges();
             if (statusHandler != null)
@@ -138,7 +138,7 @@ public class ServerManager(
         }
     }
 
-    public async Task Stop(int serverId, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)
+    public async Task Stop(int serverId, User user, Func<LogItem, Task> logHandler = null, Func<ServerStatus, Task> statusHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -152,7 +152,7 @@ public class ServerManager(
             if (server == null) { throw new Exception($"Server id {server} not found"); }
             if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot stop server that is not active"); }
             logger.LogInformation($"Stopping server {server.Name}");
-            await _notificationHelper.SendMessage($"Stopping server {server.Name}", MessagePriority.HighPriority);
+            await _notificationHelper.SendMessage($"{user.Name} is stopping server {server.Name}", MessagePriority.HighPriority);
             server.StatusId = ServerStatus.Deactivating;
             await _serverRepository.SaveChanges();
             if (statusHandler != null)
@@ -204,7 +204,7 @@ public class ServerManager(
         }
     }
 
-    public async Task Restart(int serverId, Func<LogItem, Task> logHandler = null)
+    public async Task Restart(int serverId, User user, Func<LogItem, Task> logHandler = null)
     {
         var logger = new TaskLogger(_baseLogger);
         if (logHandler != null)
@@ -218,7 +218,7 @@ public class ServerManager(
             if (server == null) { throw new Exception($"Server id {server} not found"); }
             if (server.StatusId != ServerStatus.Active) { throw new Exception("Cannot restart server that is not active"); }
             logger.LogInformation($"Restarting server {server.Name}");
-            await _notificationHelper.SendMessage($"Restarting server {server.Name}", MessagePriority.HighPriority);
+            await _notificationHelper.SendMessage($"{user.Name} is restarting server {server.Name}", MessagePriority.HighPriority);
             switch (server.CloudType)
             {
                 case CloudType.Azure:
@@ -241,6 +241,32 @@ public class ServerManager(
             logger.LogError(e, $"Failed to restart server {server?.Name ?? "N/A"}");
             await _notificationHelper.SendMessage($"Failed to restart server {server?.Name ?? "(Unknown)"}", MessagePriority.HighPriority);
             throw;
+        }
+    }
+
+    public async Task<string> ExecuteCommand(int serverId, string command, User user)
+    {
+        var server = await _serverRepository.GetById(serverId);
+        if (server == null) { throw new Exception($"Server id {serverId} not found"); }
+        if (server.StatusId != ServerStatus.Active) { return $"Cannot execute command on server that is not active: {server.Name} is {server.StatusId}"; }
+
+        _baseLogger.LogInformation($"Executing command on server {server.Name}: {command}");
+        await _notificationHelper.SendMessage($"{user.Name} is executing command on server {server.Name}: {command}");
+
+        try
+        {
+            if (!_rconHelper.SupportsServerType(server.Type))
+            {
+                return $"Server type {server.Type} does not support commands";
+            }
+
+            var response = await _rconHelper.ExecuteCommand(server, command);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _baseLogger.LogError(ex, $"Failed to execute command on server {server.Name}");
+            return $"Error: {ex.Message}";
         }
     }
 
@@ -275,30 +301,5 @@ public class ServerManager(
             };
         }
         return null;
-    }
-
-    public async Task<string> ExecuteCommand(int serverId, string command)
-    {
-        var server = await _serverRepository.GetById(serverId);
-        if (server == null) { throw new Exception($"Server id {serverId} not found"); }
-        if (server.StatusId != ServerStatus.Active) { return $"Cannot execute command on server that is not active: {server.Name} is {server.StatusId}"; }
-
-        _baseLogger.LogInformation($"Executing command on server {server.Name}: {command}");
-
-        try
-        {
-            if (!_rconHelper.SupportsServerType(server.Type))
-            {
-                return $"Server type {server.Type} does not support commands";
-            }
-
-            var response = await _rconHelper.ExecuteCommand(server, command);
-            return response;
-        }
-        catch (Exception ex)
-        {
-            _baseLogger.LogError(ex, $"Failed to execute command on server {server.Name}");
-            return $"Error: {ex.Message}";
-        }
     }
 }
