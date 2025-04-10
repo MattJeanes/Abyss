@@ -82,4 +82,25 @@ public class ServerController(IServerManager serverManager, IBackgroundTaskQueue
 
         return new AcceptedResult();
     }
+
+    [Route("command/{serverId}")]
+    [HttpPost]
+    [AuthorizePermission(Permissions.ServerCommand)]
+    public async Task<IActionResult> ExecuteCommand(int serverId, [FromBody] string command)
+    {
+        if (string.IsNullOrWhiteSpace(command))
+        {
+            return new BadRequestObjectResult("Command cannot be empty");
+        }
+
+        try 
+        {
+            var response = await _serverManager.ExecuteCommand(serverId, command);
+            return new OkObjectResult(response);
+        }
+        catch (Exception ex)
+        {
+            return new BadRequestObjectResult(ex.Message);
+        }
+    }
 }

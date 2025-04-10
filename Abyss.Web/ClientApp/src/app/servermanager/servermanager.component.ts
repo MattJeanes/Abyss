@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 
 import { HttpTransportType, HubConnectionBuilder } from '@microsoft/signalr';
 
@@ -24,6 +26,8 @@ import { DialogService } from '../services';
         MatButtonModule,
         MatProgressSpinnerModule,
         MatIconModule,
+        MatInputModule,
+        MatFormFieldModule,
     ],
     providers: [
         ServerManagerService
@@ -36,6 +40,7 @@ export class ServerManagerComponent implements OnInit, OnDestroy {
     public loading = false;
     public log: string[] = [];
     public hubReady = false;
+    public command = '';
     private hub = new HubConnectionBuilder()
         .withUrl('hub/servermanager', { transport: HttpTransportType.WebSockets })
         .withAutomaticReconnect()
@@ -133,6 +138,27 @@ export class ServerManagerComponent implements OnInit, OnDestroy {
                 title: 'Failed to stop server',
                 message: e.toString(),
             });
+        }
+    }
+
+    public async executeCommand(): Promise<void> {
+        if (!this.selected || this.loading || !this.hubReady || !this.command || this.selected.StatusId !== ServerStatus.Active) {
+            return;
+        }
+        
+        try {
+            this.loading = true;
+            const response = await this.serverManagerService.executeCommand(this.selected.Id, this.command);
+            this.log.push(`> ${this.command}`);
+            this.log.push(response);
+            this.command = '';
+        } catch (e: any) {
+            this.dialogService.alert({
+                title: 'Failed to execute command',
+                message: e.toString(),
+            });
+        } finally {
+            this.loading = false;
         }
     }
 

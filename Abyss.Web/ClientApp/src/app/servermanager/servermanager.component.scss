@@ -13,3 +13,18 @@
 .button {
     align-self: center;
 }
+
+.command-container {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.command-input {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.command-field {
+    flex-grow: 1;
+}

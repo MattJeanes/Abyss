@@ -141,6 +141,7 @@ public class Program
         services.AddSingleton<IMinecraftHelper, MinecraftHelper>();
         services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         services.AddTransient<IWhoSaidHelper, WhoSaidHelper>();
+        services.AddTransient<IRconHelper, RconHelper>();
         services.AddHttpClient();
         services.AddHttpClient<IGPTClient, GPTClient>(client =>
         {

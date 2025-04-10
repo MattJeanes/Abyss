@@ -17,7 +17,8 @@ public class ServerManager(
     ICloudflareHelper cloudflareHelper,
     ILogger<ServerManager> logger,
     ISpaceEngineersHelper spaceEngineersHelper,
-    IMinecraftHelper minecraftHelper
+    IMinecraftHelper minecraftHelper,
+    IRconHelper rconHelper
         ) : IServerManager
 {
     private readonly IRepository<Server> _serverRepository = serverRepository;
@@ -29,6 +30,7 @@ public class ServerManager(
     private readonly ILogger<ServerManager> _baseLogger = logger;
     private readonly ISpaceEngineersHelper _spaceEngineersHelper = spaceEngineersHelper;
     private readonly IMinecraftHelper _minecraftHelper = minecraftHelper;
+    private readonly IRconHelper _rconHelper = rconHelper;
 
     public async Task<List<Server>> GetServers()
     {
@@ -273,5 +275,30 @@ public class ServerManager(
             };
         }
         return null;
+    }
+
+    public async Task<string> ExecuteCommand(int serverId, string command)
+    {
+        var server = await _serverRepository.GetById(serverId);
+        if (server == null) { throw new Exception($"Server id {serverId} not found"); }
+        if (server.StatusId != ServerStatus.Active) { return $"Cannot execute command on server that is not active: {server.Name} is {server.StatusId}"; }
+
+        _baseLogger.LogInformation($"Executing command on server {server.Name}: {command}");
+
+        try
+        {
+            if (!_rconHelper.SupportsServerType(server.Type))
+            {
+                return $"Server type {server.Type} does not support commands";
+            }
+
+            var response = await _rconHelper.ExecuteCommand(server, command);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _baseLogger.LogError(ex, $"Failed to execute command on server {server.Name}");
+            return $"Error: {ex.Message}";
+        }
     }
 }

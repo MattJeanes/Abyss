@@ -199,6 +199,42 @@ public class ServerCommand(IServiceProvider serviceProvider, IServerManager serv
         }
     }
 
+    [Command("command"), Description("Run a command on a server")]
+    public async Task ExecuteCommand(CommandContext ctx, 
+        [SlashChoiceProvider<ServerChoiceProvider>, Description("Server name")] string name, 
+        [Description("Command to execute")] string command)
+    {
+        await ctx.DeferResponseAsync();
+
+        if (!await CheckPermission(ctx, Permissions.ServerCommand))
+        {
+            return;
+        }
+
+        var server = await _serverManager.GetServerByAlias(name);
+        if (server == null)
+        {
+            await ctx.EditResponseAsync("Server not found");
+            return;
+        }
+        
+        if (server.StatusId != ServerStatus.Active)
+        {
+            await ctx.EditResponseAsync($"Cannot execute command on server: {FormatServerStatus(server)}");
+            return;
+        }
+
+        try
+        {
+            var response = await _serverManager.ExecuteCommand(server.Id, command);
+            await ctx.EditResponseAsync($"```\n> {command}\n{response}\n```");
+        }
+        catch (Exception ex)
+        {
+            await ctx.EditResponseAsync($"Failed to execute command: {ex.Message}");
+        }
+    }
+
     private static string FormatServerStatus(Entities.Server server, ServerRichStatus richStatus = null)
     {
         var status = server.StatusId switch

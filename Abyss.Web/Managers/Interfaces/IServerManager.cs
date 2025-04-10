@@ -12,4 +12,5 @@ public interface IServerManager
     Task<List<Server>> GetServers();
     Task<Server> GetServerByAlias(string alias);
     Task<ServerRichStatus> GetServerRichStatus(Server server);
+    Task<string> ExecuteCommand(int serverId, string command);
 }

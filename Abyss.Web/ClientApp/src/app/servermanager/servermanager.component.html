@@ -20,5 +20,18 @@
 <button mat-raised-button [disabled]="!selected || loading || !hubReady || selected.StatusId !== ServerStatus.Inactive" (click)="start()">Start</button>
 &nbsp;
 <button mat-raised-button [disabled]="!selected || loading || !hubReady || selected.StatusId !== ServerStatus.Active" (click)="stop()">Stop</button>
+
+<div class="command-container" *ngIf="selected && selected.StatusId === ServerStatus.Active">
+    <h3>Execute Command</h3>
+    <div class="command-input">
+        <mat-form-field appearance="fill" class="command-field" subscriptSizing="dynamic">
+            <mat-label>Command</mat-label>
+            <input #commandInput matInput type="text" [(ngModel)]="command" [disabled]="!hubReady" 
+                   (keyup.enter)="executeCommand()" placeholder="Enter server command">
+        </mat-form-field>
+        <button mat-raised-button color="primary" [disabled]="!command || loading || !hubReady" (click)="executeCommand()">Execute</button>
+    </div>
+</div>
+
 <h2 *ngIf="log.length > 0">Log</h2>
 <pre *ngFor="let line of log.slice().reverse()">{{ line }}</pre>

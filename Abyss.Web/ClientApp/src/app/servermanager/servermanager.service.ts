@@ -18,4 +18,10 @@ export class ServerManagerService {
         const params = connectionId ? { connectionId } : undefined;
         return firstValueFrom(this.httpClient.post<boolean>(`/api/server/stop/${serverId}`, undefined, { params }));
     }
+    public executeCommand(serverId: string, command: string): Promise<string> {
+        return firstValueFrom(this.httpClient.post<string>(`/api/server/command/${serverId}`, JSON.stringify(command), {
+            headers: { 'Content-Type': 'application/json' },
+            responseType: 'text' as 'json',
+        }));
+    }
 }
