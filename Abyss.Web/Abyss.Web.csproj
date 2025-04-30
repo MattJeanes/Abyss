@@ -40,7 +40,7 @@
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageReference Include="KubernetesClient" Version="16.0.2" />
+    <PackageReference Include="KubernetesClient" Version="16.0.7" />
   </ItemGroup>
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
