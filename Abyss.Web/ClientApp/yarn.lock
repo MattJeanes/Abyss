@@ -186,9 +186,9 @@
     lmdb "3.2.6"
 
 "@angular/cdk@^19.1.0":
-  version "19.2.12"
-  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-19.2.12.tgz#4fd1aac5e84b67b14d4a77c076131b80f5689468"
-  integrity sha512-rR/0z6TTnjum7XsefWYAWcz0TbANK6NsfgXNscr3tNnaq7vPTbS8IFllh8EPIc4Y6LPp4qwtoVTFoC3rZaBAZw==
+  version "19.2.13"
+  resolved "https://registry.yarnpkg.com/@angular/cdk/-/cdk-19.2.13.tgz#0c298cafbbc32499889ab311ebdb20fc599fe005"
+  integrity sha512-0JRFZRSdO0WFjKUJHcl4+L2avJEJ8sEB3uhAT0yZn5E5OBXaohUXjUejJG8B/N8+cni0JYkoTwuau6+ayaDWtw==
   dependencies:
     parse5 "^7.1.2"
     tslib "^2.3.0"
