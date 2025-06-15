@@ -31,7 +31,7 @@
     <PackageReference Include="NewTumblrSharp" Version="1.2.1.160" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="StackExchange.Exceptional.AspNetCore" Version="3.0.1" />
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02517" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02520" />
     <PackageReference Include="TeamSpeak3QueryApi" Version="1.13.0" />
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
     <PackageReference Include="Azure.ResourceManager.Compute" Version="1.9.0" />
