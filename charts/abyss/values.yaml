@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: ghcr.io/mattjeanes/abyss/abyss.web
+  repository: ghcr.io/amyjeanes/abyss/abyss.web
   tag: latest
   pullPolicy: Always
 ingress:

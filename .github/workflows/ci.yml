@@ -33,12 +33,12 @@ jobs:
         
     - name: Push Docker images
       run: |
-        echo $GITHUB_TOKEN | docker login ghcr.io --username MattJeanes --password-stdin
+        echo $GITHUB_TOKEN | docker login ghcr.io --username AmyJeanes --password-stdin
         for appname in Abyss.Web; do
           app=`echo $appname | tr '[:upper:]' '[:lower:]'`
           echo "Deploying $appname"
-          docker tag $app ghcr.io/mattjeanes/abyss/$app:latest
-          docker push ghcr.io/mattjeanes/abyss/$app:latest
+          docker tag $app ghcr.io/amyjeanes/abyss/$app:latest
+          docker push ghcr.io/amyjeanes/abyss/$app:latest
         done
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +52,7 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
     
     - name: Connect to Kubernetes
-      uses: MattJeanes/Abyss-Infrastructure/.github/actions/connect-k8s@main
+      uses: AmyJeanes/Abyss-Infrastructure/.github/actions/connect-k8s@main
       with:
         kubeconfig: "${{ secrets.KUBECONFIG }}"
         hostname: "${{ vars.KUBERNETES_API_HOSTNAME }}"
@@ -104,9 +104,9 @@ jobs:
       working-directory: charts
         
     - name: Wait for certificate to be ready
-      uses: MattJeanes/Abyss-Infrastructure/.github/actions/wait-kube-certificate@main
+      uses: AmyJeanes/Abyss-Infrastructure/.github/actions/wait-kube-certificate@main
       with:
         name: "abyss-tls"
         
     - name: Disconnect from Kubernetes
-      uses: MattJeanes/Abyss-Infrastructure/.github/actions/disconnect-k8s@main
+      uses: AmyJeanes/Abyss-Infrastructure/.github/actions/disconnect-k8s@main
